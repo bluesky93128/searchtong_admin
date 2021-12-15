@@ -651,6 +651,12 @@
     "title": "설문지 제목",
     "duration": "진행기간",
     "information": "기본정보",
-    "isSetPeriodLater": "나중에 설정하기"
+    "isSetPeriodLater": "나중에 설정하기",
+    "text": "본문",
+    "participate-notice": "참여안내",
+    "benefits": "구매혜택",
+    "benefitsDescription": "구매혜택 소개",
+    "benefitsPeriod": "혜택 제공 기간",
+    "benefitsLink": "제품 링크"
   }
 }

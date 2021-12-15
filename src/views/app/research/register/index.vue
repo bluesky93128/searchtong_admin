@@ -13,18 +13,20 @@
           <b-card-body class="wizard wizard-default">
             <form-wizard nav-class="justify-content-start"
               :save="onSubmitMain"
+              topNavDisabled="true"
+              :data="data"
             >
               <tab
                 name="1. 기본설정"
                 :selected="true"
               >
                 <div class="wizard-basic-step">
-                  <main-page :data="data.main" />
+                  <main-page :data="data" />
                 </div>
               </tab>
               <tab name="2. 본문설정">
                 <div class="wizard-basic-step">
-                  <p>{{ $t("wizard.content-2") }}</p>
+                  <text-page :data="data" />
                 </div>
               </tab>
               <tab name="3. 문항설정">
@@ -65,21 +67,22 @@
 import FormWizard from "../../../../components/Form/Wizard/FormWizard";
 import Tab from "../../../../components/Form/Wizard/Tab";
 import MainPage from "./main.vue";
+import TextPage from "./text.vue";
 
 export default {
   components: {
     "form-wizard": FormWizard,
     tab: Tab,
     "main-page": MainPage,
+    "text-page": TextPage
   },
   data() {
     return {
       data: {
-        main: {
-          type: "research",
-          startAt: new Date(),
-          endAt: new Date(),
-        },
+        type: "research",
+        startAt: new Date(),
+        endAt: new Date(),
+        itemText: {}
       },
     };
   },

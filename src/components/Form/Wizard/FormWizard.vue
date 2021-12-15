@@ -53,6 +53,9 @@ export default {
             default: () => {
                 console.log("called done!")
             }
+        },
+        data: {
+            default: {}
         }
     },
     data() {
@@ -104,6 +107,11 @@ export default {
             if (this.withValidate) {
                 valid = this.tabs[this.currentActive].validate();
                 if (valid) this.tabs[this.currentActive].submit();
+            }
+
+            if(!this.data.title || !this.data.title.length) {
+                alert("제목을 입력하세요.")
+                valid = false;
             }
 
             if (valid) {

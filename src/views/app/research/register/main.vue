@@ -82,7 +82,7 @@
                 horizontal
                 :label="$t('research.title')"
               >
-                <b-form-input v-model="data.title"></b-form-input>
+                <b-form-input v-model="data.title" required></b-form-input>
               </b-form-group>
               <b-form-group
                 label-cols="2"
@@ -171,13 +171,11 @@ export default {
   methods: {
     setType(type) {
       this.data.type = type;
-      console.log(this.data);
     },
     onStartDateChanged() {
       this.data.startAt = new Date(this.startDate);
       this.data.startAt.setHours(this.startHour);
       this.data.startAt.setMinutes(this.startMinute);
-      console.log(this.startHour);
     },
     onEndDateChanged() {
       this.data.endAt = new Date(this.endDate);
