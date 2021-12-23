@@ -19,8 +19,11 @@
         <button type="button" class="mr-1 btn btn-primary" @click="save()">
             {{$t('wizard.save')}}
         </button>
-        <button type="button" class="btn btn-primary" :disabled="currentActive > totalTabs - 1" @click="nextTab()">
+        <button type="button" class="btn btn-primary" v-if="currentActive != totalTabs - 1" :disabled="currentActive > totalTabs - 1" @click="nextTab()">
             {{$t('wizard.next')}}
+        </button>
+        <button type="button" class="btn btn-primary" v-if="currentActive == totalTabs - 1" @click="save()">
+            {{$t('wizard.register')}}
         </button>
     </div>
 </div>

@@ -641,6 +641,7 @@
     "next": "다음",
     "prev": "이전",
     "save": "저장",
+    "register": "등록",
     "registered": "¡Su registro se completó con éxito!",
     "async": "¡Ahorro asíncrono durante 3 segundos!"
   },
@@ -657,6 +658,23 @@
     "benefits": "구매혜택",
     "benefitsDescription": "구매혜택 소개",
     "benefitsPeriod": "혜택 제공 기간",
-    "benefitsLink": "제품 링크"
+    "benefitsLink": "제품 링크",
+    "finish-text": "종료글",
+    "participate-condition": "참여조건",
+    "gender": "성별",
+    "age": "나이",
+    "region": "지역",
+    "job": "직업",
+    "education": "학력",
+    "salary": "연간소득수준",
+    "targetReplyCount": "목표응답자수",
+    "paymentMethod": "지급방식",
+    "paymentCount": "지급인원",
+    "paymentAmount": "지급수량",
+    "estimatePrice": "예상금액",
+    "researchBudget": "응답수집비용",
+    "perPrice": "1인당 지급수량",
+    "fee": "부가세",
+    "totalPrice" :"합계"
   }
 }

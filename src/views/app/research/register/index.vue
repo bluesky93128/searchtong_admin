@@ -31,22 +31,22 @@
               </tab>
               <tab name="3. 문항설정">
                 <div class="wizard-basic-step">
-                  <p>{{ $t("wizard.content-2") }}</p>
+                  <questions-page :data="data" />
                 </div>
               </tab>
               <tab name="4. 종료글 설정">
                 <div class="wizard-basic-step">
-                  <p>{{ $t("wizard.content-2") }}</p>
+                  <finish-text-page :data="data" />
                 </div>
               </tab>
               <tab name="5. 조사대상 설정">
                 <div class="wizard-basic-step">
-                  <p>{{ $t("wizard.content-2") }}</p>
+                  <researcher-page :data="data" />
                 </div>
               </tab>
               <tab name="6. 리워드 및 등록">
                 <div class="wizard-basic-step">
-                  <p>{{ $t("wizard.content-2") }}</p>
+                  <reward-page :data="data" />
                 </div>
               </tab>
               <tab type="done">
@@ -68,13 +68,21 @@ import FormWizard from "../../../../components/Form/Wizard/FormWizard";
 import Tab from "../../../../components/Form/Wizard/Tab";
 import MainPage from "./main.vue";
 import TextPage from "./text.vue";
+import QuestionsPage from "./questions.vue";
+import FinishTextPage from "./finish_text.vue";
+import ResearcherPage from "./researcher.vue";
+import RewardPage from "./reward.vue";
 
 export default {
   components: {
     "form-wizard": FormWizard,
     tab: Tab,
     "main-page": MainPage,
-    "text-page": TextPage
+    "text-page": TextPage,
+    "questions-page": QuestionsPage,
+    "finish-text-page": FinishTextPage,
+    "researcher-page": ResearcherPage,
+    "reward-page": RewardPage,
   },
   data() {
     return {
@@ -82,7 +90,62 @@ export default {
         type: "research",
         startAt: new Date(),
         endAt: new Date(),
-        itemText: {}
+        itemText: {},
+        itemQuestion: [
+          {
+            // _id: Schema.Types.ObjectId
+            order: 0,							// 문항순서				
+            title: "String",							// 문항내용
+            answerGuide: "String",				// 
+            type1: 0,							// 문항유형1 (0: 객관식, 1: 주관식)
+            type2: 0,							// 문항유형2 (0: 단일응답, 1: 다중응답)
+            min: 1,								// 다중응답 - 최소선택개수
+            max: 1,								// 다중응답 - 최대선택개수
+            viewType: 0,						// 보기문항 (0: 텍스트, 1: 이미지)
+            itemView: [														// 보기문항내용
+              {
+                // _id: Schema.Types.ObjectId
+                order: 0,										// 순서
+                content: "String",									// 본문
+                nextItemQuestionOrder: 1,		// 다음문항순서 (itemQuestion.order)
+                imageLinks: ["String"],							// 이메지링크목록
+                isMain: true,									// 기본물음인가? (true: 기본물음, false: 기타물음)
+              }
+            ],
+            isRequireAnswer: true,							// 필수답변?
+            isRequireMix: false,								// 보기섞기?
+            isKeedExtraView: true,							// 기타보기유지?
+
+          },
+          {
+            // _id: Schema.Types.ObjectId
+            order: 1,							// 문항순서				
+            title: "String1",							// 문항내용
+            answerGuide: "String",				// 
+            type1: 0,							// 문항유형1 (0: 객관식, 1: 주관식)
+            type2: 0,							// 문항유형2 (0: 단일응답, 1: 다중응답)
+            min: 1,								// 다중응답 - 최소선택개수
+            max: 1,								// 다중응답 - 최대선택개수
+            viewType: 0,						// 보기문항 (0: 텍스트, 1: 이미지)
+            itemView: [														// 보기문항내용
+              {
+                // _id: Schema.Types.ObjectId
+                order: 0,										// 순서
+                content: "String",									// 본문
+                nextItemQuestionOrder: 1,		// 다음문항순서 (itemQuestion.order)
+                imageLinks: ["String"],							// 이메지링크목록
+                isMain: true,									// 기본물음인가? (true: 기본물음, false: 기타물음)
+              }
+            ],
+            isRequireAnswer: true,							// 필수답변?
+            isRequireMix: false,								// 보기섞기?
+            isKeedExtraView: true,							// 기타보기유지?
+
+          }
+        ],
+        itemFinish: {},
+        itemResearcher: {},
+        itemReward: {}
       },
     };
   },

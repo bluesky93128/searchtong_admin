@@ -18,7 +18,7 @@
           <quill-editor
             ref="refBenefitsDescription"
             :options="editorOption"
-            v-model="data.itemText.benefitsDescription"
+            v-model="data.itemFinish.benefitsDescription"
           >
           </quill-editor>
         </b-form-group>
@@ -85,26 +85,17 @@
           :label="$t('research.benefitsLink')"
           label-cols="2"
         >
-          <b-form-input v-model="data.itemText.benefitsLink" />
+          <b-form-input v-model="data.itemFinish.benefitsLink" />
         </b-form-group>
       </b-form>
     </b-card>
-    <h3 class="mt-4">{{ $t("research.text") }}</h3>
+    <h3 class="mt-4">{{ $t("research.finish-text") }}</h3>
     <quill-editor
       ref="myTextEditor"
       :options="editorOption"
-      v-model="data.itemText.content"
+      v-model="data.itemFinish.content"
     >
     </quill-editor>
-    <h3 class="mt-4">{{ $t("research.participate-notice") }}</h3>
-    <b-textarea v-model="data.itemText.description" />
-    <!-- <quill-editor
-      ref="myTextEditor"
-      v-model="data.itemText.description"
-      :options="editorOptionNull"
-      class="terms-of-service-textarea"
-    >
-    </quill-editor> -->
   </div>
 </template>
 <script>
@@ -146,8 +137,8 @@ export default {
     };
   },
   mounted() {
-    var startAt = new Date(this.data.itemText.benefitsStartAt);
-    var endAt = new Date(this.data.itemText.benefitsEndAt);
+    var startAt = new Date(this.data.itemFinish.benefitsStartAt);
+    var endAt = new Date(this.data.itemFinish.benefitsEndAt);
     this.startDate = startAt;
     this.startHour = startAt.getHours();
     this.startMinute = startAt.getMinutes();
@@ -157,14 +148,14 @@ export default {
   },
   methods: {
     onStartDateChanged() {
-      this.data.itemText.benefitsStartAt = new Date(this.startDate);
-      this.data.itemText.benefitsStartAt.setHours(this.startHour);
-      this.data.itemText.benefitsStartAt.setMinutes(this.startMinute);
+      this.data.itemFinish.benefitsStartAt = new Date(this.startDate);
+      this.data.itemFinish.benefitsStartAt.setHours(this.startHour);
+      this.data.itemFinish.benefitsStartAt.setMinutes(this.startMinute);
     },
     onEndDateChanged() {
-      this.data.itemText.benefitsEndAt = new Date(this.endDate);
-      this.data.itemText.benefitsEndAt.setHours(this.endHour);
-      this.data.itemText.benefitsEndAt.setMinutes(this.endMinute);
+      this.data.itemFinish.benefitsEndAt = new Date(this.endDate);
+      this.data.itemFinish.benefitsEndAt.setHours(this.endHour);
+      this.data.itemFinish.benefitsEndAt.setMinutes(this.endMinute);
     },
   },
   computed: {
