@@ -6,8 +6,8 @@
         <b-colxx xxs="3">
           <div class="rounded">
             <b-card
-              :class="`text-center ${data.type == 'research' ? 'active' : ''}`"
-              @click="setType('research')"
+              :class="`text-center ${data.type == 0 ? 'active' : ''}`"
+              @click="setType(0)"
             >
               <p class="lead text-center">{{ $t("research.research") }}</p>
               <p class="card-text font-weight-semibold mb-0 mt-4">
@@ -22,8 +22,8 @@
         <b-colxx xxs="3">
           <div class="rounded">
             <b-card
-              :class="`text-center ${data.type == 'survey' ? 'active' : ''}`"
-              @click="setType('survey')"
+              :class="`text-center ${data.type == 1 ? 'active' : ''}`"
+              @click="setType(1)"
             >
               <p class="lead text-center">{{ $t("research.survey") }}</p>
               <p class="card-text font-weight-semibold mb-0 mt-4">
@@ -38,10 +38,8 @@
         <b-colxx xxs="3">
           <div class="rounded">
             <b-card
-              :class="`text-center ${
-                data.type == 'advertisement' ? 'active' : ''
-              }`"
-              @click="setType('advertisement')"
+              :class="`text-center ${data.type == 2 ? 'active' : ''}`"
+              @click="setType(2)"
             >
               <p class="lead text-center">
                 {{ $t("research.advertisement") }}
@@ -92,7 +90,11 @@
                 <div class="d-flex">
                   <b-datepicker
                     locale="ko-KR"
-                    :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"
+                    :date-format-options="{
+                      year: 'numeric',
+                      month: 'numeric',
+                      day: 'numeric',
+                    }"
                     style="flex: 8; margin-right: 10px"
                     v-model="startDate"
                     :disabled="data.isSetPeriodLater"
@@ -119,7 +121,11 @@
                   <span class="span-center-text mx-2">~</span>
                   <b-datepicker
                     locale="ko-KR"
-                    :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"
+                    :date-format-options="{
+                      year: 'numeric',
+                      month: 'numeric',
+                      day: 'numeric',
+                    }"
                     v-model="endDate"
                     style="flex: 8; margin-left: 10px"
                     :disabled="data.isSetPeriodLater"
@@ -165,8 +171,8 @@ export default {
       startMinute: 0,
       endDate: null,
       endHour: 0,
-      endMinute: 0
-    }
+      endMinute: 0,
+    };
   },
   methods: {
     setType(type) {

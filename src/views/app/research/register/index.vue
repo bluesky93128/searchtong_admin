@@ -11,15 +11,13 @@
       <b-colxx xxs="12">
         <b-card class="mb-4">
           <b-card-body class="wizard wizard-default">
-            <form-wizard nav-class="justify-content-start"
+            <form-wizard
+              nav-class="justify-content-start"
               :save="onSubmitMain"
               topNavDisabled="true"
               :data="data"
             >
-              <tab
-                name="1. 기본설정"
-                :selected="true"
-              >
+              <tab name="1. 기본설정" :selected="true">
                 <div class="wizard-basic-step">
                   <main-page :data="data" />
                 </div>
@@ -72,6 +70,7 @@ import QuestionsPage from "./questions.vue";
 import FinishTextPage from "./finish_text.vue";
 import ResearcherPage from "./researcher.vue";
 import RewardPage from "./reward.vue";
+import { apiUrl } from "../../../../constants/config";
 
 export default {
   components: {
@@ -87,71 +86,148 @@ export default {
   data() {
     return {
       data: {
-        type: "research",
+        type: 0,
         startAt: new Date(),
         endAt: new Date(),
         itemText: {},
         itemQuestion: [
           {
             // _id: Schema.Types.ObjectId
-            order: 0,							// 문항순서				
-            title: "String",							// 문항내용
-            answerGuide: "String",				// 
-            type1: 0,							// 문항유형1 (0: 객관식, 1: 주관식)
-            type2: 0,							// 문항유형2 (0: 단일응답, 1: 다중응답)
-            min: 1,								// 다중응답 - 최소선택개수
-            max: 1,								// 다중응답 - 최대선택개수
-            viewType: 0,						// 보기문항 (0: 텍스트, 1: 이미지)
-            itemView: [														// 보기문항내용
+            order: 0, // 문항순서
+            title: "String", // 문항내용
+            answerGuide: "String", //
+            type1: 0, // 문항유형1 (0: 객관식, 1: 주관식)
+            type2: 0, // 문항유형2 (0: 단일응답, 1: 다중응답)
+            min: 1, // 다중응답 - 최소선택개수
+            max: 1, // 다중응답 - 최대선택개수
+            viewType: 0, // 보기문항 (0: 텍스트, 1: 이미지)
+            itemView: [
+              // 보기문항내용
               {
                 // _id: Schema.Types.ObjectId
-                order: 0,										// 순서
-                content: "String",									// 본문
-                nextItemQuestionOrder: 1,		// 다음문항순서 (itemQuestion.order)
-                imageLinks: ["String"],							// 이메지링크목록
-                isMain: true,									// 기본물음인가? (true: 기본물음, false: 기타물음)
-              }
+                order: 0, // 순서
+                content: "String", // 본문
+                nextItemQuestionOrder: 1, // 다음문항순서 (itemQuestion.order)
+                imageLinks: ["String"], // 이메지링크목록
+                isMain: true, // 기본물음인가? (true: 기본물음, false: 기타물음)
+              },
             ],
-            isRequireAnswer: true,							// 필수답변?
-            isRequireMix: false,								// 보기섞기?
-            isKeedExtraView: true,							// 기타보기유지?
-
+            isRequireAnswer: true, // 필수답변?
+            isRequireMix: false, // 보기섞기?
+            isKeedExtraView: true, // 기타보기유지?
           },
           {
             // _id: Schema.Types.ObjectId
-            order: 1,							// 문항순서				
-            title: "String1",							// 문항내용
-            answerGuide: "String",				// 
-            type1: 0,							// 문항유형1 (0: 객관식, 1: 주관식)
-            type2: 0,							// 문항유형2 (0: 단일응답, 1: 다중응답)
-            min: 1,								// 다중응답 - 최소선택개수
-            max: 1,								// 다중응답 - 최대선택개수
-            viewType: 0,						// 보기문항 (0: 텍스트, 1: 이미지)
-            itemView: [														// 보기문항내용
+            order: 1, // 문항순서
+            title: "String1", // 문항내용
+            answerGuide: "String", //
+            type1: 0, // 문항유형1 (0: 객관식, 1: 주관식)
+            type2: 0, // 문항유형2 (0: 단일응답, 1: 다중응답)
+            min: 1, // 다중응답 - 최소선택개수
+            max: 1, // 다중응답 - 최대선택개수
+            viewType: 0, // 보기문항 (0: 텍스트, 1: 이미지)
+            itemView: [
+              // 보기문항내용
               {
                 // _id: Schema.Types.ObjectId
-                order: 0,										// 순서
-                content: "String",									// 본문
-                nextItemQuestionOrder: 1,		// 다음문항순서 (itemQuestion.order)
-                imageLinks: ["String"],							// 이메지링크목록
-                isMain: true,									// 기본물음인가? (true: 기본물음, false: 기타물음)
-              }
+                order: 0, // 순서
+                content: "String", // 본문
+                nextItemQuestionOrder: 1, // 다음문항순서 (itemQuestion.order)
+                imageLinks: ["String"], // 이메지링크목록
+                isMain: true, // 기본물음인가? (true: 기본물음, false: 기타물음)
+              },
             ],
-            isRequireAnswer: true,							// 필수답변?
-            isRequireMix: false,								// 보기섞기?
-            isKeedExtraView: true,							// 기타보기유지?
-
-          }
+            isRequireAnswer: true, // 필수답변?
+            isRequireMix: false, // 보기섞기?
+            isKeedExtraView: true, // 기타보기유지?
+          },
         ],
         itemFinish: {},
         itemResearcher: {},
-        itemReward: {}
+        itemReward: {},
       },
     };
+  },
+  mounted() {
+    console.log(this.$route.query.id);
+    this.id = this.$route.query.id;
+    if(this.id) {
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append(
+        "Authorization",
+        "Bearer " + localStorage.getItem("token")
+      );
+
+      var requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+      };
+
+      fetch(apiUrl + "/research/" + this.id, requestOptions)
+        .then((response) => response.json())
+        .then((result) => {
+          console.log(result);
+          this.data = result;
+          this.data.itemText = this.data.itemText || {};
+          this.data.itemQuestion = this.data.itemQuestion || {};
+          this.data.itemFinish = this.data.itemFinish || {};
+          this.data.itemResearcher = this.data.itemResearcher || {};
+          this.data.itemReward = this.data.itemReward || {};
+        })
+        .catch((error) => console.log("error", error));
+    }
   },
   methods: {
     onSubmitMain() {
       console.log(this.data);
+      if (this.data._id) {
+        var myHeaders = new Headers();
+        myHeaders.append(
+          "Authorization",
+          "Bearer " + localStorage.getItem("token")
+        );
+        myHeaders.append("Content-Type", "application/json");
+
+        var raw = JSON.stringify(this.data);
+
+        var requestOptions = {
+          method: "PUT",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+        };
+
+        fetch(apiUrl + "/research/" + this.data._id, requestOptions)
+          .then((response) => response.text())
+          .then((result) => console.log(result))
+          .catch((error) => console.log("error", error));
+      } else {
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append(
+          "Authorization",
+          "Bearer " + localStorage.getItem("token")
+        );
+
+        var raw = JSON.stringify(this.data);
+
+        var requestOptions = {
+          method: "POST",
+          headers: myHeaders,
+          body: raw,
+          redirect: "follow",
+        };
+
+        fetch(apiUrl + "/research", requestOptions)
+          .then((response) => response.json())
+          .then((result) => {
+            console.log(result);
+            this.data = result;
+          })
+          .catch((error) => console.log("error", error));
+      }
     },
   },
   watch: {

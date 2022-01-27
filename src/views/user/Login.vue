@@ -17,11 +17,10 @@
                 <h6 class="mb-4">{{ $t('user.login-title')}}</h6>
 
                 <b-form @submit.prevent="formSubmit" class="av-tooltip tooltip-label-bottom">
-                    <b-form-group :label="$t('user.email')" class="has-float-label mb-4">
-                        <b-form-input type="text" v-model="$v.form.email.$model" :state="!$v.form.email.$error" />
-                        <b-form-invalid-feedback v-if="!$v.form.email.required">Please enter your email address</b-form-invalid-feedback>
-                        <b-form-invalid-feedback v-else-if="!$v.form.email.email">Please enter a valid email address</b-form-invalid-feedback>
-                        <b-form-invalid-feedback v-else-if="!$v.form.email.minLength">Your email must be minimum 4 characters</b-form-invalid-feedback>
+                    <b-form-group :label="$t('user.username')" class="has-float-label mb-4">
+                        <b-form-input type="text" v-model="$v.form.username.$model" :state="!$v.form.username.$error" />
+                        <b-form-invalid-feedback v-if="!$v.form.username.required">Please enter your email address</b-form-invalid-feedback>
+                        <b-form-invalid-feedback v-else-if="!$v.form.username.minLength">Your email must be minimum 4 characters</b-form-invalid-feedback>
                     </b-form-group>
 
                     <b-form-group :label="$t('user.password')" class="has-float-label mb-4">
@@ -75,7 +74,7 @@ export default {
     data() {
         return {
             form: {
-                email: "test@coloredstrategies.com",
+                username: "test@coloredstrategies.com",
                 password: "xxxxxx"
             },
         };
@@ -88,9 +87,8 @@ export default {
                 maxLength: maxLength(16),
                 minLength: minLength(4)
             },
-            email: {
+            username: {
                 required,
-                email,
                 minLength: minLength(4)
             }
         }
@@ -101,13 +99,12 @@ export default {
     methods: {
         ...mapActions(["login"]),
         formSubmit() {
+            console.log(this.form);
             this.$v.$touch();
-            this.form.email = "piaf-vue@coloredstrategies.com";
-            this.form.password = "piaf123";
             this.$v.form.$touch();
            // if (!this.$v.form.$anyError) {
                 this.login({
-                    email: this.form.email,
+                    username: this.form.username,
                     password: this.form.password
                 });
             //}
@@ -115,7 +112,8 @@ export default {
     },
     watch: {
         currentUser(val) {
-            if (val && val.uid && val.uid.length > 0) {
+            console.log('user = ', val);
+            if (val && val.username && val.username.length > 0) {
                 setTimeout(() => {
                     this.$router.push("/");
                 }, 200);

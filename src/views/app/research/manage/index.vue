@@ -1,16 +1,335 @@
 <template>
-<div>
-  <b-row>
-    <b-colxx xxs="12">
-      <!-- <piaf-breadcrumb :heading="$t('menu.single')"/> -->
-      <div class="separator mb-5"></div>
-    </b-colxx>
-  </b-row>
-  <b-row>
-    <b-colxx xxs="12">
-        <b-card class="mb-4" :title="$t('menu.single')" >
+  <div>
+    <b-row>
+      <b-colxx xxs="12">
+        <h2>{{$t('menu.research.manage')}}</h2>
+        <div class="separator mb-5"></div>
+      </b-colxx>
+    </b-row>
+    <b-row>
+      <b-colxx xxs="12">
+        <b-card class="mb-4">
+          <b-row>
+            <b-colxx xxs="6">
+              <b-form-group label="설문제목 또는 ID" :label-cols="2">
+                <b-form-input v-model="searchForm.title" />
+              </b-form-group>
+            </b-colxx>
+            <b-colxx xxs="6">
+              <b-form-group label="등록일" :label-cols="2">
+                <div class="d-flex">
+                  <b-datepicker
+                    locale="ko-KR"
+                    v-model="searchForm.fromDate"
+                    :placeholder="$t('search.all')"
+                    :max="disabledFrom"
+                  />
+                  <span class="span-center-text mx-2">~</span>
+                  <b-datepicker
+                    locale="ko-KR"
+                    v-model="searchForm.toDate"
+                    :placeholder="$t('search.all')"
+                    :min="disabledTo"
+                  />
+                </div>
+              </b-form-group>
+            </b-colxx>
+          </b-row>
+          <b-row>
+            <b-colxx xxs="6">
+              <b-form-group label="진행기간" :label-cols="2">
+                <div class="d-flex">
+                  <b-datepicker
+                    locale="ko-KR"
+                    v-model="searchForm.fromDate"
+                    :placeholder="$t('search.all')"
+                    :max="disabledFrom"
+                  />
+                  <span class="span-center-text mx-2">~</span>
+                  <b-datepicker
+                    locale="ko-KR"
+                    v-model="searchForm.toDate"
+                    :placeholder="$t('search.all')"
+                    :min="disabledTo"
+                  />
+                </div>
+              </b-form-group>
+            </b-colxx>
+            <b-colxx xxs="6">
+              <b-form-group label="설문유형" :label-cols="2">
+                <div class="d-flex justify-content-between">
+                  <v-select
+                    v-model="searchForm.type"
+                    :options="type_options"
+                    placeholder="전체"
+                    :reduce="(item) => item.value"
+                    class="research-type"
+                  />
+                  <b-button class="primary">검색</b-button>
+                </div>
+              </b-form-group>
+            </b-colxx>
+          </b-row>
         </b-card>
-    </b-colxx>
-  </b-row>
+      </b-colxx>
+    </b-row>
+    <b-row>
+      <b-colxx xxs="12">
+        <b-card class="mt-4">
+          <b-row class="mb-2">
+            <b-colxx xs="4">
+              <div class="d-flex">
+                <v-select :options="[5, 10, 25, 50, 100]" v-model="perPage"></v-select>
+                <span class="span-center-text ml-2 mr-4">개씩 보기</span>
+              </div>
+            </b-colxx>
+            <b-colxx xs="8" class="text-right">
+              <span></span>
+            </b-colxx>
+          </b-row>
+          <b-table
+            ref="custom-table"
+            class="vuetable"
+            :current-page="currentPage"
+            :per-page="perPage"
+            :fields="bootstrapTable.fields"
+            :items="items"
+            selectable
+            select-mode="single"
+          >
+            <template #cell(status)="{ item }">
+              <v-select
+                v-model="item.status"
+                :options="status_options"
+                :reduce="(item) => item.value"
+                class="research-type"
+              />
+            </template>
+            <template #cell(level)="{ item }">
+              <v-select
+                v-model="item.level"
+                :options="level_options"
+                class="research-type"
+              />
+            </template>
+            <template #cell(createdAt)="{ item }">
+              {{ formatDateWithMin(item.createdAt) }}
+            </template>
+            <template #cell(duration)="{ item }">
+              {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
+            </template>
+            <template #cell(type)="{ item }">
+              {{ type_options[item.type].label }}
+            </template>
+            <template #cell(action)="{ item }">
+              <div class="d-flex align-items-center justify-content-center">
+                <div class="manage-icon-container">
+                  <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
+                    <i class="simple-icon-pencil" />
+                  </router-link>
+                </div>
+                <div class="manage-icon-container ml-1">
+                  <i class="simple-icon-trash" />
+                </div>
+                <div class="manage-icon-container ml-1">
+                  <i class="simple-icon-docs" />
+                </div>
+              </div>
+            </template>
+          </b-table>
+          <b-pagination
+            size="sm"
+            align="center"
+            :total-rows="totalRows"
+            :per-page="perPage"
+            v-model="currentPage"
+          >
+            <template v-slot:next-text>
+              <i class="simple-icon-arrow-right" />
+            </template>
+            <template v-slot:prev-text>
+              <i class="simple-icon-arrow-left" />
+            </template>
+            <template v-slot:first-text>
+              <i class="simple-icon-control-start" />
+            </template>
+            <template v-slot:last-text>
+              <i class="simple-icon-control-end" />
+            </template>
+          </b-pagination>
+        </b-card>
+      </b-colxx>
+    </b-row>
   </div>
 </template>
+
+<script>
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
+import { apiUrl } from '../../../../constants/config';
+import moment from "moment";
+
+export default {
+  components: {
+    "v-select": vSelect,
+  },
+  mounted() {
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append(
+      "Authorization",
+      "Bearer " + localStorage.getItem("token")
+    );
+    var requestOptions = {
+      method: 'GET',
+      headers: myHeaders,
+      redirect: 'follow'
+    };
+
+    fetch(apiUrl + "/research", requestOptions)
+      .then(response => response.json())
+      .then(result => {
+        console.log(result);
+        this.items = result.data;
+        this.totalRows = result.total;
+      })
+      .catch(error => console.log('error', error));
+  },
+  data() {
+    return {
+      searchForm: {},
+      disabledTo: null,
+      disabledFrom: null,
+      currentPage: 0,
+      perPage: 5,
+      totalRows: 0,
+      items: [],
+      type_options: [
+        {
+          label: "여론조사",
+          value: 0,
+        },
+        {
+          label: "서베이",
+          value: 1,
+        },
+        {
+          label: "광고",
+          value: 2,
+        },
+      ],
+      status_options: [
+        { value: 0, label: "진행중" },
+        { value: 1, label: "예약" },
+        { value: 2, label: "대기" },
+        { value: 3, label: "중지" },
+        { value: 4, label: "종료" },
+      ],
+      bootstrapTable: {
+        selected: [],
+        fields: [
+          {
+            key: "status",
+            label: "",
+            sortable: false,
+            thClass: "fix-width bg-dark text-white text-center",
+            tdClass: "list-item-heading fix-width text-center",
+          },
+          {
+            key: "level",
+            label: "레벨",
+            sortable: true,
+            thClass: "fix-width bg-dark text-white text-center",
+            tdClass: "fix-width text-center",
+          },
+          {
+            key: "_id",
+            label: "설문ID",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+          {
+            key: "title",
+            label: "설문제목",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+          {
+            key: "type",
+            label: "설문유형",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+          {
+            key: "count",
+            label: "참여자수",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+          {
+            key: "createdAt",
+            label: "등록일",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+          {
+            key: "duration",
+            label: "진행기간",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+          {
+            key: "action",
+            label: "관리",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+        ],
+      },
+    };
+  },
+  methods: {
+    formatDate(date) {
+      return moment(date).format("YYYY.MM.DD");
+    },
+    formatDateWithMin(date) {
+      return moment(date).format("YYYY.MM.DD hh:mm");
+    },
+  },
+  computed: {
+    level_options() {
+      var ary = [...Array(99).keys()];
+      return ary;
+    },
+  },
+};
+</script>
+
+<style scoped>
+.research-type {
+  width: 150px;
+}
+.fix-width {
+  width: 50px;
+}
+.manage-icon-container {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.manage-icon-container .text-link {
+  color: #3a3a3a;
+  text-decoration: none;
+}
+</style>

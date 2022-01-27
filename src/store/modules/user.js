@@ -1,6 +1,7 @@
+import axios from 'axios'
 import firebase from 'firebase/app'
 import 'firebase/auth'
-import { currentUser, isAuthActive } from '../../constants/config'
+import { currentUser, isAuthActive, apiUrl } from '../../constants/config'
 
 export default {
   state: {
@@ -57,23 +58,32 @@ export default {
     login({ commit }, payload) {
       commit('clearError')
       commit('setProcessing', true)
-      firebase
-        .auth()
-        .signInWithEmailAndPassword(payload.email, payload.password)
-        .then(
-          user => {
-            const item = { uid: user.user.uid, ...currentUser }
-            localStorage.setItem('user', JSON.stringify(item))
-            commit('setUser', { uid: user.user.uid, ...currentUser })
-          },
-          err => {
-            localStorage.removeItem('user')
-            commit('setError', err.message)
-            setTimeout(() => {
-              commit('clearError')
-            }, 3000)
-          }
-        )
+      axios
+        .post(apiUrl + "/user/adminLogin", {
+          username: payload.username,
+          password: payload.password,
+        })
+        .then(response => {
+          return response.data;
+        })
+        .then(res => {
+          console.log(res);
+          // if(res.status == 1) {
+            const item = {
+              ...currentUser,
+              username: res.name,
+              title: "Admin",
+              img: "/assets/img/avatar.jpg",
+            };
+  
+            localStorage.setItem("user", JSON.stringify(item));
+            localStorage.setItem("token", res.token);
+            commit("setUser", item);
+          // }
+        })
+        .catch(err => {
+          commit("setError", err.response.data.message);
+        });
     },
     forgotPassword({ commit }, payload) {
       commit('clearError')

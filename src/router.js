@@ -46,8 +46,13 @@ const routes = [
         redirect: "/app/app_manage/notice",
         children: [
           { path: 'notice', component: () => import(/* webpackChunkName: "piaf" */ './views/app/app_manage/notice') },
+          { path: 'notices_new', component: () => import(/* webpackChunkName: "app_manage" */ "./views/app/app_manage/notice/notices_new") },
+          { path: 'notices_edit', component: () => import(/* webpackChunkName: "app_manage" */ "./views/app/app_manage/notice/notices_edit") },
           { path: 'faq', component: () => import(/* webpackChunkName: "piaf" */ './views/app/app_manage/faq') },
+          { path: 'faq_new', component: () => import(/* webpackChunkName: "app_management" */ "./views/app/app_manage/faq/faq_new") },
+          { path: 'faq_edit', component: () => import(/* webpackChunkName: "app_management" */ "./views/app/app_manage/faq/faq_edit") },
           { path: 'inquery', component: () => import(/* webpackChunkName: "piaf" */ './views/app/app_manage/inquery') },
+          { path: 'inquery_edit', component: () => import(/* webpackChunkName: "app_management" */ "./views/app/app_manage/inquery/inquery_edit") },
         ]
       },
 
@@ -57,9 +62,32 @@ const routes = [
           import(/* webpackChunkName: "single" */ "./views/app/user_manage")
       },
       {
-        path: "privacy_policy",
+        path: "terms_of_service",
         component: () =>
-          import(/* webpackChunkName: "single" */ "./views/app/privacy_policy")
+          import(/* webpackChunkName: "single" */ "./views/app/terms_of_service"),
+        redirect: "/app/terms_of_service/privacy_policy",
+        children: [
+          {
+            path: 'privacy_policy',
+            component: () => import(/* webpackChunkName: "terms_of_service" */ './views/app/terms_of_service/privacy_policy'),
+          },
+          {
+            path: 'terms_of_service',
+            component: () => import(/* webpackChunkName: "terms_of_service" */ './views/app/terms_of_service/terms_of_service')
+          },
+          {
+            path: 'online_policy',
+            component: () => import(/* webpackChunkName: "terms_of_service" */ './views/app/terms_of_service/online_policy')
+          },
+          {
+            path: 'youth_policy',
+            component: () => import(/* webpackChunkName: "terms_of_service" */ './views/app/terms_of_service/youth_policy')
+          },
+          {
+            path: 'oneid_policy',
+            component: () => import(/* webpackChunkName: "terms_of_service" */ './views/app/terms_of_service/oneid_policy')
+          }
+        ]
       }
     ]
   },

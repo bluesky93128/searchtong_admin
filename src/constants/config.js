@@ -25,7 +25,9 @@ export const firebaseConfig = {
 };
 
 
-export const apiUrl = 'https://api.coloredstrategies.com'
+// export const apiUrl = 'https://api.coloredstrategies.com'
+export const apiUrl = 'http://1.201.162.236:3000/api';
+export const downloadUrl = 'http://1.201.162.236:3000/';
 
 export const currentUser = {
   id: 1,

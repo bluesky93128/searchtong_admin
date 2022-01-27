@@ -7811,3 +7811,60 @@ select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 1000px $foreground-color inset !important;
 }
+
+.search-days {
+    padding: 5px 10px;
+    // width: 65px;
+    height: 35px;
+    overflow: hidden;
+}
+
+.span-center-text {
+    display: inline-flex;
+    align-items: center;
+}
+
+.search-card-header {
+    padding: .75rem 1.25rem;
+    margin-bottom: 0;
+    background-color: rgba(0,0,0,0.2);
+    border-bottom: 1px solid rgba(0,0,0,0.125);
+    border-radius: 12px 12px 0 0 !important;
+}
+
+.text-link {
+    color: rgb(192, 0, 0);
+    text-decoration: underline;
+}
+
+.per-page-dropdown {
+    position: absolute;
+    right: 40px;
+    top: 30px;
+}
+
+.table-column-width {
+    max-width: 150px;
+    min-width: 50px;
+    max-height: 40px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-column-width-sm {
+    min-width: 50px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.text-gray {
+    color: darkgray;
+}
+
+.terms-of-service-textarea {
+    .ql-container {
+        min-height: 400px;
+    }
+}

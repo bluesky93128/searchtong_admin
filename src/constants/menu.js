@@ -70,10 +70,31 @@ const data = [{
   to: "/app/user_manage"
 },
 {
-  id: "privacy_policy",
+  id: "terms_of_service",
   icon: "iconsminds-library",
-  label: "menu.privacy_policy",
-  to: "/app/privacy_policy"
+  label: "menu.terms_of_service",
+  to: "/app/terms_of_service",
+  subs: [{
+    icon: "simple-icon-doc",
+    label: "menu.privacy_policy",
+    to: "/app/terms_of_service/privacy_policy"
+  }, {
+    icon: "simple-icon-doc",
+    label: "menu.terms_of_service",
+    to: "/app/terms_of_service/terms_of_service"
+  }, {
+    icon: "simple-icon-doc",
+    label: "menu.online_policy",
+    to: "/app/terms_of_service/online_policy"
+  }, {
+    icon: "simple-icon-doc",
+    label: "menu.youth_policy",
+    to: "/app/terms_of_service/youth_policy"
+  }, {
+    icon: "simple-icon-doc",
+    label: "menu.oneid_policy",
+    to: "/app/terms_of_service/oneid_policy"
+  }]
 }
 ];
 export default data;

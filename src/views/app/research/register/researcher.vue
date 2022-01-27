@@ -5,7 +5,7 @@
       <b-badge class="mb-1" variant="primary">{{
         $t("research." + data.type)
       }}</b-badge>
-      <span class="gray-text ml-2">설문지 ID: 516s51d6f5s1</span>
+      <span class="gray-text ml-2">설문지 ID: {{data._id}}</span>
     </div>
 
     <b-form>

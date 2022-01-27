@@ -133,7 +133,11 @@
       "inquery": "1:1문의"
     },
     "user_manage": "회원관리",
-    "privacy_policy": "이용약관"
+    "terms_of_service": "이용약관",
+    "privacy_policy": "개인정보처리방침",
+    "online_policy": "전자상거래이용약관",
+    "youth_policy": "청소년보호정책",
+    "oneid_policy": "토미토 ONE-ID이용약관"
   },
   "dashboards": {
     "pending-orders": "Pedidos Pendientes",
@@ -676,5 +680,8 @@
     "perPrice": "1인당 지급수량",
     "fee": "부가세",
     "totalPrice" :"합계"
+  },
+  "search": {
+    "all": "전체"
   }
 }
