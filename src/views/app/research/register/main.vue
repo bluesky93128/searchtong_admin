@@ -154,6 +154,31 @@
                   {{ $t("research.isSetPeriodLater") }}
                 </b-check>
               </b-form-group>
+              <b-form-group label-cols="2" content-cols="4" label="썸네일">
+                <!-- <b-img :src="image" /> -->
+                <div class="d-flex">
+                  <img
+                    :src="downloadUrl + '/' + data.thumbnailUrl"
+                    class-name="card-img"
+                    style="
+                      width: 200px;
+                      height: 150px;
+                      border: 1px solid #d7d7d7;
+                      justify-content: center;
+                      display: flex;
+                    "
+                    alt="이미지"
+                    :key = thumbnailKey
+                  />
+                  <b-button
+                    variant="primary"
+                    class="ml-2"
+                    style="height: 32px;"
+                    @click="onClickSelectFile()"
+                    >이미지 업로드</b-button
+                  >
+                </div>
+              </b-form-group>
             </b-card>
           </div>
         </b-colxx>
@@ -162,6 +187,8 @@
   </div>
 </template>
 <script>
+import { apiUrl, downloadUrl } from "../../../../constants/config";
+
 export default {
   props: ["data"],
   data() {
@@ -172,7 +199,25 @@ export default {
       endDate: null,
       endHour: 0,
       endMinute: 0,
+      downloadUrl: downloadUrl,
+      thumbnailKey: ""
     };
+  },
+  mounted() {
+    this.startDate = new Date(
+      new Date(this.data.startAt).getFullYear(),
+      new Date(this.data.startAt).getMonth(),
+      new Date(this.data.startAt).getDate()
+    );
+    this.startHour = new Date(this.data.startAt).getHours();
+    this.startMinute = new Date(this.data.startAt).getMinutes();
+    this.endDate = new Date(
+      new Date(this.data.endAt).getFullYear(),
+      new Date(this.data.endAt).getMonth(),
+      new Date(this.data.endAt).getDate()
+    );
+    this.endHour = new Date(this.data.endAt).getHours();
+    this.endMinute = new Date(this.data.endAt).getMinutes();
   },
   methods: {
     setType(type) {
@@ -182,16 +227,45 @@ export default {
       this.data.startAt = new Date(this.startDate);
       this.data.startAt.setHours(this.startHour);
       this.data.startAt.setMinutes(this.startMinute);
+      console.log(this.data);
     },
     onEndDateChanged() {
       this.data.endAt = new Date(this.endDate);
       this.data.endAt.setHours(this.endHour);
       this.data.endAt.setMinutes(this.endMinute);
     },
+    onClickSelectFile() {
+      let input = document.createElement('input');
+      input.accept=".jpg, .jpeg, .png";
+      input.type = 'file';
+      var self = this;
+      input.onchange = _ => {
+        // you can use this method to get file and perform respective operations
+        var formdata = new FormData();
+        formdata.append("file", input.files[0]);
+
+        var requestOptions = {
+          method: 'POST',
+          body: formdata,
+          redirect: 'follow'
+        };
+
+        fetch(apiUrl + "/upload", requestOptions)
+          .then(response => response.json())
+          .then(result => {
+            console.log(result);
+            self.data.thumbnailUrl = result.filename;
+            self.thumbnailKey = result.filename;
+          })
+          .catch(error => console.log('error', error));
+        
+      };
+      input.click();
+    },
   },
   computed: {
     duration() {
-      return {
+      let ret = {
         startDate: new Date(
           this.data.startAt.getFullYear(),
           this.data.startAt.getMonth(),
@@ -207,6 +281,8 @@ export default {
         endHour: this.data.endAt.getHours(),
         endMinute: this.data.endAt.getMinutes(),
       };
+      console.log(ret);
+      return ret;
     },
   },
 };

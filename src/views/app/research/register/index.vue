@@ -190,6 +190,14 @@ export default {
         );
         myHeaders.append("Content-Type", "application/json");
 
+        // if(!this.data.status) {
+          if(this.data.isSetPeriodLater) {
+            this.data.status = 2;
+          } else {
+            this.data.status = 1;
+          }
+        // }
+
         var raw = JSON.stringify(this.data);
 
         var requestOptions = {
@@ -225,6 +233,11 @@ export default {
           .then((result) => {
             console.log(result);
             this.data = result;
+            this.data.itemText = this.data.itemText || {};
+            this.data.itemQuestion = this.data.itemQuestion || {};
+            this.data.itemFinish = this.data.itemFinish || {};
+            this.data.itemResearcher = this.data.itemResearcher || {};
+            this.data.itemReward = this.data.itemReward || {};
           })
           .catch((error) => console.log("error", error));
       }

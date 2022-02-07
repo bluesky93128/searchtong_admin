@@ -3,7 +3,7 @@
     <h2 class="mt-2">{{ data.title }}</h2>
     <div class="d-flex align-itmes-center">
       <b-badge class="mb-1" variant="primary">{{
-        $t("research." + data.type)
+        typeOption[data.type]
       }}</b-badge>
       <span class="gray-text ml-2">설문지 ID: {{data._id}}</span>
     </div>
@@ -32,7 +32,7 @@
               <b-form-radio-group
                 :options="paymentCountOption"
               ></b-form-radio-group>
-              <b-input class="ml-2 w-10" v-model="data.itemReward.paymentCount" />
+              <b-input class="ml-2 w-10" v-model="data.itemReward.paymentCount" @change="key++" />
               <span class="ml-2">명</span>
             </div>
           </b-form-group>
@@ -44,14 +44,14 @@
               <b-form-radio-group
                 :options="paymentAmountOption"
               ></b-form-radio-group>
-              <b-input class="ml-2 w-10" v-model="data.itemReward.paymentAmount" />
+              <b-input class="ml-2 w-10" v-model="data.itemReward.paymentAmount" @change="key++" />
               <span class="ml-2">TTC</span>
             </div>
           </b-form-group>
         </b-card>
       </b-colxx>
       <b-colxx xxs="5">
-        <b-card :title="$t('research.estimatePrice')" class="text-center">
+        <b-card :title="$t('research.estimatePrice')" class="text-center" :key="key">
           <div class="d-flex justify-content-between">
             <span>{{$t('research.researchBudget')}}</span>
             <span>{{data.itemReward.paymentCount * data.itemReward.paymentAmount}}TTC</span>
@@ -95,6 +95,7 @@ export default {
   props: ["data"],
   data() {
     return {
+      key: 0,
       editorOption: {
         placeholder: "",
         modules: {
@@ -111,6 +112,7 @@ export default {
           ],
         },
       },
+      typeOption: ["여론조사", "서베이", "광고"],
       paymentOptions: [
         { text: '고정금액 지급', value: 0 },
       ],

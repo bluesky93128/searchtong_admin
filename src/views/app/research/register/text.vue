@@ -3,13 +3,13 @@
     <h2 class="mt-2">{{ data.title }}</h2>
     <div class="d-flex align-itmes-center">
       <b-badge class="mb-1" variant="primary">{{
-        $t("research." + data.type)
+        typeOption[data.type]
       }}</b-badge>
       <span class="gray-text ml-2">설문지 ID: {{data._id}}</span>
     </div>
 
     <h3 class="mt-4" v-if="data.type != 'research'">{{ $t("research.benefits") }}</h3>
-    <b-card v-if="data.type != 'research'">
+    <b-card v-if="data.type != 0">
       <b-form>
         <b-form-group
           :label="$t('research.benefitsDescription')"
@@ -97,14 +97,13 @@
     >
     </quill-editor>
     <h3 class="mt-4">{{ $t("research.participate-notice") }}</h3>
-    <b-textarea v-model="data.itemText.description" />
-    <!-- <quill-editor
+    <!-- <b-textarea v-model="data.itemText.description" /> -->
+    <quill-editor
       ref="myTextEditor"
       v-model="data.itemText.description"
-      :options="editorOptionNull"
-      class="terms-of-service-textarea"
+      :options="editorOption"
     >
-    </quill-editor> -->
+    </quill-editor>
   </div>
 </template>
 <script>
@@ -137,6 +136,7 @@ export default {
           ],
         },
       },
+      typeOption: ["여론조사", "서베이", "광고"],
       startDate: null,
       startHour: 0,
       startMinute: 0,

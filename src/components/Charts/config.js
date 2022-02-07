@@ -147,7 +147,8 @@ export const barChartOptions = {
       padding: 30,
       usePointStyle: true,
       fontSize: 12
-    }
+    },
+    display: false
   },
   responsive: true,
   maintainAspectRatio: false,
@@ -162,9 +163,9 @@ export const barChartOptions = {
         },
         ticks: {
           beginAtZero: true,
-          stepSize: 100,
-          min: 300,
-          max: 800,
+          // stepSize: 100,
+          // min: 300,
+          // max: 800,
           padding: 20
         }
       }
@@ -228,19 +229,20 @@ export const doughnutChartOptions = {
       padding: 30,
       usePointStyle: true,
       fontSize: 12
-    }
-  },
-  responsive: true,
-  maintainAspectRatio: false,
-  title: {
+    },
     display: false
   },
-  cutoutPercentage: 80,
-  layout: {
-    padding: {
-      bottom: 20
-    }
-  },
+  // responsive: true,
+  maintainAspectRatio: false,
+  // title: {
+  //   display: false
+  // },
+  cutoutPercentage: 60,
+  // layout: {
+  //   padding: {
+  //     bottom: 20
+  //   }
+  // },
   tooltips: chartTooltip
 }
 

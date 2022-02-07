@@ -3,7 +3,7 @@
     <h2 class="mt-2">{{ data.title }}</h2>
     <div class="d-flex align-itmes-center">
       <b-badge class="mb-1" variant="primary">{{
-        $t("research." + data.type)
+        typeOption[data.type]
       }}</b-badge>
       <span class="gray-text ml-2">설문지 ID: {{data._id}}</span>
     </div>
@@ -151,6 +151,7 @@ export default {
       endDate: null,
       endHour: 0,
       endMinute: 0,
+      typeOption: ["여론조사", "서베이", "광고"],
       type1Options: [
         { text: '객관식', value: 0 },
         { text: '주관식', value: 1 },

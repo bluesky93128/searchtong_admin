@@ -93,23 +93,31 @@
             :current-page="currentPage"
             :per-page="perPage"
             :fields="bootstrapTable.fields"
-            :items="items"
+            :items="dataProvider"
             selectable
             select-mode="single"
+            :key="tableKey"
           >
             <template #cell(status)="{ item }">
               <v-select
                 v-model="item.status"
                 :options="status_options"
                 :reduce="(item) => item.value"
-                class="research-type"
-              />
+                class="fix-width"
+              >
+                <template slot="selection" slot-scope="data">
+                  <i class="simple-icon-pencil" >{{data.item.value}}</i>
+                </template>
+                <template slot="item" slot-scope="data">
+                  <i class="simple-icon-pencil" >{{data.item.value}}</i>
+                </template>
+              </v-select>
             </template>
             <template #cell(level)="{ item }">
               <v-select
                 v-model="item.level"
                 :options="level_options"
-                class="research-type"
+                class="fix-width"
               />
             </template>
             <template #cell(createdAt)="{ item }">
@@ -129,7 +137,7 @@
                   </router-link>
                 </div>
                 <div class="manage-icon-container ml-1">
-                  <i class="simple-icon-trash" />
+                  <i class="simple-icon-trash" @click="deleteItem(item)" />
                 </div>
                 <div class="manage-icon-container ml-1">
                   <i class="simple-icon-docs" />
@@ -168,38 +176,40 @@ import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 import { apiUrl } from '../../../../constants/config';
 import moment from "moment";
+import axios from "axios";
 
 export default {
   components: {
     "v-select": vSelect,
   },
   mounted() {
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append(
-      "Authorization",
-      "Bearer " + localStorage.getItem("token")
-    );
-    var requestOptions = {
-      method: 'GET',
-      headers: myHeaders,
-      redirect: 'follow'
-    };
+    // var myHeaders = new Headers();
+    // myHeaders.append("Content-Type", "application/json");
+    // myHeaders.append(
+    //   "Authorization",
+    //   "Bearer " + localStorage.getItem("token")
+    // );
+    // var requestOptions = {
+    //   method: 'GET',
+    //   headers: myHeaders,
+    //   redirect: 'follow'
+    // };
 
-    fetch(apiUrl + "/research", requestOptions)
-      .then(response => response.json())
-      .then(result => {
-        console.log(result);
-        this.items = result.data;
-        this.totalRows = result.total;
-      })
-      .catch(error => console.log('error', error));
+    // fetch(apiUrl + "/research", requestOptions)
+    //   .then(response => response.json())
+    //   .then(result => {
+    //     console.log(result);
+    //     this.items = result.data;
+    //     this.totalRows = result.total;
+    //   })
+    //   .catch(error => console.log('error', error));
   },
   data() {
     return {
       searchForm: {},
       disabledTo: null,
       disabledFrom: null,
+      tableKey: 0,
       currentPage: 0,
       perPage: 5,
       totalRows: 0,
@@ -264,7 +274,7 @@ export default {
             tdClass: " text-center",
           },
           {
-            key: "count",
+            key: "attendCount",
             label: "참여자수",
             sortable: false,
             thClass: "bg-dark text-white text-center",
@@ -301,6 +311,79 @@ export default {
     },
     formatDateWithMin(date) {
       return moment(date).format("YYYY.MM.DD hh:mm");
+    },
+    dataProvider(ctx) {
+      const params = this.apiParamsConverter(ctx);
+      let promise = axios.get(apiUrl + "/research", {
+        params: params,
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+
+      return promise
+        .then((result) => result.data)
+        .then((data) => {
+          this.currentPage = data.current_page;
+          // this.perPage = data.per_page;
+          this.totalRows = data.total;
+          const items = data.data;
+          return items;
+        })
+        .catch((_error) => {
+          return [];
+        });
+    },
+    apiParamsConverter(params) {
+      let apiParams = {};
+      if (params.perPage !== 0) {
+        apiParams.per_page = params.perPage;
+      }
+      if (params.currentPage >= 1) {
+        apiParams.page = params.currentPage;
+      }
+      if (params.sortBy && params.sortBy.length > 0) {
+        apiParams.sort = `${params.sortBy}|${params.sortDesc ? "desc" : "asc"}`;
+      }
+      if (params.filter && params.filter.length > 0) {
+        // Optional
+      }
+      return apiParams;
+    },
+    deleteItem(item) {
+      if(item.status == 0) {
+        this.addNotification("error filled", "설문 삭제", "진행중인 설문은 삭제할수 없읍니다!");
+        return;
+      }
+      var myHeaders = new Headers();
+      myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
+
+      var requestOptions = {
+        method: 'DELETE',
+        headers: myHeaders,
+        redirect: 'follow'
+      };
+
+      var self = this;
+      fetch(apiUrl + "/research/" + item._id, requestOptions)
+        .then(response => response.json())
+        .then(result => {
+          console.log(result);
+          if(result.status) {
+            self.addNotification("success filled", "설문 삭제", "설문이 성공적으로 삭제되었습니다!");
+            self.tableKey++;
+          } else {
+            self.addNotification("error filled", "설문 삭제", "설문을 삭제하는 중에 오류가 발생했습니다!");
+          }
+        })
+        .catch(error => console.log('error', error));
+    },
+    addNotification(
+      type = "success",
+      title = "This is Notify Title",
+      message = "This is Notify Message,<br>with html."
+    ) {
+      this.$notify(type, title, message, { duration: 3000, permanent: false });
     },
   },
   computed: {
