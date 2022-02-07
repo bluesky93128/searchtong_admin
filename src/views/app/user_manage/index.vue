@@ -74,7 +74,7 @@
             :key="tableKey"
           >
             <template #cell(gender)="{ item }">
-              {{item.panelInfo.gender ? '여자' : '남자'}}
+              {{item.panelInfo && item.panelInfo.gender ? '여자' : '남자'}}
             </template>
             <template #cell(createdAt)="{ item }">
               {{ formatDateWithMin(item.createdAt) }}
@@ -83,7 +83,7 @@
               {{calcAge(item)}}
             </template>
             <template #cell(postalCode)="{ item }">
-              {{ item.panelInfo.postData.sigunguCode }}
+              {{ item.panelInfo && item.panelInfo.postData.sigunguCode }}
             </template>
             <template #cell(action)="{ item }">
               <router-link :to="{ path: 'user_detail', query: { id: item._id } }" class="text-link">
@@ -159,6 +159,7 @@ export default {
       currentPage: 0,
       perPage: 5,
       totalRows: 0,
+      isLoading: false,
       items: [],
       type_options: [
         {
@@ -253,7 +254,11 @@ export default {
     },
     calcAge(item) {
       let now = new Date();
-      return now.getFullYear() - item.panelInfo.birthYear;
+      if(item.panelInfo) {
+        return now.getFullYear() - item.panelInfo.birthYear;
+      } else {
+        return 0;
+      }
     },
     dataProvider(ctx) {
       const params = this.apiParamsConverter(ctx);
@@ -263,6 +268,8 @@ export default {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
       });
+      
+      this.isLoading = true;
 
       return promise
         .then((result) => result.data)
@@ -271,6 +278,7 @@ export default {
           // this.perPage = data.per_page;
           this.totalRows = data.total;
           const items = data.data;
+          this.isLoading = false;
           return items;
         })
         .catch((_error) => {

@@ -12,7 +12,7 @@
           <b-row>
             <b-colxx xxs="6">
               <b-form-group label="설문제목 또는 ID" :label-cols="2">
-                <b-form-input v-model="searchForm.title" />
+                <b-form-input v-model="searchForm.search_word" />
               </b-form-group>
             </b-colxx>
             <b-colxx xxs="6">
@@ -20,14 +20,14 @@
                 <div class="d-flex">
                   <b-datepicker
                     locale="ko-KR"
-                    v-model="searchForm.fromDate"
+                    v-model="searchForm.periodFrom"
                     :placeholder="$t('search.all')"
                     :max="disabledFrom"
                   />
                   <span class="span-center-text mx-2">~</span>
                   <b-datepicker
                     locale="ko-KR"
-                    v-model="searchForm.toDate"
+                    v-model="searchForm.periodTo"
                     :placeholder="$t('search.all')"
                     :min="disabledTo"
                   />
@@ -41,14 +41,14 @@
                 <div class="d-flex">
                   <b-datepicker
                     locale="ko-KR"
-                    v-model="searchForm.fromDate"
+                    v-model="searchForm.registerFrom"
                     :placeholder="$t('search.all')"
                     :max="disabledFrom"
                   />
                   <span class="span-center-text mx-2">~</span>
                   <b-datepicker
                     locale="ko-KR"
-                    v-model="searchForm.toDate"
+                    v-model="searchForm.registerTo"
                     :placeholder="$t('search.all')"
                     :min="disabledTo"
                   />
@@ -65,7 +65,7 @@
                     :reduce="(item) => item.value"
                     class="research-type"
                   />
-                  <b-button class="primary">검색</b-button>
+                  <b-button class="primary" @click="onClickSearch()">검색</b-button>
                 </div>
               </b-form-group>
             </b-colxx>
@@ -97,19 +97,24 @@
             selectable
             select-mode="single"
             :key="tableKey"
+            :filter="filter"
           >
             <template #cell(status)="{ item }">
               <v-select
                 v-model="item.status"
                 :options="status_options"
                 :reduce="(item) => item.value"
-                class="fix-width"
               >
-                <template slot="selection" slot-scope="data">
-                  <i class="simple-icon-pencil" >{{data.item.value}}</i>
+                <template v-slot:selected-option="option">
+                  <div class="d-flex align-items-center">
+                    <div :class="'status ' + getStatus(option.value)"></div>
+                  </div>
                 </template>
-                <template slot="item" slot-scope="data">
-                  <i class="simple-icon-pencil" >{{data.item.value}}</i>
+                <template v-slot:option="option">
+                  <div class="d-flex align-items-center">
+                    <div :class="'status mr-2 ' + getStatus(option.value)"></div>
+                    <span>{{option.label}}</span>
+                  </div>
                 </template>
               </v-select>
             </template>
@@ -117,7 +122,6 @@
               <v-select
                 v-model="item.level"
                 :options="level_options"
-                class="fix-width"
               />
             </template>
             <template #cell(createdAt)="{ item }">
@@ -207,6 +211,7 @@ export default {
   data() {
     return {
       searchForm: {},
+      filter: null,
       disabledTo: null,
       disabledFrom: null,
       tableKey: 0,
@@ -345,8 +350,26 @@ export default {
       if (params.sortBy && params.sortBy.length > 0) {
         apiParams.sort = `${params.sortBy}|${params.sortDesc ? "desc" : "asc"}`;
       }
-      if (params.filter && params.filter.length > 0) {
+      if (params.filter && Object.keys(params.filter).length > 0) {
         // Optional
+        if(params.filter.search_word) {
+          apiParams.search_word = params.filter.search_word;
+        }
+        if(params.filter.periodFrom) {
+          apiParams.periodFrom = params.filter.periodFrom;
+        }
+        if(params.filter.periodTo) {
+          apiParams.periodTo = params.filter.periodTo;
+        }
+        if(params.filter.registerFrom) {
+          apiParams.registerFrom = params.filter.registerFrom;
+        }
+        if(params.filter.registerTo) {
+          apiParams.registerTo = params.filter.registerTo;
+        }
+        if(params.filter.type >= 0) {
+          apiParams.type = params.filter.type;
+        }
       }
       return apiParams;
     },
@@ -377,6 +400,18 @@ export default {
           }
         })
         .catch(error => console.log('error', error));
+    },
+    getStatus(option) {
+      switch(option) {
+        case 0: return 'working';
+        case 1: return 'reserved';
+        case 2: return 'onhold';
+        case 3: return 'stopped';
+        case 4: return 'finished';
+      }
+    },
+    onClickSearch() {
+      this.filter = {...this.searchForm};
     },
     addNotification(
       type = "success",
@@ -414,5 +449,26 @@ export default {
 .manage-icon-container .text-link {
   color: #3a3a3a;
   text-decoration: none;
+}
+.status {
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #a3a3a3;
+}
+.working {
+  background-color: #2f5597;
+}
+.reserved {
+  background-color: #70ad47;
+}
+.onhold {
+  background-color: #ffc000;
+}
+.stopped {
+  background-color: #ff0000;
+}
+.finished {
+  background-color: #7f7f7f;
 }
 </style>

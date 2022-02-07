@@ -12,7 +12,7 @@
           <b-row>
             <b-colxx xxs="6">
               <b-form-group label="설문제목 또는 ID" :label-cols="2">
-                <b-form-input v-model="searchForm.title" />
+                <b-form-input v-model="searchForm.search_word" />
               </b-form-group>
             </b-colxx>
             <b-colxx xxs="6">
@@ -20,14 +20,14 @@
                 <div class="d-flex">
                   <b-datepicker
                     locale="ko-KR"
-                    v-model="searchForm.fromDate"
+                    v-model="searchForm.periodFrom"
                     :placeholder="$t('search.all')"
                     :max="disabledFrom"
                   />
                   <span class="span-center-text mx-2">~</span>
                   <b-datepicker
                     locale="ko-KR"
-                    v-model="searchForm.toDate"
+                    v-model="searchForm.periodTo"
                     :placeholder="$t('search.all')"
                     :min="disabledTo"
                   />
@@ -41,14 +41,14 @@
                 <div class="d-flex">
                   <b-datepicker
                     locale="ko-KR"
-                    v-model="searchForm.fromDate"
+                    v-model="searchForm.registerFrom"
                     :placeholder="$t('search.all')"
                     :max="disabledFrom"
                   />
                   <span class="span-center-text mx-2">~</span>
                   <b-datepicker
                     locale="ko-KR"
-                    v-model="searchForm.toDate"
+                    v-model="searchForm.registerTo"
                     :placeholder="$t('search.all')"
                     :min="disabledTo"
                   />
@@ -65,7 +65,7 @@
                     :reduce="(item) => item.value"
                     class="research-type"
                   />
-                  <b-button class="primary">검색</b-button>
+                  <b-button class="primary" @click="onClickSearch()">검색</b-button>
                 </div>
               </b-form-group>
             </b-colxx>
@@ -97,6 +97,7 @@
             selectable
             select-mode="single"
             :key="tableKey"
+            :filter="filter"
           >
             <template #cell(status)="{ item }">
               <div :class="getStatus(item.status)"></div>
@@ -178,6 +179,7 @@ export default {
   data() {
     return {
       searchForm: {},
+      filter: null,
       disabledTo: null,
       disabledFrom: null,
       tableKey: 0,
@@ -309,8 +311,26 @@ export default {
       if (params.sortBy && params.sortBy.length > 0) {
         apiParams.sort = `${params.sortBy}|${params.sortDesc ? "desc" : "asc"}`;
       }
-      if (params.filter && params.filter.length > 0) {
+      if (params.filter && Object.keys(params.filter).length > 0) {
         // Optional
+        if(params.filter.search_word) {
+          apiParams.search_word = params.filter.search_word;
+        }
+        if(params.filter.periodFrom) {
+          apiParams.periodFrom = params.filter.periodFrom;
+        }
+        if(params.filter.periodTo) {
+          apiParams.periodTo = params.filter.periodTo;
+        }
+        if(params.filter.registerFrom) {
+          apiParams.registerFrom = params.filter.registerFrom;
+        }
+        if(params.filter.registerTo) {
+          apiParams.registerTo = params.filter.registerTo;
+        }
+        if(params.filter.type >= 0) {
+          apiParams.type = params.filter.type;
+        }
       }
       return apiParams;
     },
@@ -322,6 +342,9 @@ export default {
         case 3: return 'status stopped';
         case 4: return 'status finished';
       }
+    },
+    onClickSearch() {
+      this.filter = {...this.searchForm};
     },
     addNotification(
       type = "success",
