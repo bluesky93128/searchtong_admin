@@ -22,7 +22,7 @@
         <button type="button" class="btn btn-primary" v-if="currentActive != totalTabs - 1" :disabled="currentActive > totalTabs - 1" @click="nextTab()">
             {{$t('wizard.next')}}
         </button>
-        <button type="button" class="btn btn-primary" v-if="currentActive == totalTabs - 1" @click="save()">
+        <button type="button" class="btn btn-primary" v-if="currentActive == totalTabs - 1" @click="register()">
             {{$t('wizard.register')}}
         </button>
     </div>
@@ -89,12 +89,21 @@ export default {
         },
         clickedTab(tabIndex) {
             if (!this.topNavDisabled) {
+                if(!this.data.title || !this.data.title.length) {
+                    alert("제목을 입력하세요.")
+                    return;
+                }
                 if (!(this.lastStepEnd && this.isCompleted)) {
                     this.currentActive = tabIndex;
                     this.tabStatusFix();
                     this.tabs[this.currentActive].isActive = true;
                 }
             }
+        },
+        register() {
+            this.data.isDraft = false;
+            this.save();
+            this.$router.push('/app/research/manage');
         },
         saveData() {
             this.save();
@@ -117,7 +126,15 @@ export default {
                 valid = false;
             }
 
+            if(this.data.endAt < this.data.startAt) {
+                alert("진행기간을 정확히 입력하세요.")
+                valid = false;
+            }
+
             if (valid) {
+                if(this.currentActive == 0 && !this.data._id) {
+                    this.save();
+                }
                 this.currentActive++;
                 this.tabStatusFix();
                 if (this.currentActive >= this.totalTabs) {

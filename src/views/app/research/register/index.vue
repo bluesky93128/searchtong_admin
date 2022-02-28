@@ -14,8 +14,9 @@
             <form-wizard
               nav-class="justify-content-start"
               :save="onSubmitMain"
-              topNavDisabled="true"
               :data="data"
+              :currentActive="current_page"
+              :key="key"
             >
               <tab name="1. 기본설정" :selected="true">
                 <div class="wizard-basic-step">
@@ -24,27 +25,27 @@
               </tab>
               <tab name="2. 본문설정">
                 <div class="wizard-basic-step">
-                  <text-page :data="data" />
+                  <text-page :data="data" :gotoHome="gotoHome" />
                 </div>
               </tab>
               <tab name="3. 문항설정">
                 <div class="wizard-basic-step">
-                  <questions-page :data="data" />
+                  <questions-page :data="data" :gotoHome="gotoHome" />
                 </div>
               </tab>
               <tab name="4. 종료글 설정">
                 <div class="wizard-basic-step">
-                  <finish-text-page :data="data" />
+                  <finish-text-page :data="data" :gotoHome="gotoHome" />
                 </div>
               </tab>
               <tab name="5. 조사대상 설정">
                 <div class="wizard-basic-step">
-                  <researcher-page :data="data" />
+                  <researcher-page :data="data" :gotoHome="gotoHome" />
                 </div>
               </tab>
               <tab name="6. 리워드 및 등록">
                 <div class="wizard-basic-step">
-                  <reward-page :data="data" />
+                  <reward-page :data="data" :gotoHome="gotoHome" />
                 </div>
               </tab>
               <tab type="done">
@@ -94,8 +95,8 @@ export default {
           {
             // _id: Schema.Types.ObjectId
             order: 0, // 문항순서
-            title: "String", // 문항내용
-            answerGuide: "String", //
+            title: "", // 문항내용
+            answerGuide: "", //
             type1: 0, // 문항유형1 (0: 객관식, 1: 주관식)
             type2: 0, // 문항유형2 (0: 단일응답, 1: 다중응답)
             min: 1, // 다중응답 - 최소선택개수
@@ -106,34 +107,9 @@ export default {
               {
                 // _id: Schema.Types.ObjectId
                 order: 0, // 순서
-                content: "String", // 본문
+                content: "", // 본문
                 nextItemQuestionOrder: 1, // 다음문항순서 (itemQuestion.order)
-                imageLinks: ["String"], // 이메지링크목록
-                isMain: true, // 기본물음인가? (true: 기본물음, false: 기타물음)
-              },
-            ],
-            isRequireAnswer: true, // 필수답변?
-            isRequireMix: false, // 보기섞기?
-            isKeedExtraView: true, // 기타보기유지?
-          },
-          {
-            // _id: Schema.Types.ObjectId
-            order: 1, // 문항순서
-            title: "String1", // 문항내용
-            answerGuide: "String", //
-            type1: 0, // 문항유형1 (0: 객관식, 1: 주관식)
-            type2: 0, // 문항유형2 (0: 단일응답, 1: 다중응답)
-            min: 1, // 다중응답 - 최소선택개수
-            max: 1, // 다중응답 - 최대선택개수
-            viewType: 0, // 보기문항 (0: 텍스트, 1: 이미지)
-            itemView: [
-              // 보기문항내용
-              {
-                // _id: Schema.Types.ObjectId
-                order: 0, // 순서
-                content: "String", // 본문
-                nextItemQuestionOrder: 1, // 다음문항순서 (itemQuestion.order)
-                imageLinks: ["String"], // 이메지링크목록
+                imageLinks: [""], // 이메지링크목록
                 isMain: true, // 기본물음인가? (true: 기본물음, false: 기타물음)
               },
             ],
@@ -145,7 +121,10 @@ export default {
         itemFinish: {},
         itemResearcher: {},
         itemReward: {},
+        isDraft: true
       },
+      current_page: 0,
+      key: 0
     };
   },
   mounted() {
@@ -209,7 +188,10 @@ export default {
 
         fetch(apiUrl + "/research/" + this.data._id, requestOptions)
           .then((response) => response.text())
-          .then((result) => console.log(result))
+          .then((result) => {
+            console.log(result)
+            this.addNotification("success filled", "설문 저장", "저장 되었습니다");
+          })
           .catch((error) => console.log("error", error));
       } else {
         var myHeaders = new Headers();
@@ -238,9 +220,21 @@ export default {
             this.data.itemFinish = this.data.itemFinish || {};
             this.data.itemResearcher = this.data.itemResearcher || {};
             this.data.itemReward = this.data.itemReward || {};
+            this.addNotification("success filled", "설문 저장", "저장 되었습니다");
           })
           .catch((error) => console.log("error", error));
       }
+    },
+    gotoHome() {
+      this.current_page = 0;
+      this.key++;
+    },
+    addNotification(
+      type = "success",
+      title = "This is Notify Title",
+      message = "This is Notify Message,<br>with html."
+    ) {
+      this.$notify(type, title, message, { duration: 3000, permanent: false });
     },
   },
   watch: {

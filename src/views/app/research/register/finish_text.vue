@@ -1,6 +1,6 @@
 <template>
   <div class="mb-4">
-    <h2 class="mt-2">{{ data.title }}</h2>
+    <h2 class="mt-2 cursor-pointer" @click="gotoHome()">{{ data.title }}</h2>
     <div class="d-flex align-itmes-center">
       <b-badge class="mb-1" variant="primary">{{
         typeOption[data.type]
@@ -109,7 +109,7 @@ export default {
   components: {
     "quill-editor": quillEditor,
   },
-  props: ["data"],
+  props: ["data", "gotoHome"],
   data() {
     return {
       editorOption: {

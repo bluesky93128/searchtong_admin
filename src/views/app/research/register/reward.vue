@@ -1,6 +1,6 @@
 <template>
   <div class="mb-4">
-    <h2 class="mt-2">{{ data.title }}</h2>
+    <h2 class="mt-2 cursor-pointer" @click="gotoHome()">{{ data.title }}</h2>
     <div class="d-flex align-itmes-center">
       <b-badge class="mb-1" variant="primary">{{
         typeOption[data.type]
@@ -32,7 +32,7 @@
               <b-form-radio-group
                 :options="paymentCountOption"
               ></b-form-radio-group>
-              <b-input class="ml-2 w-10" v-model="data.itemReward.paymentCount" @change="key++" />
+              <b-input class="ml-2 w-15" type="number" v-model="data.itemReward.paymentCount" @change="key++" />
               <span class="ml-2">명</span>
             </div>
           </b-form-group>
@@ -44,7 +44,7 @@
               <b-form-radio-group
                 :options="paymentAmountOption"
               ></b-form-radio-group>
-              <b-input class="ml-2 w-10" v-model="data.itemReward.paymentAmount" @change="key++" />
+              <b-input class="ml-2 w-15" type="number" v-model="data.itemReward.paymentAmount" @change="key++" />
               <span class="ml-2">TTC</span>
             </div>
           </b-form-group>
@@ -92,7 +92,7 @@ export default {
   components: {
     "quill-editor": quillEditor,
   },
-  props: ["data"],
+  props: ["data", "gotoHome"],
   data() {
     return {
       key: 0,

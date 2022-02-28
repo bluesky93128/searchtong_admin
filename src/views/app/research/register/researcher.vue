@@ -1,6 +1,6 @@
 <template>
   <div class="mb-4">
-    <h2 class="mt-2">{{ data.title }}</h2>
+    <h2 class="mt-2 cursor-pointer" @click="gotoHome()">{{ data.title }}</h2>
     <div class="d-flex align-itmes-center">
       <b-badge class="mb-1" variant="primary">{{
         typeOption[data.type]
@@ -21,6 +21,7 @@
       <b-form-group
         :label="$t('research.gender')"
         label-cols="2"
+        :disabled="!!data.itemResearcher.condition"
       >
         <b-form-radio-group
           v-model="data.itemResearcher.gender"
@@ -30,6 +31,7 @@
       <b-form-group
         :label="$t('research.age')"
         label-cols="2"
+        :disabled="!!data.itemResearcher.condition"
       >
         <b-form-radio-group
           v-model="data.itemResearcher.age"
@@ -39,6 +41,7 @@
       <b-form-group
         :label="$t('research.region')"
         label-cols="2"
+        :disabled="!!data.itemResearcher.condition"
       >
         <b-form-radio-group
           v-model="data.itemResearcher.region"
@@ -48,6 +51,7 @@
       <b-form-group
         :label="$t('research.job')"
         label-cols="2"
+        :disabled="!!data.itemResearcher.condition"
       >
         <b-form-radio-group
           v-model="data.itemResearcher.job"
@@ -57,6 +61,7 @@
       <b-form-group
         :label="$t('research.education')"
         label-cols="2"
+        :disabled="!!data.itemResearcher.condition"
       >
         <b-form-radio-group
           v-model="data.itemResearcher.education"
@@ -66,6 +71,7 @@
       <b-form-group
         :label="$t('research.salary')"
         label-cols="2"
+        :disabled="!!data.itemResearcher.condition"
       >
         <b-form-radio-group
           v-model="data.itemResearcher.salary"
@@ -76,10 +82,14 @@
         :label="$t('research.targetReplyCount')"
         label-cols="2"
       >
-        <b-form-radio-group
-          v-model="data.itemResearcher.targetReplyCount"
-          :options="targetReplyCountOptions"
-        ></b-form-radio-group>
+        <div class="d-flex">
+          <b-form-radio-group
+            class="d-flex align-items-center"
+            v-model="data.itemResearcher.targetReplyCount"
+            :options="targetReplyCountOptions"
+          ></b-form-radio-group>
+          <b-form-input class="w-10" v-show="data.itemResearcher.targetReplyCount" v-model="data.itemResearcher.targetReplyCount" />
+        </div>
       </b-form-group>
     </b-form>
   </div>
@@ -95,7 +105,7 @@ export default {
   components: {
     "quill-editor": quillEditor,
   },
-  props: ["data"],
+  props: ["data", "gotoHome"],
   data() {
     return {
       editorOption: {

@@ -1,6 +1,6 @@
 <template>
   <div class="mb-4">
-    <h2 class="mt-2">{{ data.title }}</h2>
+    <h2 class="mt-2 cursor-pointer" @click="gotoHome()">{{ data.title }}</h2>
     <div class="d-flex align-itmes-center">
       <b-badge class="mb-1" variant="primary">{{
         typeOption[data.type]
@@ -12,7 +12,7 @@
       <b-colxx xxs="4" class="body">
         <div class="content left">
           <h5 class="list-item">총 {{data.itemQuestion.length}}개 문항</h5>
-          <draggable type="ul" class="list-unstyled" handle=".handle" v-model="data.itemQuestion" @change="log">
+          <draggable type="ul" class="list-unstyled" handle=".handle" v-model="data.itemQuestion" @change="onChangeItemOrder()">
             <li v-for="item in data.itemQuestion" :key="item.order" class="list-item">
               <span class="handle mr-1"><i class="simple-icon-cursor-move" /></span>
               <span>{{item.title}}</span>
@@ -43,16 +43,16 @@
                 </b-colxx>
                 <b-colxx xxs="6" class="d-flex align-items-center">
                   <span class="mr-1">최소</span>
-                  <b-input class="w-10" v-model="item.min" :disabled="item.type2==0" />
+                  <b-input type="number" class="w-20" v-model="item.min" min="1" :disabled="item.type2==0" />
                   <span class="ml-1">개</span>
                   <span class="mx-2">~</span>
                   <span class="mr-1">최대</span>
-                  <b-input class="w-10" v-model="item.max" :disabled="item.type2==0" />
+                  <b-input type="number" class="w-20" v-model="item.max" :min="item.min" :max="data.itemQuestion.length" :disabled="item.type2==0" />
                   <span class="ml-1">개</span>
                 </b-colxx>
               </b-row>
             </b-form-group>
-            <b-form-textarea v-model="item.answerGuide" placeholder="답변을 입력해주세요" />
+            <b-form-textarea v-model="item.answerGuide" v-if="item.type1 == 1" placeholder="답변을 입력해주세요" />
             <b-form-group
               label="보기문항"
               label-cols="2"
@@ -63,12 +63,12 @@
                 :options="viewTypeOptions"
               ></b-form-radio-group>
             </b-form-group>
-            <draggable v-if="item.type1 == 0" type="ul" class="list-unstyled" handle=".handle" v-model="data.itemQuestion[index].itemView" @change="log">
+            <draggable v-if="item.type1 == 0" type="ul" class="list-unstyled" handle=".handle" v-model="data.itemQuestion[index].itemView" @change="onChangeItemViewOrder(item)">
               <li v-for="(view, vIndex) in item.itemView" :key="view.order" class="view-item">
                 <b-input-group class="mb-3 d-flex align-items-center">
                   <div class="view-handle handle">{{view.order + 1}}</div>
                   <b-form-input class="w-50" v-model="view.content"></b-form-input>
-                  <b-form-select v-model="view.nextItemQuestionOrder" :options="['Option1', 'Option2','Option3','Option4']"  plain class="ml-2 mr-2" />
+                  <b-form-select v-model="view.nextItemQuestionOrder" :options="calcNextItemOptions(index)"  plain class="ml-2 mr-2" />
                   <span class="view-icon cursor-pointer mr-1" @click="onAddView(index)"><i class="simple-icon-plus" /></span>
                   <span class="view-icon cursor-pointer mr-1" @click="onCopyView(index, vIndex)"><i class="iconsminds-files" /></span>
                   <span class="view-icon cursor-pointer mr-1" @click="onDeleteView(index, vIndex)"><i class="iconsminds-close" /></span>
@@ -126,7 +126,7 @@ export default {
     "quill-editor": quillEditor,
     switches: Switches
   },
-  props: ["data"],
+  props: ["data", "gotoHome"],
   data() {
     return {
       editorOption: {
@@ -187,8 +187,15 @@ export default {
       this.data.itemText.benefitsEndAt.setHours(this.endHour);
       this.data.itemText.benefitsEndAt.setMinutes(this.endMinute);
     },
-    log() {
-      console.log(this.data.itemQuestion);
+    onChangeItemOrder() {
+      this.data.itemQuestion.forEach((item, index) => {
+        item.order = index;
+      })
+    },
+    onChangeItemViewOrder(item) {
+      item.itemView.forEach((view, index) => {
+        view.order = index;
+      })
     },
     onAddView(index) {
       this.data.itemQuestion[index].itemView.push({
@@ -207,6 +214,15 @@ export default {
       this.data.itemQuestion[index].itemView.forEach((item, i) => {
         item.order = i;
       });
+      if(!this.data.itemQuestion[index].itemView.length) {
+        this.data.itemQuestion[index].itemView.push({
+          order: 0,
+          content: "",
+          nextItemQuestionOrder: 1,
+          imageLinks: [""],
+          isMain: true,
+        })
+      }
     },
     onAddViewOther(index) {
       console.log('other view add');
@@ -270,8 +286,59 @@ export default {
       this.data.itemQuestion.forEach((item, i) => {
         item.order = i;
       });
+      if(!this.data.itemQuestion.length) {
+        this.data.itemQuestion.push({
+          order: 0, // 문항순서
+            title: "", // 문항내용
+            answerGuide: "", //
+            type1: 0, // 문항유형1 (0: 객관식, 1: 주관식)
+            type2: 0, // 문항유형2 (0: 단일응답, 1: 다중응답)
+            min: 1, // 다중응답 - 최소선택개수
+            max: 1, // 다중응답 - 최대선택개수
+            viewType: 0, // 보기문항 (0: 텍스트, 1: 이미지)
+            itemView: [
+              // 보기문항내용
+              {
+                // _id: Schema.Types.ObjectId
+                order: 0, // 순서
+                content: "", // 본문
+                nextItemQuestionOrder: 1, // 다음문항순서 (itemQuestion.order)
+                imageLinks: [""], // 이메지링크목록
+                isMain: true, // 기본물음인가? (true: 기본물음, false: 기타물음)
+              },
+            ],
+            isRequireAnswer: true, // 필수답변?
+            isRequireMix: false, // 보기섞기?
+            isKeedExtraView: true, // 기타보기유지?
+        })
+      }
       this.$forceUpdate();
     },
+    calcNextItemOptions(index) {
+      let options = [];
+      if(index >= this.data.itemQuestion.length-1) {
+        options.push({
+          text: "설문종료",
+          value: -1
+        })
+      } else {
+        options.push({
+          text: "다음 문항 이동",
+          value: index + 1
+        });
+        for(let i = index + 2; i < this.data.itemQuestion.length; i++) {
+          options.push({
+            text: "Q" + (i+1) + " 문항으로 이동",
+            value: i
+          })
+        }
+        options.push({
+          text: "설문종료",
+          value: -1
+        })
+      }
+      return options;
+    }
   },
   computed: {
     duration() {

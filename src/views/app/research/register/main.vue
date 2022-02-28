@@ -95,6 +95,7 @@
                       month: 'numeric',
                       day: 'numeric',
                     }"
+                    :min="today"
                     style="flex: 8; margin-right: 10px"
                     v-model="startDate"
                     :disabled="data.isSetPeriodLater"
@@ -126,6 +127,7 @@
                       month: 'numeric',
                       day: 'numeric',
                     }"
+                    :min="startDate"
                     v-model="endDate"
                     style="flex: 8; margin-left: 10px"
                     :disabled="data.isSetPeriodLater"
@@ -200,7 +202,8 @@ export default {
       endHour: 0,
       endMinute: 0,
       downloadUrl: downloadUrl,
-      thumbnailKey: ""
+      thumbnailKey: "",
+      today: new Date()
     };
   },
   mounted() {

@@ -107,7 +107,8 @@
               >
                 <template v-slot:selected-option="option">
                   <div class="d-flex align-items-center">
-                    <div :class="'status ' + getStatus(option.value)"></div>
+                    <div :class="'status mr-2 ' + getStatus(option.value)"></div>
+                    <span>{{option.label}}</span>
                   </div>
                 </template>
                 <template v-slot:option="option">
@@ -319,7 +320,7 @@ export default {
     },
     dataProvider(ctx) {
       const params = this.apiParamsConverter(ctx);
-      let promise = axios.get(apiUrl + "/research", {
+      let promise = axios.get(apiUrl + "/research?isDraft=0", {
         params: params,
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),

@@ -20,10 +20,10 @@
               <span>종료: {{formatDateWithMin(data.endAt)}}</span>
             </b-col>
             <b-col xxs="4">
-              <span>응답자수: {{data.attendCount + '/' + data.itemReward.paymentCount}}</span>
+              <span>응답자수: {{data.attendCount + '/' + data.itemReward ? data.itemReward.paymentCount : '설정되지 않음'}}</span>
             </b-col>
             <b-col xxs="4">
-              <span>응답비용: {{data.itemReward.paymentCount * data.itemReward.paymentAmount}}</span>
+              <span>{{data.itemReward ? '응답비용:' +  (data.itemReward.paymentCount * data.itemReward.paymentAmount) : '설정되지 않음'}}</span>
             </b-col>
           </b-row>
         </b-card>
@@ -35,7 +35,7 @@
           <b-button class="primary">주관식 답변 내보내기</b-button>
           <b-button class="primary ml-2">전체결과 내보내기</b-button>
         </div>
-        <b-card class="mb-4" no-body v-if="analyticsData">
+        <b-card class="mb-4" no-body v-if="analyticsData && analyticsData.respondentCharacteristics">
           <b-tabs card no-fade>
             <b-tab title="분석" active>
               <h4>응답자특성</h4>
@@ -226,6 +226,7 @@
             </b-tab>
           </b-tabs>
         </b-card>
+        <b-card class="mb-4" title="통계자료가 없습니다." v-else></b-card>
       </b-colxx>
     </b-row>
   </div>
