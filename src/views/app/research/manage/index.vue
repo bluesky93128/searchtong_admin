@@ -102,8 +102,9 @@
             <template #cell(status)="{ item }">
               <v-select
                 v-model="item.status"
-                :options="status_options"
+                :options="getStatusOptions(item.status)"
                 :reduce="(item) => item.value"
+                :on-change="onChangeStatus(item)"
               >
                 <template v-slot:selected-option="option">
                   <div class="d-flex align-items-center">
@@ -220,6 +221,7 @@ export default {
       perPage: 5,
       totalRows: 0,
       items: [],
+      level_options: [1, 2, 3, 99],
       type_options: [
         {
           label: "여론조사",
@@ -411,6 +413,37 @@ export default {
         case 4: return 'finished';
       }
     },
+    getStatusOptions(status) {
+      switch(status) {
+        case 0: return [
+          { value: 0, label: "진행중" },
+          { value: 3, label: "중지" },
+          { value: 4, label: "종료" },
+        ];
+        case 1: return [
+          { value: 0, label: "진행중" },
+          { value: 1, label: "예약" },
+          { value: 2, label: "대기" },
+          { value: 4, label: "종료" },
+        ];
+        case 2: return [
+          { value: 1, label: "예약" },
+          { value: 2, label: "대기" },
+          { value: 4, label: "종료" },
+        ];
+        case 3: return [
+          { value: 0, label: "진행중" },
+          { value: 3, label: "중지" },
+          { value: 4, label: "종료" },
+        ];
+        case 4: return [
+          { value: 4, label: "종료" },
+        ];
+      }
+    },
+    onChangeStatus(item) {
+      console.log('item = ', item);
+    },
     onClickSearch() {
       this.filter = {...this.searchForm};
     },
@@ -420,12 +453,6 @@ export default {
       message = "This is Notify Message,<br>with html."
     ) {
       this.$notify(type, title, message, { duration: 3000, permanent: false });
-    },
-  },
-  computed: {
-    level_options() {
-      var ary = [...Array(99).keys()];
-      return ary;
     },
   },
 };

@@ -66,8 +66,21 @@
             <draggable v-if="item.type1 == 0" type="ul" class="list-unstyled" handle=".handle" v-model="data.itemQuestion[index].itemView" @change="onChangeItemViewOrder(item)">
               <li v-for="(view, vIndex) in item.itemView" :key="view.order" class="view-item">
                 <b-input-group class="mb-3 d-flex align-items-center">
-                  <div class="view-handle handle">{{view.order + 1}}</div>
-                  <b-form-input class="w-50" v-model="view.content"></b-form-input>
+                  <div class="d-flex w-70">
+                    <div class="view-handle handle">{{view.order + 1}}</div>
+                    <b-form-input class="w-80" v-if="item.viewType==0" v-model="view.content"></b-form-input>
+                    <div class="remove-image-btn" @click="onRemoveImage(view)" v-if="view.imageLink">
+                      <div class="glyph-icon simple-icon-close"></div>
+                    </div>
+                    <div class="image-container w-100" v-if="item.viewType==1">
+                      <img :src="view.imageLink" v-if="view.imageLink" width="100" height="70" />
+                      <span v-if="view.imageLink" class="ml-4">{{view.content}}</span>
+                      <div v-if="!view.imageLink" class="add-image-button" @click="onUploadImage(view)">
+                        <label>+</label>
+                        <label>파일첨부</label>
+                      </div>
+                    </div>
+                  </div>
                   <b-form-select v-model="view.nextItemQuestionOrder" :options="calcNextItemOptions(index)"  plain class="ml-2 mr-2" />
                   <span class="view-icon cursor-pointer mr-1" @click="onAddView(index)"><i class="simple-icon-plus" /></span>
                   <span class="view-icon cursor-pointer mr-1" @click="onCopyView(index, vIndex)"><i class="iconsminds-files" /></span>
@@ -117,6 +130,7 @@ import "quill/dist/quill.snow.css";
 import "quill/dist/quill.bubble.css";
 import Draggable from "vuedraggable";
 import Switches from "vue-switches";
+import {apiUrl, downloadUrl} from "../../../../constants/config"
 
 import { quillEditor } from "vue-quill-editor";
 
@@ -338,6 +352,39 @@ export default {
         })
       }
       return options;
+    },
+    onUploadImage(view) {
+      let input = document.createElement("input");
+      input.accept = ".jpg, .jpeg, .gif, .png";
+      input.type = "file";
+      var self = this;
+      input.onchange = (_) => {
+        // you can use this method to get file and perform respective operations
+        var formdata = new FormData();
+        formdata.append("file", input.files[0]);
+        console.log(input.files[0]);
+
+        var requestOptions = {
+          method: "POST",
+          body: formdata,
+          redirect: "follow",
+        };
+
+        fetch(apiUrl + "/upload", requestOptions)
+          .then((response) => response.json())
+          .then((result) => {
+            view.imageLink = downloadUrl + "/" + result.filename;
+            view.content = input.files[0].name.split('.').slice(0, -1).join('.');
+            this.$forceUpdate();
+            console.log(view);
+          })
+          .catch((error) => console.log("error", error));
+      };
+      input.click();
+    },
+    onRemoveImage(view) {
+      view.imageLink = null;
+      view.content = '';
     }
   },
   computed: {
@@ -422,5 +469,32 @@ export default {
   width: 100%;
   height: 1px;
   background-color: #c1c1c1;
+}
+.image-container {
+  /* width: 100%; */
+  border: 1px solid #d7d7d7;
+  padding: 5px;
+}
+.image-container .add-image-button {
+  width: 100px;
+  height: 70px;
+  border: 1px dashed #c1c1c1;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.remove-image-btn {
+  z-index: 10;
+  border-radius: 50%;
+  border: none;
+  width: 15px;
+  height: 15px;
+  position: absolute;
+  top: 10px;
+  left: 150px;
+  cursor: pointer;
 }
 </style>
