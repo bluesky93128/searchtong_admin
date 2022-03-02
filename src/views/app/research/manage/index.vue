@@ -104,7 +104,6 @@
                 v-model="item.status"
                 :options="getStatusOptions(item.status)"
                 :reduce="(item) => item.value"
-                :on-change="onChangeStatus(item)"
               >
                 <template v-slot:selected-option="option">
                   <div class="d-flex align-items-center">
