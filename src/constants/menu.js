@@ -33,13 +33,13 @@ const data = [{
   to: "/app/second-menu",
   subs: [{
     icon: "simple-icon-paper-plane",
-    label: "menu.coin.calculation",
-    to: "/app/coin_manage/calculation"
+    label: "menu.coin.transaction",
+    to: "/app/coin_manage/transaction"
   },
   {
     icon: "simple-icon-paper-plane",
-    label: "menu.coin.transaction",
-    to: "/app/coin_manage/transaction"
+    label: "menu.coin.calculation",
+    to: "/app/coin_manage/calculation"
   },
   ]
 },
@@ -67,7 +67,12 @@ const data = [{
   id: "user_manage",
   icon: "simple-icon-people",
   label: "menu.user_manage",
-  to: "/app/user_manage"
+  to: "/app/user_manage",
+  subs: [{
+    icon: "simple-icon-people",
+    label: "menu.user_manage",
+    to: "/app/user_manage/list"
+  }]
 },
 {
   id: "terms_of_service",

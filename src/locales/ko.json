@@ -681,7 +681,16 @@
     "fee": "부가세",
     "totalPrice" :"합계"
   },
+  "tongtongcoin": {
+    "restore": "복구하기"
+  },
   "search": {
-    "all": "전체"
+    "all": "전체",
+    "today": "오늘",
+    "week": "7일",
+    "month": "1개월",
+    "halfyear": "6개월",
+    "submit": "조회",
+    "search": "검색"
   }
 }

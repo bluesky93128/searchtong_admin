@@ -37,6 +37,7 @@ const routes = [
         redirect: "/app/coin_manage/calculation",
         children: [
           { path: 'calculation', component: () => import(/* webpackChunkName: "piaf" */ './views/app/coin_manage/calculation') },
+          { path: 'detail', component: () => import(/* webpackChunkName: "piaf" */ './views/app/coin_manage/calculation/detail') },
           { path: 'transaction', component: () => import(/* webpackChunkName: "piaf" */ './views/app/coin_manage/transaction') },
         ]
       },
@@ -60,7 +61,12 @@ const routes = [
       {
         path: "user_manage",
         component: () =>
-          import(/* webpackChunkName: "single" */ "./views/app/user_manage")
+          import(/* webpackChunkName: "user_manage" */ "./views/app/user_manage"),
+        redirect: "/app/user_manage/list",
+        children: [
+          { path: 'list', component: () => import(/* webpackChunkName: "user_manage" */ './views/app/user_manage/list') },
+          { path: 'detail', component: () => import(/* webpackChunkName: "user_manage" */ './views/app/user_manage/detail') },
+        ]
       },
       {
         path: "terms_of_service",

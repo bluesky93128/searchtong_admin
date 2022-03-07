@@ -73,7 +73,7 @@
                       <div class="glyph-icon simple-icon-close"></div>
                     </div>
                     <div class="image-container w-100" v-if="item.viewType==1">
-                      <img :src="view.imageLink" v-if="view.imageLink" width="100" height="70" />
+                      <img :src="downloadUrl + '/' + view.imageLink" v-if="view.imageLink" width="100" height="70" />
                       <span v-if="view.imageLink" class="ml-4">{{view.content}}</span>
                       <div v-if="!view.imageLink" class="add-image-button" @click="onUploadImage(view)">
                         <label>+</label>
@@ -159,6 +159,7 @@ export default {
           ],
         },
       },
+      downloadUrl: downloadUrl,
       startDate: null,
       startHour: 0,
       startMinute: 0,
@@ -373,7 +374,7 @@ export default {
         fetch(apiUrl + "/upload", requestOptions)
           .then((response) => response.json())
           .then((result) => {
-            view.imageLink = downloadUrl + "/" + result.filename;
+            view.imageLink = result.filename;
             view.content = input.files[0].name.split('.').slice(0, -1).join('.');
             this.$forceUpdate();
             console.log(view);

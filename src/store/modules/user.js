@@ -74,6 +74,9 @@ export default {
               username: res.name,
               title: "Admin",
               img: "/assets/img/avatar.jpg",
+              wallet_name: res.wallet_name,
+              wallet_pw: res.wallet_pw,
+              wallet_addr: res.wallet_addr
             };
   
             localStorage.setItem("user", JSON.stringify(item));

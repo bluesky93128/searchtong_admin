@@ -100,27 +100,28 @@
             :filter="filter"
           >
             <template #cell(status)="{ item }">
-              <v-select
+              <b-form-select
                 v-model="item.status"
                 :options="getStatusOptions(item.status)"
                 :reduce="(item) => item.value"
+                @change="onChangeStatus(item)"
               >
-                <template v-slot:selected-option="option">
+                <!-- <template v-slot:selected-option="option">
                   <div class="d-flex align-items-center">
                     <div :class="'status mr-2 ' + getStatus(option.value)"></div>
                     <span>{{option.label}}</span>
                   </div>
                 </template>
                 <template v-slot:option="option">
-                  <div class="d-flex align-items-center">
+                  <div class="d-flex align-items-center" @click="onChangeStatus(item)">
                     <div :class="'status mr-2 ' + getStatus(option.value)"></div>
                     <span>{{option.label}}</span>
                   </div>
-                </template>
-              </v-select>
+                </template> -->
+              </b-form-select>
             </template>
             <template #cell(level)="{ item }">
-              <v-select
+              <b-select
                 v-model="item.level"
                 :options="level_options"
               />
@@ -249,15 +250,15 @@ export default {
             key: "status",
             label: "",
             sortable: false,
-            thClass: "fix-width bg-dark text-white text-center",
-            tdClass: "list-item-heading fix-width text-center",
+            thClass: "fix-width bg-dark text-white text-center w-10",
+            tdClass: "list-item-heading fix-width text-center w-10",
           },
           {
             key: "level",
             label: "레벨",
             sortable: true,
-            thClass: "fix-width bg-dark text-white text-center",
-            tdClass: "fix-width text-center",
+            thClass: "fix-width bg-dark text-white text-center w-10",
+            tdClass: "fix-width text-center w-10",
           },
           {
             key: "_id",
@@ -415,28 +416,28 @@ export default {
     getStatusOptions(status) {
       switch(status) {
         case 0: return [
-          { value: 0, label: "진행중" },
-          { value: 3, label: "중지" },
-          { value: 4, label: "종료" },
+          { value: 0, text: "진행중" },
+          { value: 3, text: "중지" },
+          { value: 4, text: "종료" },
         ];
         case 1: return [
-          { value: 0, label: "진행중" },
-          { value: 1, label: "예약" },
-          { value: 2, label: "대기" },
-          { value: 4, label: "종료" },
+          { value: 0, text: "진행중" },
+          { value: 1, text: "예약" },
+          { value: 2, text: "대기" },
+          { value: 4, text: "종료" },
         ];
         case 2: return [
-          { value: 1, label: "예약" },
-          { value: 2, label: "대기" },
-          { value: 4, label: "종료" },
+          { value: 1, text: "예약" },
+          { value: 2, text: "대기" },
+          { value: 4, text: "종료" },
         ];
         case 3: return [
-          { value: 0, label: "진행중" },
-          { value: 3, label: "중지" },
-          { value: 4, label: "종료" },
+          { value: 0, text: "진행중" },
+          { value: 3, text: "중지" },
+          { value: 4, text: "종료" },
         ];
         case 4: return [
-          { value: 4, label: "종료" },
+          { value: 4, text: "종료" },
         ];
       }
     },
