@@ -57,6 +57,9 @@
           <template #cell(sent)="{item}">
             {{item.coin}}
           </template>
+          <template #cell(receivedStatus)="{item}">
+            {{item.receivedStatus == 0 ? "성공" : "대기"}}
+          </template>
         </b-table>
         <b-pagination
           size="sm"
@@ -155,6 +158,13 @@ export default {
           {
             key: "sent",
             label: "보내기",
+            sortable: false,
+            tdClass: "w-10",
+            thClass: "bg-dark text-white",
+          },
+          {
+            key: "receivedStatus",
+            label: "전송성공여부",
             sortable: false,
             tdClass: "w-10",
             thClass: "bg-dark text-white",

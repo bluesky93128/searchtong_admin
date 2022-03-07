@@ -73,6 +73,9 @@
             <template #cell(postalCode)="{ item }">
               {{ item.panelInfo && item.panelInfo.postData.sigunguCode }}
             </template>
+            <template #cell(receivedStatus)="{item}">
+              {{item.receivedStatus == 0 ? "성공" : "대기"}}
+            </template>
             <template #cell(action)="{ item }">
               <router-link :to="{ path: 'user_detail', query: { id: item._id } }" class="text-link">
                 보기
@@ -195,6 +198,13 @@ export default {
             sortable: false,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
+          },
+          {
+            key: "receivedStatus",
+            label: "전송성공여부",
+            sortable: false,
+            tdClass: "w-10",
+            thClass: "bg-dark text-white",
           },
           {
             key: "createdAt",
