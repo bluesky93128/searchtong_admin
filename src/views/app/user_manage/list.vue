@@ -194,7 +194,7 @@ export default {
             tdClass: "list-item-heading fix-width text-center",
           },
           {
-            key: "_id",
+            key: "decPhoneNum",
             label: "ID",
             sortable: false,
             thClass: "bg-dark text-white text-center",

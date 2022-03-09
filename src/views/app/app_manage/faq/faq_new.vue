@@ -10,12 +10,12 @@
       <b-colxx xxs="12">
         <!-- <b-card class="mb-4" title="이벤트 등록"> -->
         <b-form @submit.prevent="onRegister">
-          <b-form-group label-cols="2" label="유형" content-cols="2">
+          <!-- <b-form-group label-cols="2" label="유형" content-cols="2">
             <v-select
               :options="typeOptions"
               v-model="faq_data.type"
             ></v-select>
-          </b-form-group>
+          </b-form-group> -->
           <b-form-group label-cols="2" label="제목" content-cols="8">
             <b-form-input v-model="faq_data.title" required />
           </b-form-group>

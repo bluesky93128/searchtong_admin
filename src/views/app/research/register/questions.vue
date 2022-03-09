@@ -43,7 +43,7 @@
                 </b-colxx>
                 <b-colxx xxs="6" class="d-flex align-items-center">
                   <span class="mr-1">최소</span>
-                  <b-input type="number" class="w-20" v-model="item.min" min="1" :disabled="item.type2==0" />
+                  <b-input type="number" class="w-20" v-model="item.min" min="1" :max="data.itemQuestion.length" :disabled="item.type2==0" />
                   <span class="ml-1">개</span>
                   <span class="mx-2">~</span>
                   <span class="mr-1">최대</span>
@@ -74,7 +74,8 @@
                     </div>
                     <div class="image-container w-100" v-if="item.viewType==1">
                       <img :src="downloadUrl + '/' + view.imageLink" v-if="view.imageLink" width="100" height="70" />
-                      <span v-if="view.imageLink" class="ml-4">{{view.content}}</span>
+                      <!-- <span v-if="view.imageLink" class="ml-4">{{view.content}}</span> -->
+                      <b-form-input class="w-70" v-if="view.imageLink" v-model="view.content"></b-form-input>
                       <div v-if="!view.imageLink" class="add-image-button" @click="onUploadImage(view)">
                         <label>+</label>
                         <label>파일첨부</label>
@@ -93,7 +94,7 @@
                 <b-input-group class="mb-3 d-flex align-items-center">
                   <div class="view-other">기타 {{view.order + 1}}</div>
                   <b-form-input class="w-50" v-model="view.content"></b-form-input>
-                  <b-form-select v-model="view.nextItemQuestionOrder" :options="['Option1', 'Option2','Option3','Option4']"  plain class="ml-2 mr-2" />
+                  <b-form-select v-model="view.nextItemQuestionOrder" :options="calcNextItemOptions(index)"  plain class="ml-2 mr-2" />
                   <span class="view-icon cursor-pointer mr-1" @click="onAddViewOther(index)"><i class="simple-icon-plus" /></span>
                   <span class="view-icon cursor-pointer mr-1" @click="onCopyViewOther(index, vIndex)"><i class="iconsminds-files" /></span>
                   <span class="view-icon cursor-pointer mr-1" @click="onDeleteViewOther(index, vIndex)"><i class="iconsminds-close" /></span>
@@ -475,6 +476,7 @@ export default {
   /* width: 100%; */
   border: 1px solid #d7d7d7;
   padding: 5px;
+  display: flex;
 }
 .image-container .add-image-button {
   width: 100px;

@@ -11,22 +11,22 @@
         <!-- <b-card class="mb-4" title="PUSH 등록"> -->
         <b-form @submit.prevent="onHorizontalSubmit">
           <b-form-group label-cols="2" label="등록일" content-cols="2">
-            <b-form-input :value="formatDate(customer_center_data.createdAt)" />
+            <b-form-input :value="formatDate(customer_center_data.createdAt)" disabled />
           </b-form-group>
           <b-form-group label-cols="2" label="ID" content-cols="2">
-            <b-form-input :value="customer_center_data.user.name" />
+            <b-form-input :value="customer_center_data.user.name" disabled />
           </b-form-group>
           <b-form-group label-cols="2" label="연락처" content-cols="2">
-            <b-form-input :value="customer_center_data.user.decPhoneNum" />
+            <b-form-input :value="customer_center_data.user.decPhoneNum" disabled />
           </b-form-group>
           <b-form-group label-cols="2" label="이메일" content-cols="2">
-            <b-form-input :value="customer_center_data.user.email" />
+            <b-form-input :value="customer_center_data.user.email" disabled />
           </b-form-group>
           <b-form-group label-cols="2" label="제목" content-cols="8">
-            <b-form-input v-model="customer_center_data.title" required />
+            <b-form-input v-model="customer_center_data.title" required disabled />
           </b-form-group>
           <b-form-group label-cols="2" label="내용" content-cols="8">
-            <b-form-textarea v-model="customer_center_data.content" required />
+            <b-form-textarea v-model="customer_center_data.content" required disabled />
           </b-form-group>
           <b-form-group label-cols="2" label="관리자 답변" content-cols="6">
             <b-form-textarea v-model="customer_center_data.answer" />

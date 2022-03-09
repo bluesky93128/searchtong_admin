@@ -121,7 +121,8 @@ export default {
         itemFinish: {},
         itemResearcher: {},
         itemReward: {},
-        isDraft: true
+        isDraft: true,
+        isSetPeriodLater: true
       },
       current_page: 0,
       key: 0

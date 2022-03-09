@@ -146,7 +146,7 @@
                   <i class="simple-icon-trash" @click="deleteItem(item)" />
                 </div>
                 <div class="manage-icon-container ml-1">
-                  <i class="simple-icon-docs" />
+                  <i class="simple-icon-docs" @click="duplicateItem(item)" />
                 </div>
               </div>
             </template>
@@ -403,6 +403,44 @@ export default {
           }
         })
         .catch(error => console.log('error', error));
+    },
+    duplicateItem(item) {
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append(
+        "Authorization",
+        "Bearer " + localStorage.getItem("token")
+      );
+
+      
+      let cloneData = {...item};
+      delete cloneData._id;
+      cloneData.isDraft = true;
+      cloneData.isSetPeriodLater = true;
+
+
+      var raw = JSON.stringify(cloneData);
+
+      var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+
+      fetch(apiUrl + "/research", requestOptions)
+        .then((response) => response.json())
+        .then((result) => {
+          console.log(result);
+          this.data = result;
+          this.data.itemText = this.data.itemText || {};
+          this.data.itemQuestion = this.data.itemQuestion || {};
+          this.data.itemFinish = this.data.itemFinish || {};
+          this.data.itemResearcher = this.data.itemResearcher || {};
+          this.data.itemReward = this.data.itemReward || {};
+          this.addNotification("success filled", "설문 복사", "설문이 복사 되었습니다");
+        })
+        .catch((error) => console.log("error", error));
     },
     getStatus(option) {
       switch(option) {

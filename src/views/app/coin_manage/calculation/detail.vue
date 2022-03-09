@@ -150,8 +150,8 @@ export default {
             thClass: "bg-dark text-white",
           },
           {
-            key: "user.nickname",
-            label: "회원명",
+            key: "user.decPhoneNum",
+            label: "회원ID",
             sortable: false,
             thClass: "bg-dark text-white",
           },
@@ -219,7 +219,7 @@ export default {
   },
   methods: {
     formatDate(date) {
-      return moment(date).format("YYYY.MM.DD");
+      return moment(date).format("YYYY.MM.DD hh:mm");
     },
 
     formatDateWithMin(date) {
