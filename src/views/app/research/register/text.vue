@@ -8,7 +8,7 @@
       <span class="gray-text ml-2">설문지 ID: {{data._id}}</span>
     </div>
 
-    <h3 class="mt-4" v-if="data.type != 'research'">{{ $t("research.benefits") }}</h3>
+    <h3 class="mt-4" v-if="data.type != 0">{{ $t("research.benefits") }}</h3>
     <b-card v-if="data.type != 0">
       <b-form>
         <b-form-group

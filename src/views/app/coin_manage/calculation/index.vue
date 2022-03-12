@@ -159,6 +159,248 @@
         </b-card>
       </b-colxx>
       <b-colxx xs="12">
+        <b-card class="mt-4">
+          <div class="d-flex per-page-container">
+            <v-select :options="[5, 10, 25, 50, 100]" v-model="perPage"></v-select>
+            <span class="span-center-text ml-2 mr-4">개씩 보기</span>
+          </div>
+          <b-tabs>
+            <b-tab :title="'전체('+totalRows+')'">
+              <b-table
+                ref="custom-table"
+                class="vuetable"
+                :current-page="currentPage"
+                :per-page="perPage"
+                :fields="bootstrapTable.fields"
+                :items="dataProvider"
+                selectable
+                select-mode="single"
+                :key="tableKey"
+                :filter="filter"
+              >
+                <template #cell(status)="{ item }">
+                  <div class="d-flex justify-content-center align-items-center">
+                    <div :class="getStatus(item.status)"></div>
+                    <span class="ml-2">{{status_options[item.status].label}}</span>
+                  </div>
+                </template>
+                <template #cell(createdAt)="{ item }">
+                  {{ formatDateWithMin(item.createdAt) }}
+                </template>
+                <template #cell(duration)="{ item }">
+                  {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
+                </template>
+                <template #cell(type)="{ item }">
+                  {{ type_options[item.type].label }}
+                </template>
+                <template #cell(action)="{ item }">
+                  <div class="d-flex flex-column">
+                    {{item.responseCost}} TTC
+                    <router-link :to="{ path: 'detail', query: { id: item._id } }" class="text-link">
+                      보기
+                    </router-link>
+                  </div>
+                </template>
+              </b-table>
+              <b-pagination
+                size="sm"
+                align="center"
+                :total-rows="totalRows"
+                :per-page="perPage"
+                v-model="currentPage"
+              >
+                <template v-slot:next-text>
+                  <i class="simple-icon-arrow-right" />
+                </template>
+                <template v-slot:prev-text>
+                  <i class="simple-icon-arrow-left" />
+                </template>
+                <template v-slot:first-text>
+                  <i class="simple-icon-control-start" />
+                </template>
+                <template v-slot:last-text>
+                  <i class="simple-icon-control-end" />
+                </template>
+              </b-pagination>
+            </b-tab>
+            <b-tab :title="'진행중('+totalWorkingRows+')'">
+              <b-table
+                ref="custom-table"
+                class="vuetable"
+                :current-page="currentWorkingPage"
+                :per-page="perPage"
+                :fields="bootstrapTable.fields"
+                :items="dataProviderWorking"
+                selectable
+                select-mode="single"
+                :key="tableKey"
+                :filter="filter"
+              >
+                <template #cell(status)="{ item }">
+                  <div class="d-flex justify-content-center align-items-center">
+                    <div :class="getStatus(item.status)"></div>
+                    <span class="ml-2">{{status_options[item.status].label}}</span>
+                  </div>
+                </template>
+                <template #cell(createdAt)="{ item }">
+                  {{ formatDateWithMin(item.createdAt) }}
+                </template>
+                <template #cell(duration)="{ item }">
+                  {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
+                </template>
+                <template #cell(type)="{ item }">
+                  {{ type_options[item.type].label }}
+                </template>
+                <template #cell(action)="{ item }">
+                  <div class="d-flex flex-column">
+                    {{item.responseCost}} TTC
+                    <router-link :to="{ path: 'detail', query: { id: item._id } }" class="text-link">
+                      보기
+                    </router-link>
+                  </div>
+                </template>
+              </b-table>
+              <b-pagination
+                size="sm"
+                align="center"
+                :total-rows="totalWorkingRows"
+                :per-page="perPage"
+                v-model="currentWorkingPage"
+              >
+                <template v-slot:next-text>
+                  <i class="simple-icon-arrow-right" />
+                </template>
+                <template v-slot:prev-text>
+                  <i class="simple-icon-arrow-left" />
+                </template>
+                <template v-slot:first-text>
+                  <i class="simple-icon-control-start" />
+                </template>
+                <template v-slot:last-text>
+                  <i class="simple-icon-control-end" />
+                </template>
+              </b-pagination>
+            </b-tab>
+            <b-tab :title="'중지('+totalStoppedRows+')'">
+              <b-table
+                ref="custom-table"
+                class="vuetable"
+                :current-page="currentStoppedPage"
+                :per-page="perPage"
+                :fields="bootstrapTable.fields"
+                :items="dataProviderStopped"
+                selectable
+                select-mode="single"
+                :key="tableKey"
+                :filter="filter"
+              >
+                <template #cell(status)="{ item }">
+                  <div class="d-flex justify-content-center align-items-center">
+                    <div :class="getStatus(item.status)"></div>
+                    <span class="ml-2">{{status_options[item.status].label}}</span>
+                  </div>
+                </template>
+                <template #cell(createdAt)="{ item }">
+                  {{ formatDateWithMin(item.createdAt) }}
+                </template>
+                <template #cell(duration)="{ item }">
+                  {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
+                </template>
+                <template #cell(type)="{ item }">
+                  {{ type_options[item.type].label }}
+                </template>
+                <template #cell(action)="{ item }">
+                  <div class="d-flex flex-column">
+                    {{item.responseCost}} TTC
+                    <router-link :to="{ path: 'detail', query: { id: item._id } }" class="text-link">
+                      보기
+                    </router-link>
+                  </div>
+                </template>
+              </b-table>
+              <b-pagination
+                size="sm"
+                align="center"
+                :total-rows="totalStoppedRows"
+                :per-page="perPage"
+                v-model="currentStoppedPage"
+              >
+                <template v-slot:next-text>
+                  <i class="simple-icon-arrow-right" />
+                </template>
+                <template v-slot:prev-text>
+                  <i class="simple-icon-arrow-left" />
+                </template>
+                <template v-slot:first-text>
+                  <i class="simple-icon-control-start" />
+                </template>
+                <template v-slot:last-text>
+                  <i class="simple-icon-control-end" />
+                </template>
+              </b-pagination>
+            </b-tab>
+            <b-tab :title="'종료('+totalFinishedRows+')'">
+              <b-table
+                ref="custom-table"
+                class="vuetable"
+                :current-page="currentFinishedPage"
+                :per-page="perPage"
+                :fields="bootstrapTable.fields"
+                :items="dataProviderFinished"
+                selectable
+                select-mode="single"
+                :key="tableKey"
+                :filter="filter"
+              >
+                <template #cell(status)="{ item }">
+                  <div class="d-flex justify-content-center align-items-center">
+                    <div :class="getStatus(item.status)"></div>
+                    <span class="ml-2">{{status_options[item.status].label}}</span>
+                  </div>
+                </template>
+                <template #cell(createdAt)="{ item }">
+                  {{ formatDateWithMin(item.createdAt) }}
+                </template>
+                <template #cell(duration)="{ item }">
+                  {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
+                </template>
+                <template #cell(type)="{ item }">
+                  {{ type_options[item.type].label }}
+                </template>
+                <template #cell(action)="{ item }">
+                  <div class="d-flex flex-column">
+                    {{item.responseCost}} TTC
+                    <router-link :to="{ path: 'detail', query: { id: item._id } }" class="text-link">
+                      보기
+                    </router-link>
+                  </div>
+                </template>
+              </b-table>
+              <b-pagination
+                size="sm"
+                align="center"
+                :total-rows="totalFinishedRows"
+                :per-page="perPage"
+                v-model="currentFinishedPage"
+              >
+                <template v-slot:next-text>
+                  <i class="simple-icon-arrow-right" />
+                </template>
+                <template v-slot:prev-text>
+                  <i class="simple-icon-arrow-left" />
+                </template>
+                <template v-slot:first-text>
+                  <i class="simple-icon-control-start" />
+                </template>
+                <template v-slot:last-text>
+                  <i class="simple-icon-control-end" />
+                </template>
+              </b-pagination>
+            </b-tab>
+          </b-tabs>
+        </b-card>
+      </b-colxx>
+      <!-- <b-colxx xs="12">
         <b-button variant="outline-primary" class="mt-4 mb-2">EXCEL 저장</b-button>
         <div class="d-flex per-page-dropdown">
             <v-select :options="[10, 25, 50, 100]" v-model="perPage"></v-select>
@@ -217,7 +459,7 @@
             <i class="simple-icon-control-end" />
           </template>
         </b-pagination>
-      </b-colxx>
+      </b-colxx> -->
     </b-row>
   </div>
 </template>
@@ -263,15 +505,28 @@ export default {
           value: 2,
         },
       ],
-      status_options: ["진행중","예약","대기","중지","종료"],
+      filter: null,
+      status_options: [
+        { value: 0, label: "진행중" },
+        { value: 1, label: "예약" },
+        { value: 2, label: "대기" },
+        { value: 3, label: "중지" },
+        { value: 4, label: "종료" },
+      ],
       secretWords: "",
       user_data: {},
       sentPrice: 0,
       receivedPrice: 0,
       balance: 0,
-      currentPage: 1,
+      currentPage: 0,
+      currentWorkingPage: 0,
+      currentStoppedPage: 0,
+      currentFinishedPage: 0,
       perPage: 5,
       totalRows: 0,
+      totalWorkingRows: 0,
+      totalStoppedRows: 0,
+      totalFinishedRows: 0,
       items: [],
       bootstrapTable: {
         selected: [],
@@ -374,10 +629,17 @@ export default {
     rowSelected(items) {
       this.bootstrapTable.selected = items;
     },
-    formatDateFromTimestamp(ts) {
-      let date = new Date(ts);
-      // console.log(date);
-      return moment(date).format("YYYY.MM.DD. hh:mm");
+    formatDateWithMin(date) {
+      return moment(date).format("YYYY.MM.DD hh:mm");
+    },
+    getStatus(status) {
+      switch(status) {
+        case 0: return 'status working';
+        case 1: return 'status reserved';
+        case 2: return 'status onhold';
+        case 3: return 'status stopped';
+        case 4: return 'status finished';
+      }
     },
     calcSentPrice(item) {
       let user = JSON.parse(localStorage.getItem('user'));
@@ -397,7 +659,7 @@ export default {
     },
     dataProvider(ctx) {
       const params = this.apiParamsConverter(ctx);
-      let promise = axios.get(apiUrl + "/research?isDraft=0", {
+      let promise = axios.get(apiUrl + "/research?status=0,3,4", {
         params: params,
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
@@ -417,31 +679,67 @@ export default {
           return [];
         });
     },
-    getList() {
-      // const params = this.apiParamsConverter(ctx);
-      let promise = axios.get(
-        apiUrl + "/tongtongcoin/tx_list",
-        {
-          // params: params,
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        }
-      );
+    dataProviderWorking(ctx) {
+      const params = this.apiParamsConverter(ctx);
+      let promise = axios.get(apiUrl + "/research?isDraft=0&status=0", {
+        params: params,
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
 
       return promise
         .then((result) => result.data)
         .then((data) => {
-          this.totalRows = data.total;
-          this.items = data.data;
-          var sent = 0;
-          var received = 0;
-          this.items.forEach(item => {
-            sent += item.refund_amount || 0;
-            received += item.total_price || 0;
-          })
-          this.sentPrice = sent;
-          this.receivedPrice = received;
+          this.currentWorkingPage = data.current_page;
+          // this.perPage = data.per_page;
+          this.totalWorkingRows = data.total;
+          const items = data.data;
+          return items;
+        })
+        .catch((_error) => {
+          return [];
+        });
+    },
+    dataProviderStopped(ctx) {
+      const params = this.apiParamsConverter(ctx);
+      let promise = axios.get(apiUrl + "/research?isDraft=0&status=3", {
+        params: params,
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+
+      return promise
+        .then((result) => result.data)
+        .then((data) => {
+          this.currentStoppedPage = data.current_page;
+          // this.perPage = data.per_page;
+          this.totalStoppedRows = data.total;
+          const items = data.data;
+          return items;
+        })
+        .catch((_error) => {
+          return [];
+        });
+    },
+    dataProviderFinished(ctx) {
+      const params = this.apiParamsConverter(ctx);
+      let promise = axios.get(apiUrl + "/research?isDraft=0&status=4", {
+        params: params,
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+
+      return promise
+        .then((result) => result.data)
+        .then((data) => {
+          this.currentFinishedPage = data.current_page;
+          // this.perPage = data.per_page;
+          this.totalFinishedRows = data.total;
+          const items = data.data;
+          return items;
         })
         .catch((_error) => {
           return [];
@@ -484,8 +782,26 @@ export default {
       if (params.sortBy && params.sortBy.length > 0) {
         apiParams.sort = `${params.sortBy}|${params.sortDesc ? "desc" : "asc"}`;
       }
-      if (params.filter && params.filter.length > 0) {
+      if (params.filter && Object.keys(params.filter).length > 0) {
         // Optional
+        if(params.filter.search_word) {
+          apiParams.search_word = params.filter.search_word;
+        }
+        if(params.filter.periodFrom) {
+          apiParams.periodFrom = params.filter.periodFrom;
+        }
+        if(params.filter.periodTo) {
+          apiParams.periodTo = params.filter.periodTo;
+        }
+        if(params.filter.registerFrom) {
+          apiParams.registerFrom = params.filter.registerFrom;
+        }
+        if(params.filter.registerTo) {
+          apiParams.registerTo = params.filter.registerTo;
+        }
+        if(params.filter.type >= 0) {
+          apiParams.type = params.filter.type;
+        }
       }
       return apiParams;
     },
@@ -561,5 +877,37 @@ export default {
 }
 .table td {
   min-width: 80px;
+}
+
+.status {
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #a3a3a3;
+}
+.working {
+  background-color: #2f5597;
+}
+.reserved {
+  background-color: #70ad47;
+}
+.onhold {
+  background-color: #ffc000;
+}
+.stopped {
+  background-color: #ff0000;
+}
+.finished {
+  background-color: #7f7f7f;
+}
+
+.custom-select {
+  height: 32px;
+  padding: 0px 10px;
+}
+.per-page-container {
+  position: absolute;
+  right: 30px;
+  top: 20px;
 }
 </style>

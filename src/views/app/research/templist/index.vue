@@ -374,32 +374,34 @@ export default {
       return apiParams;
     },
     deleteItem(item) {
-      if(item.status == 0) {
-        this.addNotification("error filled", "설문 삭제", "진행중인 설문은 삭제할수 없읍니다!");
-        return;
+      if(confirm('삭제하시겠습니까?')) {
+        if(item.status == 0) {
+          this.addNotification("error filled", "설문 삭제", "진행중인 설문은 삭제할수 없읍니다!");
+          return;
+        }
+        var myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
+
+        var requestOptions = {
+          method: 'DELETE',
+          headers: myHeaders,
+          redirect: 'follow'
+        };
+
+        var self = this;
+        fetch(apiUrl + "/research/" + item._id, requestOptions)
+          .then(response => response.json())
+          .then(result => {
+            console.log(result);
+            if(result.status) {
+              self.addNotification("success filled", "설문 삭제", "설문이 성공적으로 삭제되었습니다!");
+              self.tableKey++;
+            } else {
+              self.addNotification("error filled", "설문 삭제", "설문을 삭제하는 중에 오류가 발생했습니다!");
+            }
+          })
+          .catch(error => console.log('error', error));
       }
-      var myHeaders = new Headers();
-      myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
-
-      var requestOptions = {
-        method: 'DELETE',
-        headers: myHeaders,
-        redirect: 'follow'
-      };
-
-      var self = this;
-      fetch(apiUrl + "/research/" + item._id, requestOptions)
-        .then(response => response.json())
-        .then(result => {
-          console.log(result);
-          if(result.status) {
-            self.addNotification("success filled", "설문 삭제", "설문이 성공적으로 삭제되었습니다!");
-            self.tableKey++;
-          } else {
-            self.addNotification("error filled", "설문 삭제", "설문을 삭제하는 중에 오류가 발생했습니다!");
-          }
-        })
-        .catch(error => console.log('error', error));
     },
     duplicateItem(item) {
       var myHeaders = new Headers();

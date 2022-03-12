@@ -20,10 +20,11 @@
               <span>종료: {{formatDateWithMin(data.endAt)}}</span>
             </b-col>
             <b-col xxs="4">
-              <span>응답자수: {{data.attendCount + '/' + data.itemReward ? data.itemReward.paymentCount : '설정되지 않음'}}</span>
+              <span>응답자수: {{data.attendCount + '/' + (data.itemReward ? data.itemReward.paymentCount : '설정되지 않음')}}</span>
             </b-col>
             <b-col xxs="4">
-              <span>{{data.itemReward ? '응답비용:' +  (data.itemReward.paymentCount * data.itemReward.paymentAmount) : '설정되지 않음'}}</span>
+              <!-- <span>{{data.itemReward ? '응답비용:' + data.responseCost + '/' +  (data.itemReward.paymentCount * data.itemReward.paymentAmount) : '설정되지 않음'}}</span> -->
+              <span>응답비용: {{data.responseCost}}</span>
             </b-col>
           </b-row>
         </b-card>
@@ -134,19 +135,19 @@
                 <b-thead head-variant="dark">
                   <b-tr>
                     <b-th rowspan="2" class="main-header">구분</b-th>
-                    <b-th colspan="12" class="main-header">보기문항</b-th>
+                    <b-th :colspan="getMaxCount() + 1" class="main-header">보기문항</b-th>
                     <b-th rowspan="2" class="main-header">합계</b-th>
                   </b-tr>
                   <b-tr>
                     <b-th class="sub-header">주관식</b-th>
-                    <b-th v-for="index in 11" :key="index" class="sub-header">{{index}}</b-th>
+                    <b-th v-for="index in getMaxCount()" :key="index" class="sub-header">{{index}}</b-th>
                   </b-tr>
                 </b-thead>
                 <b-tbody>
                   <b-tr v-for="(item, index) in analyticsData.itemQuestionDetails" :key="item.itemQuestionId">
                     <b-td class="item-header">Q{{index + 1}}</b-td>
                     <b-td>{{getSubjectiveDetailCount(item)}}</b-td>
-                    <b-td v-for="subIndex in 11" :key="'sub-'+subIndex">{{getDetailCount(item, subIndex-1)}}</b-td>
+                    <b-td v-for="subIndex in getMaxCount()" :key="'sub-'+subIndex">{{getDetailCount(item, subIndex-1)}}</b-td>
                     <b-td>{{item.respondentCharacteristics.totalReplies}}</b-td>
                   </b-tr>
                 </b-tbody>
@@ -223,6 +224,92 @@
                   </b-tab>
                 </template>
               </b-tabs>
+              
+              <b-table-simple
+                small
+                responsive
+                class="text-center mt-4"
+              >
+                <b-thead head-variant="dark">
+                  <b-tr>
+                    <b-th colspan="3" rowspan="2" class="main-header">구분</b-th>
+                    <b-th colspan="2" class="main-header">조사완료 응답자수</b-th>
+                    <b-th class="main-header">목표응답자수</b-th>
+                  </b-tr>
+                  <b-tr>
+                    <b-th class="sub-header">사례수(명)</b-th>
+                    <b-th class="sub-header">비율(%)</b-th>
+                    <b-th class="sub-header">사례수(명)</b-th>
+                  </b-tr>
+                </b-thead>
+                <b-tbody>
+                  <b-tr>
+                    <b-td colspan="3" class="item-header">전체</b-td>
+                    <b-td>{{analyticsData.respondentCharacteristics.totalReplies}}</b-td>
+                    <b-td>100%</b-td>
+                    <b-td :rowspan="calcTotalRows()">{{data.itemResearcher.targetReplyCount == 0 ? '제한없음' : data.itemResearcher.targetReplyCount}}</b-td>
+                  </b-tr>
+                  <b-tr>
+                    <b-td rowspan="2" class="item-header">성별</b-td>
+                    <b-td colspan="2" class="subitem-header">남성</b-td>
+                    <b-td>{{analyticsData.respondentCharacteristics.bySex.male}}</b-td>
+                    <b-td>{{analyticsData.respondentCharacteristics.bySex.male / analyticsData.respondentCharacteristics.totalReplies * 100}}%</b-td>
+                  </b-tr>
+                  <b-tr>
+                    <b-td colspan="2" class="subitem-header">여성</b-td>
+                    <b-td>{{analyticsData.respondentCharacteristics.bySex.female}}</b-td>
+                    <b-td>{{analyticsData.respondentCharacteristics.bySex.female / analyticsData.respondentCharacteristics.totalReplies * 100}}%</b-td>
+                  </b-tr>
+                  <b-tr>
+                    <b-td rowspan="6" class="item-header">연령</b-td>
+                    <b-td colspan="2" class="subitem-header">18세 이하</b-td>
+                    <b-td>{{analyticsData.respondentCharacteristics.byAge.byAge10}}</b-td>
+                    <b-td>{{analyticsData.respondentCharacteristics.byAge.byAge10 / analyticsData.respondentCharacteristics.totalReplies * 100}}%</b-td>
+                  </b-tr>
+                  <b-tr>
+                    <b-td colspan="2" class="subitem-header">18세 이상 ~ 29세 이하</b-td>
+                    <b-td>{{analyticsData.respondentCharacteristics.byAge.byAge20}}</b-td>
+                    <b-td>{{analyticsData.respondentCharacteristics.byAge.byAge20 / analyticsData.respondentCharacteristics.totalReplies * 100}}%</b-td>
+                  </b-tr>
+                  <b-tr>
+                    <b-td colspan="2" class="subitem-header">30대</b-td>
+                    <b-td>{{analyticsData.respondentCharacteristics.byAge.byAge30}}</b-td>
+                    <b-td>{{analyticsData.respondentCharacteristics.byAge.byAge30 / analyticsData.respondentCharacteristics.totalReplies * 100}}%</b-td>
+                  </b-tr>
+                  <b-tr>
+                    <b-td colspan="2" class="subitem-header">40대</b-td>
+                    <b-td>{{analyticsData.respondentCharacteristics.byAge.byAge40}}</b-td>
+                    <b-td>{{analyticsData.respondentCharacteristics.byAge.byAge40 / analyticsData.respondentCharacteristics.totalReplies * 100}}%</b-td>
+                  </b-tr>
+                  <b-tr>
+                    <b-td colspan="2" class="subitem-header">50대</b-td>
+                    <b-td>{{analyticsData.respondentCharacteristics.byAge.byAge50}}</b-td>
+                    <b-td>{{analyticsData.respondentCharacteristics.byAge.byAge50 / analyticsData.respondentCharacteristics.totalReplies * 100}}%</b-td>
+                  </b-tr>
+                  <b-tr>
+                    <b-td colspan="2" class="subitem-header">60대 이상</b-td>
+                    <b-td>{{analyticsData.respondentCharacteristics.byAge.byAge60}}</b-td>
+                    <b-td>{{analyticsData.respondentCharacteristics.byAge.byAge60 / analyticsData.respondentCharacteristics.totalReplies * 100}}%</b-td>
+                  </b-tr>
+                  <b-tr>
+                    <b-td :rowspan="calcTotalRegionCount()" class="item-header">지역</b-td>
+                  </b-tr>
+                  <template v-for="region in Object.keys(analyticsData.respondentCharacteristics.byRegion)">
+                    <b-tr :key="region">
+                      <b-td :rowspan="calcRegionCount(region)" class="subitem-header">{{region}}</b-td>
+                    </b-tr>
+                    <b-tr v-for="sido in Object.keys(analyticsData.respondentCharacteristics.byRegion[region])" :key="sido">
+                      <b-td>{{sido}}</b-td>
+                      <b-td>{{analyticsData.respondentCharacteristics.byRegion[region][sido]}}</b-td>
+                      <b-td>{{analyticsData.respondentCharacteristics.byRegion[region][sido] / analyticsData.respondentCharacteristics.totalReplies * 100}}%</b-td>
+                    </b-tr>
+                  </template>
+                </b-tbody>
+                <b-tfoot>
+                  <b-tr>
+                  </b-tr>
+                </b-tfoot>
+              </b-table-simple>
             </b-tab>
           </b-tabs>
         </b-card>
@@ -407,6 +494,16 @@ export default {
       } else {
         return 0;
       }
+    },
+
+    getMaxCount() {
+      let max = 0;
+      this.data.itemQuestion.forEach(item => {
+        if(max < (item.itemView.length + item.itemViewOther.length)) {
+          max = item.itemView.length + item.itemViewOther.length;
+        }
+      })
+      return max;
     },
 
     addNotification(

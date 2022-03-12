@@ -1,4 +1,4 @@
-<template>
+<template v-if="data">
   <div class="mb-4">
     <p class="description">※설문유형을 선택해주세요.</p>
     <b-form>
@@ -221,10 +221,51 @@ export default {
     );
     this.endHour = new Date(this.data.endAt).getHours();
     this.endMinute = new Date(this.data.endAt).getMinutes();
+    console.log('start = ', this.startDate);
+    console.log('end = ', this.endDate);
+    console.log('data = ', this.data);
   },
   methods: {
     setType(type) {
-      this.data.type = type;
+      if(this.data.type == 0) {
+        if(type == 1) {
+          if(confirm('설문유형을 서베이로 변경합니다. 계속하시겠습니까?')) {
+            this.data.type = type;
+          }
+        } else if(type == 2) {
+          if(confirm('설문유형을 광고로 변경합니다. 본문을 제외한 모든 설정이 삭제됩니다. 계속하시겠습니까?')) {
+            this.data.type = type;
+            this.data.itemQuestion = {};
+            this.data.itemFinish = {};
+            this.data.itemResearcher = {};
+          }
+        }
+      } else if(this.data.type == 1) {
+        if(type == 0) {
+          if(confirm('설문유형을 여론조사로 변경합니다. 설정하신 구매혜택은 삭제됩니다. 계속하시겠습니까?')) {
+            this.data.type = type;
+            this.itemFinish = {};
+          }
+        } else if(type == 2) {
+          if(confirm('설문유형을 광고로 변경합니다. 본문을 제외한 모든 설정이 삭제됩니다. 계속하시겠습니까?')) {
+            this.data.type = type;
+            this.data.itemQuestion = {};
+            this.data.itemFinish = {};
+            this.data.itemResearcher = {};
+          }
+        }
+      } else if(this.data.type == 2) {
+        if(type == 0) {
+          if(confirm('설문유형을 여론조사로 변경합니다. 설정하신 구매혜택은 삭제됩니다. 계속하시겠습니까?')) {
+            this.data.type = type;
+            this.itemFinish = {};
+          }
+        } else if(type == 1) {
+          if(confirm('설문유형을 서베이로 변경합니다. 계속하시겠습니까?')) {
+            this.data.type = type;
+          }
+        }
+      }
     },
     onStartDateChanged() {
       this.data.startAt = new Date(this.startDate);
@@ -266,28 +307,28 @@ export default {
       input.click();
     },
   },
-  computed: {
-    duration() {
-      let ret = {
-        startDate: new Date(
-          this.data.startAt.getFullYear(),
-          this.data.startAt.getMonth(),
-          this.data.startAt.getDate()
-        ),
-        startHour: this.data.startAt.getHours(),
-        startMinute: this.data.startAt.getMinutes(),
-        endDate: new Date(
-          this.data.endAt.getFullYear(),
-          this.data.endAt.getMonth(),
-          this.data.endAt.getDate()
-        ),
-        endHour: this.data.endAt.getHours(),
-        endMinute: this.data.endAt.getMinutes(),
-      };
-      console.log(ret);
-      return ret;
-    },
-  },
+  // computed: {
+  //   duration() {
+  //     let ret = {
+  //       startDate: new Date(
+  //         this.data.startAt.getFullYear(),
+  //         this.data.startAt.getMonth(),
+  //         this.data.startAt.getDate()
+  //       ),
+  //       startHour: this.data.startAt.getHours(),
+  //       startMinute: this.data.startAt.getMinutes(),
+  //       endDate: new Date(
+  //         this.data.endAt.getFullYear(),
+  //         this.data.endAt.getMonth(),
+  //         this.data.endAt.getDate()
+  //       ),
+  //       endHour: this.data.endAt.getHours(),
+  //       endMinute: this.data.endAt.getMinutes(),
+  //     };
+  //     console.log(ret);
+  //     return ret;
+  //   },
+  // },
 };
 </script>
 <style scoped>

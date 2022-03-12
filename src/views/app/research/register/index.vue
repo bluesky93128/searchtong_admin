@@ -10,7 +10,7 @@
     <b-row>
       <b-colxx xxs="12">
         <b-card class="mb-4">
-          <b-card-body class="wizard wizard-default">
+          <b-card-body class="wizard wizard-default" v-if="data">
             <form-wizard
               nav-class="justify-content-start"
               :save="onSubmitMain"
@@ -86,7 +86,42 @@ export default {
   },
   data() {
     return {
-      data: {
+      data: null,
+      current_page: 0,
+      key: 0
+    };
+  },
+  mounted() {
+    console.log(this.$route.query.id);
+    this.id = this.$route.query.id;
+    if(this.id) {
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      myHeaders.append(
+        "Authorization",
+        "Bearer " + localStorage.getItem("token")
+      );
+
+      var requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+      };
+
+      fetch(apiUrl + "/research/" + this.id, requestOptions)
+        .then((response) => response.json())
+        .then((result) => {
+          console.log(result);
+          this.data = result;
+          this.data.itemText = this.data.itemText || {};
+          this.data.itemQuestion = this.data.itemQuestion || {};
+          this.data.itemFinish = this.data.itemFinish || {};
+          this.data.itemResearcher = this.data.itemResearcher || {};
+          this.data.itemReward = this.data.itemReward || {};
+        })
+        .catch((error) => console.log("error", error));
+    } else {
+      this.data = {
         type: 0,
         startAt: new Date(),
         endAt: new Date(),
@@ -123,40 +158,7 @@ export default {
         itemReward: {},
         isDraft: true,
         isSetPeriodLater: true
-      },
-      current_page: 0,
-      key: 0
-    };
-  },
-  mounted() {
-    console.log(this.$route.query.id);
-    this.id = this.$route.query.id;
-    if(this.id) {
-      var myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      myHeaders.append(
-        "Authorization",
-        "Bearer " + localStorage.getItem("token")
-      );
-
-      var requestOptions = {
-        method: "GET",
-        headers: myHeaders,
-        redirect: "follow",
       };
-
-      fetch(apiUrl + "/research/" + this.id, requestOptions)
-        .then((response) => response.json())
-        .then((result) => {
-          console.log(result);
-          this.data = result;
-          this.data.itemText = this.data.itemText || {};
-          this.data.itemQuestion = this.data.itemQuestion || {};
-          this.data.itemFinish = this.data.itemFinish || {};
-          this.data.itemResearcher = this.data.itemResearcher || {};
-          this.data.itemReward = this.data.itemReward || {};
-        })
-        .catch((error) => console.log("error", error));
     }
   },
   methods: {

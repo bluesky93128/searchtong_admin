@@ -76,101 +76,456 @@
     <b-row>
       <b-colxx xxs="12">
         <b-card class="mt-4">
-          <b-row class="mb-2">
-            <b-colxx xs="4">
-              <div class="d-flex">
-                <v-select :options="[5, 10, 25, 50, 100]" v-model="perPage"></v-select>
-                <span class="span-center-text ml-2 mr-4">개씩 보기</span>
-              </div>
-            </b-colxx>
-            <b-colxx xs="8" class="text-right">
-              <span></span>
-            </b-colxx>
-          </b-row>
-          <b-table
-            ref="custom-table"
-            class="vuetable"
-            :current-page="currentPage"
-            :per-page="perPage"
-            :fields="bootstrapTable.fields"
-            :items="dataProvider"
-            selectable
-            select-mode="single"
-            :key="tableKey"
-            :filter="filter"
-          >
-            <template #cell(status)="{ item }">
-              <b-form-select
-                v-model="item.status"
-                :options="getStatusOptions(item.status)"
-                :reduce="(item) => item.value"
-                @change="onChangeStatus(item)"
+          <div class="d-flex per-page-container">
+            <v-select :options="[5, 10, 25, 50, 100]" v-model="perPage"></v-select>
+            <span class="span-center-text ml-2 mr-4">개씩 보기</span>
+          </div>
+          <b-tabs>
+            <b-tab :title="'전체('+totalRows+')'">
+              <b-table
+                ref="custom-table"
+                class="vuetable"
+                :current-page="currentPage"
+                :per-page="perPage"
+                :fields="bootstrapTable.fields"
+                :items="dataProvider"
+                selectable
+                select-mode="single"
+                :key="tableKey"
+                :filter="filter"
               >
-                <!-- <template v-slot:selected-option="option">
-                  <div class="d-flex align-items-center">
-                    <div :class="'status mr-2 ' + getStatus(option.value)"></div>
-                    <span>{{option.label}}</span>
+                <template #cell(status)="{ item }">
+                  <custom-select
+                    :options="getStatusOptions(item.status)"
+                    :default="status_options[item.status >= 0 ? item.status : 2]"
+                    @input="onChangeStatus(item, $event)"
+                    :key="'status_'+item._id"
+                  />
+                </template>
+                <template #cell(level)="{ item }">
+                  <b-select
+                    v-model="item.level"
+                    :options="level_options"
+                    @change="onChangeLevel(item)"
+                  />
+                </template>
+                <template #cell(createdAt)="{ item }">
+                  {{ formatDateWithMin(item.createdAt) }}
+                </template>
+                <template #cell(duration)="{ item }">
+                  {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
+                </template>
+                <template #cell(type)="{ item }">
+                  {{ type_options[item.type].label }}
+                </template>
+                <template #cell(action)="{ item }">
+                  <div class="d-flex align-items-center justify-content-center">
+                    <div class="manage-icon-container">
+                      <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
+                        <i class="simple-icon-pencil" />
+                      </router-link>
+                    </div>
+                    <div class="manage-icon-container ml-1">
+                      <i class="simple-icon-trash" @click="deleteItem(item)" />
+                    </div>
+                    <div class="manage-icon-container ml-1">
+                      <i class="simple-icon-docs" @click="duplicateItem(item)" />
+                    </div>
                   </div>
                 </template>
-                <template v-slot:option="option">
-                  <div class="d-flex align-items-center" @click="onChangeStatus(item)">
-                    <div :class="'status mr-2 ' + getStatus(option.value)"></div>
-                    <span>{{option.label}}</span>
+              </b-table>
+              <b-pagination
+                size="sm"
+                align="center"
+                :total-rows="totalRows"
+                :per-page="perPage"
+                v-model="currentPage"
+              >
+                <template v-slot:next-text>
+                  <i class="simple-icon-arrow-right" />
+                </template>
+                <template v-slot:prev-text>
+                  <i class="simple-icon-arrow-left" />
+                </template>
+                <template v-slot:first-text>
+                  <i class="simple-icon-control-start" />
+                </template>
+                <template v-slot:last-text>
+                  <i class="simple-icon-control-end" />
+                </template>
+              </b-pagination>
+            </b-tab>
+            <b-tab :title="'진행중('+totalWorkingRows+')'">
+              <b-table
+                ref="custom-table"
+                class="vuetable"
+                :current-page="currentWorkingPage"
+                :per-page="perPage"
+                :fields="bootstrapTable.fields"
+                :items="dataProviderWorking"
+                selectable
+                select-mode="single"
+                :key="tableKey"
+                :filter="filter"
+              >
+                <template #cell(status)="{ item }">
+                  <custom-select
+                    :options="getStatusOptions(item.status)"
+                    :default="status_options[item.status >= 0 ? item.status : 2]"
+                    @input="onChangeStatus(item, $event)"
+                    :key="'status_'+item._id"
+                  />
+                </template>
+                <template #cell(level)="{ item }">
+                  <b-select
+                    v-model="item.level"
+                    :options="level_options"
+                    @change="onChangeLevel(item)"
+                  />
+                </template>
+                <template #cell(createdAt)="{ item }">
+                  {{ formatDateWithMin(item.createdAt) }}
+                </template>
+                <template #cell(duration)="{ item }">
+                  {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
+                </template>
+                <template #cell(type)="{ item }">
+                  {{ type_options[item.type].label }}
+                </template>
+                <template #cell(action)="{ item }">
+                  <div class="d-flex align-items-center justify-content-center">
+                    <div class="manage-icon-container">
+                      <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
+                        <i class="simple-icon-pencil" />
+                      </router-link>
+                    </div>
+                    <div class="manage-icon-container ml-1">
+                      <i class="simple-icon-trash" @click="deleteItem(item)" />
+                    </div>
+                    <div class="manage-icon-container ml-1">
+                      <i class="simple-icon-docs" @click="duplicateItem(item)" />
+                    </div>
                   </div>
-                </template> -->
-              </b-form-select>
-            </template>
-            <template #cell(level)="{ item }">
-              <b-select
-                v-model="item.level"
-                :options="level_options"
-              />
-            </template>
-            <template #cell(createdAt)="{ item }">
-              {{ formatDateWithMin(item.createdAt) }}
-            </template>
-            <template #cell(duration)="{ item }">
-              {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
-            </template>
-            <template #cell(type)="{ item }">
-              {{ type_options[item.type].label }}
-            </template>
-            <template #cell(action)="{ item }">
-              <div class="d-flex align-items-center justify-content-center">
-                <div class="manage-icon-container">
-                  <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
-                    <i class="simple-icon-pencil" />
-                  </router-link>
-                </div>
-                <div class="manage-icon-container ml-1">
-                  <i class="simple-icon-trash" @click="deleteItem(item)" />
-                </div>
-                <div class="manage-icon-container ml-1">
-                  <i class="simple-icon-docs" @click="duplicateItem(item)" />
-                </div>
-              </div>
-            </template>
-          </b-table>
-          <b-pagination
-            size="sm"
-            align="center"
-            :total-rows="totalRows"
-            :per-page="perPage"
-            v-model="currentPage"
-          >
-            <template v-slot:next-text>
-              <i class="simple-icon-arrow-right" />
-            </template>
-            <template v-slot:prev-text>
-              <i class="simple-icon-arrow-left" />
-            </template>
-            <template v-slot:first-text>
-              <i class="simple-icon-control-start" />
-            </template>
-            <template v-slot:last-text>
-              <i class="simple-icon-control-end" />
-            </template>
-          </b-pagination>
+                </template>
+              </b-table>
+              <b-pagination
+                size="sm"
+                align="center"
+                :total-rows="totalWorkingRows"
+                :per-page="perPage"
+                v-model="currentWorkingPage"
+              >
+                <template v-slot:next-text>
+                  <i class="simple-icon-arrow-right" />
+                </template>
+                <template v-slot:prev-text>
+                  <i class="simple-icon-arrow-left" />
+                </template>
+                <template v-slot:first-text>
+                  <i class="simple-icon-control-start" />
+                </template>
+                <template v-slot:last-text>
+                  <i class="simple-icon-control-end" />
+                </template>
+              </b-pagination>
+            </b-tab>
+            <b-tab :title="'예약('+totalReservedRows+')'">
+              <b-table
+                ref="custom-table"
+                class="vuetable"
+                :current-page="currentReservedPage"
+                :per-page="perPage"
+                :fields="bootstrapTable.fields"
+                :items="dataProviderReserved"
+                selectable
+                select-mode="single"
+                :key="tableKey"
+                :filter="filter"
+              >
+                <template #cell(status)="{ item }">
+                  <custom-select
+                    :options="getStatusOptions(item.status)"
+                    :default="status_options[item.status >= 0 ? item.status : 2]"
+                    @input="onChangeStatus(item, $event)"
+                    :key="'status_'+item._id"
+                  />
+                </template>
+                <template #cell(level)="{ item }">
+                  <b-select
+                    v-model="item.level"
+                    :options="level_options"
+                    @change="onChangeLevel(item)"
+                  />
+                </template>
+                <template #cell(createdAt)="{ item }">
+                  {{ formatDateWithMin(item.createdAt) }}
+                </template>
+                <template #cell(duration)="{ item }">
+                  {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
+                </template>
+                <template #cell(type)="{ item }">
+                  {{ type_options[item.type].label }}
+                </template>
+                <template #cell(action)="{ item }">
+                  <div class="d-flex align-items-center justify-content-center">
+                    <div class="manage-icon-container">
+                      <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
+                        <i class="simple-icon-pencil" />
+                      </router-link>
+                    </div>
+                    <div class="manage-icon-container ml-1">
+                      <i class="simple-icon-trash" @click="deleteItem(item)" />
+                    </div>
+                    <div class="manage-icon-container ml-1">
+                      <i class="simple-icon-docs" @click="duplicateItem(item)" />
+                    </div>
+                  </div>
+                </template>
+              </b-table>
+              <b-pagination
+                size="sm"
+                align="center"
+                :total-rows="totalReservedRows"
+                :per-page="perPage"
+                v-model="currentReservedPage"
+              >
+                <template v-slot:next-text>
+                  <i class="simple-icon-arrow-right" />
+                </template>
+                <template v-slot:prev-text>
+                  <i class="simple-icon-arrow-left" />
+                </template>
+                <template v-slot:first-text>
+                  <i class="simple-icon-control-start" />
+                </template>
+                <template v-slot:last-text>
+                  <i class="simple-icon-control-end" />
+                </template>
+              </b-pagination>
+            </b-tab>
+            <b-tab :title="'대기('+totalPausedRows+')'">
+              <b-table
+                ref="custom-table"
+                class="vuetable"
+                :current-page="currentPausedPage"
+                :per-page="perPage"
+                :fields="bootstrapTable.fields"
+                :items="dataProviderPaused"
+                selectable
+                select-mode="single"
+                :key="tableKey"
+                :filter="filter"
+              >
+                <template #cell(status)="{ item }">
+                  <custom-select
+                    :options="getStatusOptions(item.status)"
+                    :default="status_options[item.status >= 0 ? item.status : 2]"
+                    @input="onChangeStatus(item, $event)"
+                    :key="'status_'+item._id"
+                  />
+                </template>
+                <template #cell(level)="{ item }">
+                  <b-select
+                    v-model="item.level"
+                    :options="level_options"
+                    @change="onChangeLevel(item)"
+                  />
+                </template>
+                <template #cell(createdAt)="{ item }">
+                  {{ formatDateWithMin(item.createdAt) }}
+                </template>
+                <template #cell(duration)="{ item }">
+                  {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
+                </template>
+                <template #cell(type)="{ item }">
+                  {{ type_options[item.type].label }}
+                </template>
+                <template #cell(action)="{ item }">
+                  <div class="d-flex align-items-center justify-content-center">
+                    <div class="manage-icon-container">
+                      <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
+                        <i class="simple-icon-pencil" />
+                      </router-link>
+                    </div>
+                    <div class="manage-icon-container ml-1">
+                      <i class="simple-icon-trash" @click="deleteItem(item)" />
+                    </div>
+                    <div class="manage-icon-container ml-1">
+                      <i class="simple-icon-docs" @click="duplicateItem(item)" />
+                    </div>
+                  </div>
+                </template>
+              </b-table>
+              <b-pagination
+                size="sm"
+                align="center"
+                :total-rows="totalPausedRows"
+                :per-page="perPage"
+                v-model="currentPausedPage"
+              >
+                <template v-slot:next-text>
+                  <i class="simple-icon-arrow-right" />
+                </template>
+                <template v-slot:prev-text>
+                  <i class="simple-icon-arrow-left" />
+                </template>
+                <template v-slot:first-text>
+                  <i class="simple-icon-control-start" />
+                </template>
+                <template v-slot:last-text>
+                  <i class="simple-icon-control-end" />
+                </template>
+              </b-pagination>
+            </b-tab>
+            <b-tab :title="'중지('+totalStoppedRows+')'">
+              <b-table
+                ref="custom-table"
+                class="vuetable"
+                :current-page="currentStoppedPage"
+                :per-page="perPage"
+                :fields="bootstrapTable.fields"
+                :items="dataProviderStopped"
+                selectable
+                select-mode="single"
+                :key="tableKey"
+                :filter="filter"
+              >
+                <template #cell(status)="{ item }">
+                  <custom-select
+                    :options="getStatusOptions(item.status)"
+                    :default="status_options[item.status >= 0 ? item.status : 2]"
+                    @input="onChangeStatus(item, $event)"
+                    :key="'status_'+item._id"
+                  />
+                </template>
+                <template #cell(level)="{ item }">
+                  <b-select
+                    v-model="item.level"
+                    :options="level_options"
+                    @change="onChangeLevel(item)"
+                  />
+                </template>
+                <template #cell(createdAt)="{ item }">
+                  {{ formatDateWithMin(item.createdAt) }}
+                </template>
+                <template #cell(duration)="{ item }">
+                  {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
+                </template>
+                <template #cell(type)="{ item }">
+                  {{ type_options[item.type].label }}
+                </template>
+                <template #cell(action)="{ item }">
+                  <div class="d-flex align-items-center justify-content-center">
+                    <div class="manage-icon-container">
+                      <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
+                        <i class="simple-icon-pencil" />
+                      </router-link>
+                    </div>
+                    <div class="manage-icon-container ml-1">
+                      <i class="simple-icon-trash" @click="deleteItem(item)" />
+                    </div>
+                    <div class="manage-icon-container ml-1">
+                      <i class="simple-icon-docs" @click="duplicateItem(item)" />
+                    </div>
+                  </div>
+                </template>
+              </b-table>
+              <b-pagination
+                size="sm"
+                align="center"
+                :total-rows="totalStoppedRows"
+                :per-page="perPage"
+                v-model="currentStoppedPage"
+              >
+                <template v-slot:next-text>
+                  <i class="simple-icon-arrow-right" />
+                </template>
+                <template v-slot:prev-text>
+                  <i class="simple-icon-arrow-left" />
+                </template>
+                <template v-slot:first-text>
+                  <i class="simple-icon-control-start" />
+                </template>
+                <template v-slot:last-text>
+                  <i class="simple-icon-control-end" />
+                </template>
+              </b-pagination>
+            </b-tab>
+            <b-tab :title="'종료('+totalFinishedRows+')'">
+              <b-table
+                ref="custom-table"
+                class="vuetable"
+                :current-page="currentFinishedPage"
+                :per-page="perPage"
+                :fields="bootstrapTable.fields"
+                :items="dataProviderFinished"
+                selectable
+                select-mode="single"
+                :key="tableKey"
+                :filter="filter"
+              >
+                <template #cell(status)="{ item }">
+                  <custom-select
+                    :options="getStatusOptions(item.status)"
+                    :default="status_options[item.status >= 0 ? item.status : 2]"
+                    @input="onChangeStatus(item, $event)"
+                    :key="'status_'+item._id"
+                  />
+                </template>
+                <template #cell(level)="{ item }">
+                  <b-select
+                    v-model="item.level"
+                    :options="level_options"
+                    @change="onChangeLevel(item)"
+                  />
+                </template>
+                <template #cell(createdAt)="{ item }">
+                  {{ formatDateWithMin(item.createdAt) }}
+                </template>
+                <template #cell(duration)="{ item }">
+                  {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
+                </template>
+                <template #cell(type)="{ item }">
+                  {{ type_options[item.type].label }}
+                </template>
+                <template #cell(action)="{ item }">
+                  <div class="d-flex align-items-center justify-content-center">
+                    <div class="manage-icon-container">
+                      <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
+                        <i class="simple-icon-pencil" />
+                      </router-link>
+                    </div>
+                    <div class="manage-icon-container ml-1">
+                      <i class="simple-icon-trash" @click="deleteItem(item)" />
+                    </div>
+                    <div class="manage-icon-container ml-1">
+                      <i class="simple-icon-docs" @click="duplicateItem(item)" />
+                    </div>
+                  </div>
+                </template>
+              </b-table>
+              <b-pagination
+                size="sm"
+                align="center"
+                :total-rows="totalFinishedRows"
+                :per-page="perPage"
+                v-model="currentFinishedPage"
+              >
+                <template v-slot:next-text>
+                  <i class="simple-icon-arrow-right" />
+                </template>
+                <template v-slot:prev-text>
+                  <i class="simple-icon-arrow-left" />
+                </template>
+                <template v-slot:first-text>
+                  <i class="simple-icon-control-start" />
+                </template>
+                <template v-slot:last-text>
+                  <i class="simple-icon-control-end" />
+                </template>
+              </b-pagination>
+            </b-tab>
+          </b-tabs>
         </b-card>
       </b-colxx>
     </b-row>
@@ -183,10 +538,12 @@ import "vue-select/dist/vue-select.css";
 import { apiUrl } from '../../../../constants/config';
 import moment from "moment";
 import axios from "axios";
+import customSelect from '../../../../components/MyComponents/CustomSelect.vue';
 
 export default {
   components: {
     "v-select": vSelect,
+    "custom-select": customSelect
   },
   mounted() {
     // var myHeaders = new Headers();
@@ -218,8 +575,18 @@ export default {
       disabledFrom: null,
       tableKey: 0,
       currentPage: 0,
+      currentWorkingPage: 0,
+      currentReservedPage: 0,
+      currentPausedPage: 0,
+      currentStoppedPage: 0,
+      currentFinishedPage: 0,
       perPage: 5,
       totalRows: 0,
+      totalWorkingRows: 0,
+      totalReservedRows: 0,
+      totalPausedRows: 0,
+      totalStoppedRows: 0,
+      totalFinishedRows: 0,
       items: [],
       level_options: [1, 2, 3, 99],
       type_options: [
@@ -237,11 +604,11 @@ export default {
         },
       ],
       status_options: [
-        { value: 0, label: "진행중" },
-        { value: 1, label: "예약" },
-        { value: 2, label: "대기" },
-        { value: 3, label: "중지" },
-        { value: 4, label: "종료" },
+        { value: 0, text: "진행중" },
+        { value: 1, text: "예약" },
+        { value: 2, text: "대기" },
+        { value: 3, text: "중지" },
+        { value: 4, text: "종료" },
       ],
       bootstrapTable: {
         selected: [],
@@ -284,21 +651,21 @@ export default {
           {
             key: "attendCount",
             label: "참여자수",
-            sortable: false,
+            sortable: true,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
           },
           {
             key: "createdAt",
             label: "등록일",
-            sortable: false,
+            sortable: true,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
           },
           {
             key: "duration",
             label: "진행기간",
-            sortable: false,
+            sortable: true,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
           },
@@ -342,6 +709,116 @@ export default {
           return [];
         });
     },
+    dataProviderWorking(ctx) {
+      const params = this.apiParamsConverter(ctx);
+      let promise = axios.get(apiUrl + "/research?isDraft=0&status=0", {
+        params: params,
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+
+      return promise
+        .then((result) => result.data)
+        .then((data) => {
+          this.currentWorkingPage = data.current_page;
+          // this.perPage = data.per_page;
+          this.totalWorkingRows = data.total;
+          const items = data.data;
+          return items;
+        })
+        .catch((_error) => {
+          return [];
+        });
+    },
+    dataProviderReserved(ctx) {
+      const params = this.apiParamsConverter(ctx);
+      let promise = axios.get(apiUrl + "/research?isDraft=0&status=1", {
+        params: params,
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+
+      return promise
+        .then((result) => result.data)
+        .then((data) => {
+          this.currentReservedPage = data.current_page;
+          // this.perPage = data.per_page;
+          this.totalReservedRows = data.total;
+          const items = data.data;
+          return items;
+        })
+        .catch((_error) => {
+          return [];
+        });
+    },
+    dataProviderPaused(ctx) {
+      const params = this.apiParamsConverter(ctx);
+      let promise = axios.get(apiUrl + "/research?isDraft=0&status=2", {
+        params: params,
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+
+      return promise
+        .then((result) => result.data)
+        .then((data) => {
+          this.currentPausedPage = data.current_page;
+          // this.perPage = data.per_page;
+          this.totalPausedRows = data.total;
+          const items = data.data;
+          return items;
+        })
+        .catch((_error) => {
+          return [];
+        });
+    },
+    dataProviderStopped(ctx) {
+      const params = this.apiParamsConverter(ctx);
+      let promise = axios.get(apiUrl + "/research?isDraft=0&status=3", {
+        params: params,
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+
+      return promise
+        .then((result) => result.data)
+        .then((data) => {
+          this.currentStoppedPage = data.current_page;
+          // this.perPage = data.per_page;
+          this.totalStoppedRows = data.total;
+          const items = data.data;
+          return items;
+        })
+        .catch((_error) => {
+          return [];
+        });
+    },
+    dataProviderFinished(ctx) {
+      const params = this.apiParamsConverter(ctx);
+      let promise = axios.get(apiUrl + "/research?isDraft=0&status=4", {
+        params: params,
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+
+      return promise
+        .then((result) => result.data)
+        .then((data) => {
+          this.currentFinishedPage = data.current_page;
+          // this.perPage = data.per_page;
+          this.totalFinishedRows = data.total;
+          const items = data.data;
+          return items;
+        })
+        .catch((_error) => {
+          return [];
+        });
+    },
     apiParamsConverter(params) {
       let apiParams = {};
       if (params.perPage !== 0) {
@@ -351,7 +828,9 @@ export default {
         apiParams.page = params.currentPage;
       }
       if (params.sortBy && params.sortBy.length > 0) {
-        apiParams.sort = `${params.sortBy}|${params.sortDesc ? "desc" : "asc"}`;
+        // apiParams.sort = `${params.sortBy}|${params.sortDesc ? "desc" : "asc"}`;
+        apiParams.sortField = params.sortBy;
+        apiParams.sortType = params.sortDesc ? 1 : -1;
       }
       if (params.filter && Object.keys(params.filter).length > 0) {
         // Optional
@@ -374,35 +853,38 @@ export default {
           apiParams.type = params.filter.type;
         }
       }
+      this.$forceUpdate();
       return apiParams;
     },
     deleteItem(item) {
-      if(item.status == 0) {
-        this.addNotification("error filled", "설문 삭제", "진행중인 설문은 삭제할수 없읍니다!");
-        return;
+      if(confirm("삭제하시겠습니까?")) {
+        if(item.status == 0) {
+          this.addNotification("error filled", "설문 삭제", "진행중인 설문은 삭제할수 없읍니다!");
+          return;
+        }
+        var myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
+
+        var requestOptions = {
+          method: 'DELETE',
+          headers: myHeaders,
+          redirect: 'follow'
+        };
+
+        var self = this;
+        fetch(apiUrl + "/research/" + item._id, requestOptions)
+          .then(response => response.json())
+          .then(result => {
+            console.log(result);
+            if(result.status) {
+              self.addNotification("success filled", "설문 삭제", "설문이 성공적으로 삭제되었습니다!");
+              self.tableKey++;
+            } else {
+              self.addNotification("error filled", "설문 삭제", "설문을 삭제하는 중에 오류가 발생했습니다!");
+            }
+          })
+          .catch(error => console.log('error', error));
       }
-      var myHeaders = new Headers();
-      myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
-
-      var requestOptions = {
-        method: 'DELETE',
-        headers: myHeaders,
-        redirect: 'follow'
-      };
-
-      var self = this;
-      fetch(apiUrl + "/research/" + item._id, requestOptions)
-        .then(response => response.json())
-        .then(result => {
-          console.log(result);
-          if(result.status) {
-            self.addNotification("success filled", "설문 삭제", "설문이 성공적으로 삭제되었습니다!");
-            self.tableKey++;
-          } else {
-            self.addNotification("error filled", "설문 삭제", "설문을 삭제하는 중에 오류가 발생했습니다!");
-          }
-        })
-        .catch(error => console.log('error', error));
     },
     duplicateItem(item) {
       var myHeaders = new Headers();
@@ -452,9 +934,10 @@ export default {
       }
     },
     getStatusOptions(status) {
-      switch(status) {
+      switch(parseInt(status)) {
         case 0: return [
           { value: 0, text: "진행중" },
+          // { value: 0, html: '<div class="d-flex align-items-center"><div class="status mr-2 working"></div><span>진행중</span></div>'},
           { value: 3, text: "중지" },
           { value: 4, text: "종료" },
         ];
@@ -477,10 +960,84 @@ export default {
         case 4: return [
           { value: 4, text: "종료" },
         ];
+        default: return [
+          { value: 1, text: "예약" },
+          { value: 2, text: "대기" },
+          { value: 4, text: "종료" },
+        ]
       }
     },
-    onChangeStatus(item) {
+    onChangeStatus(item, $event) {
+      let prevStatus = item.status;
       console.log('item = ', item);
+      item.status = $event.value;
+
+      let data = {
+        status: $event.value
+      };
+      if(prevStatus == 0) {
+        if(item.status == 4) {
+          data.endAt = new Date();
+          this.updateResearch(data, item._id);
+        }
+      } else if(prevStatus == 1) {
+        if(item.status == 0) {
+          data.startAt = new Date();
+          this.updateResearch(data, item._id);
+        } else if(item.status == 2) {
+          data.startAt = null;
+          data.endAt = null;
+          data.isSetPeriodLater = true;
+          this.updateResearch(data, item._id);
+        } else if(item.status == 4) {
+          data.startAt = null;
+          data.endAt = null;
+          data.isSetPeriodLater = true;
+          this.updateResearch(data, item._id);
+        }
+      } else if(prevStatus == 2) {
+        if(item.status == 1) {
+          this.$router.push({path: 'register', query: {id: item._id}})
+        }
+      } else if(prevStatus == 3) {
+        if(item.status == 4) {
+          this.endAt = new Date();
+          this.updateResearch(data, item._id);
+        }
+      }
+      
+    },
+    onChangeLevel(item) {
+      console.log(item.level);
+      let data = {
+        level: item.level
+      };
+      this.updateResearch(data, item._id);
+    },
+    updateResearch(data, id) {
+      var myHeaders = new Headers();
+      myHeaders.append(
+        "Authorization",
+        "Bearer " + localStorage.getItem("token")
+      );
+      myHeaders.append("Content-Type", "application/json");
+
+      var raw = JSON.stringify(data);
+
+      var requestOptions = {
+        method: "PUT",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+
+      fetch(apiUrl + "/research/" + id, requestOptions)
+        .then((response) => response.text())
+        .then((result) => {
+          console.log(result)
+          this.addNotification("success filled", "설문 상태변경", "상태가 변경 되었습니다");
+        })
+        .catch((error) => console.log("error", error));
     },
     onClickSearch() {
       this.filter = {...this.searchForm};
@@ -516,25 +1073,13 @@ export default {
   color: #3a3a3a;
   text-decoration: none;
 }
-.status {
-  width: 10px;
-  height: 10px;
-  border-radius: 5px;
-  background-color: #a3a3a3;
+.custom-select {
+  height: 32px;
+  padding: 0px 10px;
 }
-.working {
-  background-color: #2f5597;
-}
-.reserved {
-  background-color: #70ad47;
-}
-.onhold {
-  background-color: #ffc000;
-}
-.stopped {
-  background-color: #ff0000;
-}
-.finished {
-  background-color: #7f7f7f;
+.per-page-container {
+  position: absolute;
+  right: 30px;
+  top: 20px;
 }
 </style>

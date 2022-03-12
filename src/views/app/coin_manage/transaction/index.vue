@@ -263,7 +263,7 @@ export default {
             thClass: "bg-dark text-white",
           },
           {
-            key: "userId",
+            key: "user.decPhoneNum",
             label: "회원ID",
             sortable: false,
             thClass: "bg-dark text-white",

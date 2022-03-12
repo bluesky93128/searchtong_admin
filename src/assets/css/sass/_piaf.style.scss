@@ -7868,3 +7868,27 @@ select:-webkit-autofill:focus {
         min-height: 400px;
     }
 }
+
+.status-option-container {
+    .status {
+        width: 10px;
+        height: 10px;
+        border-radius: 5px;
+        background-color: #a3a3a3;
+      }
+      .working {
+        background-color: #2f5597;
+      }
+      .reserved {
+        background-color: #70ad47;
+      }
+      .onhold {
+        background-color: #ffc000;
+      }
+      .stopped {
+        background-color: #ff0000;
+      }
+      .finished {
+        background-color: #7f7f7f;
+      }
+}

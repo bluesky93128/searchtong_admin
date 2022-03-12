@@ -20,10 +20,11 @@
               <span>종료: {{formatDateWithMin(data.endAt)}}</span>
             </b-col>
             <b-col xxs="4">
-              <span>응답자수: {{data.attendCount + '/' + data.itemReward ? data.itemReward.paymentCount : '설정되지 않음'}}</span>
+              <span>응답자수: {{data.attendCount + '/' + (data.itemReward ? data.itemReward.paymentCount : '설정되지 않음')}}</span>
             </b-col>
             <b-col xxs="4">
-              <span>{{data.itemReward ? '응답비용:' +  (data.itemReward.paymentCount * data.itemReward.paymentAmount) : '설정되지 않음'}}</span>
+              <!-- <span>{{data.itemReward ? '응답비용:' + data.responseCost + '/' +  (data.itemReward.paymentCount * data.itemReward.paymentAmount) : '설정되지 않음'}}</span> -->
+              <span>응답비용: {{data.responseCost}}</span>
             </b-col>
           </b-row>
         </b-card>
@@ -151,7 +152,7 @@ export default {
           },
           {
             key: "user.decPhoneNum",
-            label: "회원ID",
+            label: "회원명",
             sortable: false,
             thClass: "bg-dark text-white",
           },
@@ -219,7 +220,7 @@ export default {
   },
   methods: {
     formatDate(date) {
-      return moment(date).format("YYYY.MM.DD hh:mm");
+      return moment(date).format("YYYY.MM.DD");
     },
 
     formatDateWithMin(date) {
