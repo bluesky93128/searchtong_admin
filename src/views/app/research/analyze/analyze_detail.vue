@@ -258,7 +258,7 @@
                     <b-th :colspan="getMaxViewitems() + 1" class="main-header"
                       >보기문항</b-th
                     >
-                    <b-th :colspan="getMaxOtherViewitems()" class="main-header"
+                    <b-th :colspan="getMaxOtherViewitems()" v-if="getMaxOtherViewitems()" class="main-header"
                       >기타문항</b-th
                     >
                     <b-th rowspan="2" class="main-header">합계</b-th>
