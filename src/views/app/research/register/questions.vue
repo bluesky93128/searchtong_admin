@@ -39,15 +39,16 @@
                   <b-form-radio-group
                     v-model="item.type2"
                     :options="type2Options"
+                    @change="onChangeType2(item)"
                   ></b-form-radio-group>
                 </b-colxx>
                 <b-colxx xxs="6" class="d-flex align-items-center">
                   <span class="mr-1">최소</span>
-                  <b-input type="number" class="w-20" v-model="item.min" min="1" :max="data.itemQuestion.length" :disabled="item.type2==0" />
+                  <b-input type="number" class="w-20" v-model="item.min" min="1" :max="data.itemQuestion.length" :disabled="item.type2==0" @change="onChangeMinValue(item)" />
                   <span class="ml-1">개</span>
                   <span class="mx-2">~</span>
                   <span class="mr-1">최대</span>
-                  <b-input type="number" class="w-20" v-model="item.max" :min="item.min" :max="data.itemQuestion.length" :disabled="item.type2==0" />
+                  <b-input type="number" class="w-20" v-model="item.max" :min="item.min" :max="data.itemQuestion.length" :disabled="item.type2==0" @change="onChangeMaxValue(item)" />
                   <span class="ml-1">개</span>
                 </b-colxx>
               </b-row>
@@ -69,7 +70,7 @@
                   <div class="d-flex w-70">
                     <div class="view-handle handle">{{view.order + 1}}</div>
                     <b-form-input class="w-80" v-if="item.viewType==0" v-model="view.content"></b-form-input>
-                    <div class="remove-image-btn" @click="onRemoveImage(view)" v-if="view.imageLink">
+                    <div class="remove-image-btn" @click="onRemoveImage(view)" v-if="item.viewType == 1 && view.imageLink">
                       <div class="glyph-icon simple-icon-close"></div>
                     </div>
                     <div class="image-container w-100" v-if="item.viewType==1">
@@ -279,7 +280,7 @@ export default {
           {
             order: 0,
             content: "",
-            nextItemQuestionOrder: 1,
+            nextItemQuestionOrder: -1,
             imageLinks: [""],
             isMain: true,
           }
@@ -387,6 +388,23 @@ export default {
     onRemoveImage(view) {
       view.imageLink = null;
       view.content = '';
+    },
+    onChangeMinValue(item) {
+      if(item.min < 1) {
+        item.min = 1;
+      }
+    },
+    onChangeMaxValue(item) {
+      if(item.max > this.data.itemQuestion.length) {
+        item.max = this.data.itemQuestion.length;
+      }
+    },
+    onChangeType2(item) {
+      if(item.type2 == 1) {
+        item.min = 1;
+        item.max = 1;
+      }
+      this.$forceUpdate();
     }
   },
   computed: {

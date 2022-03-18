@@ -30,6 +30,7 @@
           >
             <div class="d-flex align-items-center">
               <b-form-radio-group
+                v-model="data.itemReward.paymentMethod"
                 :options="paymentCountOption"
               ></b-form-radio-group>
               <b-input class="ml-2 w-15" type="number" v-model="data.itemReward.paymentCount" @change="key++" />
@@ -42,6 +43,7 @@
           >
             <div class="d-flex align-items-center">
               <b-form-radio-group
+                v-model="data.itemReward.paymentMethod"
                 :options="paymentAmountOption"
               ></b-form-radio-group>
               <b-input class="ml-2 w-15" type="number" v-model="data.itemReward.paymentAmount" @change="key++" />

@@ -307,6 +307,18 @@ export default {
       input.click();
     },
   },
+  watch: {
+    startDate(val) {
+      this.data.startAt = new Date(val);
+      this.data.startAt.setHours(this.startHour);
+      this.data.startAt.setMinutes(this.startMinute);
+    },
+    endDate(val) {
+      this.data.endAt = new Date(val);
+      this.data.endAt.setHours(this.endHour);
+      this.data.endAt.setMinutes(this.endMinute);
+    }
+  }
   // computed: {
   //   duration() {
   //     let ret = {

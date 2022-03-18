@@ -53,7 +53,7 @@
             {{index + 1}}
           </template>
           <template #cell(createdAt)="{item}">
-            {{formatDate(item.createdAt)}}
+            {{formatDateWithMin(item.createdAt)}}
           </template>
           <template #cell(sent)="{item}">
             {{item.coin}}

@@ -186,14 +186,14 @@ export default {
             thClass: "bg-dark text-white",
           },
           {
-            key: "id",
+            key: "user.decPhoneNum",
             label: "ID",
             sortable: false,
             thClass: "bg-dark text-white",
           },
           {
             key: "title",
-            label: "이름",
+            label: "제목",
             sortable: false,
             thClass: "bg-dark text-white",
           },

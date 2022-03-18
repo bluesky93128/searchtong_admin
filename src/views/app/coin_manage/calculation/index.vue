@@ -562,28 +562,28 @@ export default {
           {
             key: "attendCount",
             label: "참여자수",
-            sortable: false,
+            sortable: true,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
           },
           {
             key: "createdAt",
             label: "등록일",
-            sortable: false,
+            sortable: true,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
           },
           {
             key: "duration",
             label: "진행기간",
-            sortable: false,
+            sortable: true,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
           },
           {
             key: "action",
             label: "응답비용",
-            sortable: false,
+            sortable: true,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
           },
@@ -672,6 +672,7 @@ export default {
           this.currentPage = data.current_page;
           // this.perPage = data.per_page;
           this.totalRows = data.total;
+          this.sentPrice = data.totalCost;
           const items = data.data;
           return items;
         })
@@ -780,7 +781,12 @@ export default {
         apiParams.page = params.currentPage;
       }
       if (params.sortBy && params.sortBy.length > 0) {
-        apiParams.sort = `${params.sortBy}|${params.sortDesc ? "desc" : "asc"}`;
+        // apiParams.sort = `${params.sortBy}|${params.sortDesc ? "desc" : "asc"}`;
+        apiParams.sortField = params.sortBy;
+        if(apiParams.sortField == 'action') {
+          apiParams.sortField = 'responseCost';
+        }
+        apiParams.sortType = params.sortDesc ? 1 : -1;
       }
       if (params.filter && Object.keys(params.filter).length > 0) {
         // Optional

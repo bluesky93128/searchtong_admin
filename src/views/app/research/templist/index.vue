@@ -278,13 +278,13 @@ export default {
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
           },
-          {
-            key: "attendCount",
-            label: "참여자수",
-            sortable: false,
-            thClass: "bg-dark text-white text-center",
-            tdClass: " text-center",
-          },
+          // {
+          //   key: "attendCount",
+          //   label: "참여자수",
+          //   sortable: false,
+          //   thClass: "bg-dark text-white text-center",
+          //   tdClass: " text-center",
+          // },
           {
             key: "createdAt",
             label: "등록일",

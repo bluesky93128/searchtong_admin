@@ -120,7 +120,7 @@
                 </template>
                 <template #cell(action)="{ item }">
                   <div class="d-flex align-items-center justify-content-center">
-                    <div class="manage-icon-container">
+                    <div class="manage-icon-container" v-if="item.status != 4">
                       <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
                         <i class="simple-icon-pencil" />
                       </router-link>
@@ -194,7 +194,7 @@
                 </template>
                 <template #cell(action)="{ item }">
                   <div class="d-flex align-items-center justify-content-center">
-                    <div class="manage-icon-container">
+                    <div class="manage-icon-container" v-if="item.status != 4">
                       <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
                         <i class="simple-icon-pencil" />
                       </router-link>
@@ -268,7 +268,7 @@
                 </template>
                 <template #cell(action)="{ item }">
                   <div class="d-flex align-items-center justify-content-center">
-                    <div class="manage-icon-container">
+                    <div class="manage-icon-container" v-if="item.status != 4">
                       <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
                         <i class="simple-icon-pencil" />
                       </router-link>
@@ -342,7 +342,7 @@
                 </template>
                 <template #cell(action)="{ item }">
                   <div class="d-flex align-items-center justify-content-center">
-                    <div class="manage-icon-container">
+                    <div class="manage-icon-container" v-if="item.status != 4">
                       <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
                         <i class="simple-icon-pencil" />
                       </router-link>
@@ -416,7 +416,7 @@
                 </template>
                 <template #cell(action)="{ item }">
                   <div class="d-flex align-items-center justify-content-center">
-                    <div class="manage-icon-container">
+                    <div class="manage-icon-container" v-if="item.status != 4">
                       <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
                         <i class="simple-icon-pencil" />
                       </router-link>
@@ -490,7 +490,7 @@
                 </template>
                 <template #cell(action)="{ item }">
                   <div class="d-flex align-items-center justify-content-center">
-                    <div class="manage-icon-container">
+                    <div class="manage-icon-container" v-if="item.status != 4">
                       <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
                         <i class="simple-icon-pencil" />
                       </router-link>
@@ -979,6 +979,8 @@ export default {
         if(item.status == 4) {
           data.endAt = new Date();
           this.updateResearch(data, item._id);
+        } else if(item.status == 3) {
+          this.updateResearch(data, item._id);
         }
       } else if(prevStatus == 1) {
         if(item.status == 0) {
@@ -1003,7 +1005,11 @@ export default {
         if(item.status == 4) {
           this.endAt = new Date();
           this.updateResearch(data, item._id);
+        } else if(item.status == 0) {
+          this.updateResearch(data, item._id);
         }
+      } else {
+        this.updateResearch(data, item._id);
       }
       
     },
@@ -1035,6 +1041,7 @@ export default {
         .then((response) => response.text())
         .then((result) => {
           console.log(result)
+          this.tableKey++;
           this.addNotification("success filled", "설문 상태변경", "상태가 변경 되었습니다");
         })
         .catch((error) => console.log("error", error));

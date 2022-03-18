@@ -259,7 +259,7 @@ export default {
           {
             key: "createdAt",
             label: "발생일시",
-            sortable: false,
+            sortable: true,
             thClass: "bg-dark text-white",
           },
           {
@@ -458,7 +458,9 @@ export default {
         apiParams.page = params.currentPage;
       }
       if (params.sortBy && params.sortBy.length > 0) {
-        apiParams.sort = `${params.sortBy}|${params.sortDesc ? "desc" : "asc"}`;
+        // apiParams.sort = `${params.sortBy}|${params.sortDesc ? "desc" : "asc"}`;
+        apiParams.sortField = params.sortBy;
+        apiParams.sortType = params.sortDesc ? 1 : -1;
       }
       if (params.filter && params.filter.length > 0) {
         // Optional

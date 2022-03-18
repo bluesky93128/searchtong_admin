@@ -154,8 +154,21 @@ export default {
           },
         ],
         itemFinish: {},
-        itemResearcher: {},
-        itemReward: {},
+        itemResearcher: {
+          condition: 1,
+          gender: 0,
+          age: 0,
+          region: 0,
+          job: 0,
+          education: 0,
+          salary: 0,
+          targetReplyCount: 0
+        },
+        itemReward: {
+          paymentMethod: 0,
+          paymentCount: 1,
+          paymentAmount: 1
+        },
         isDraft: true,
         isSetPeriodLater: true
       };
@@ -172,13 +185,14 @@ export default {
         );
         myHeaders.append("Content-Type", "application/json");
 
-        // if(!this.data.status) {
+        let today = new Date();
+        if(this.data.startAt > today) {
           if(this.data.isSetPeriodLater) {
             this.data.status = 2;
           } else {
             this.data.status = 1;
           }
-        // }
+        }
 
         var raw = JSON.stringify(this.data);
 

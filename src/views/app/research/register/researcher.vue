@@ -33,10 +33,11 @@
         label-cols="2"
         :disabled="!!data.itemResearcher.condition"
       >
-        <b-form-radio-group
+        <b-form-checkbox-group
           v-model="data.itemResearcher.age"
-          :options="ageOptions"
-        ></b-form-radio-group>
+        >
+          <b-form-checkbox v-for="option in ageOptions" :key="option.value" :value="option.value" @change="onChangeAgeOption(option.value)">{{option.text}}</b-form-checkbox>
+        </b-form-checkbox-group>
       </b-form-group>
       <b-form-group
         :label="$t('research.region')"
@@ -327,6 +328,18 @@ export default {
         }
       })
       return index;
+    },
+    onChangeAgeOption(value) {
+      if(value == 0) {
+        this.data.itemResearcher.age = [0];
+      } else {
+        let index = this.data.itemResearcher.age.findIndex(x => x == 0);
+        if(index >= 0) {
+          this.data.itemResearcher.age.splice(index, 1);
+        }
+        this.data.itemResearcher.age.push(value);
+      }
+      console.log(this.data.itemResearcher.age);  
     }
   },
   computed: {
