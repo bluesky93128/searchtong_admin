@@ -186,6 +186,7 @@ export default {
         myHeaders.append("Content-Type", "application/json");
 
         let today = new Date();
+        today.setHours(0, 0, 0);
         if(this.data.startAt > today) {
           if(this.data.isSetPeriodLater) {
             this.data.status = 2;
