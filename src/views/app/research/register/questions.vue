@@ -341,7 +341,7 @@ export default {
       } else {
         options.push({
           text: "다음 문항 이동",
-          value: index + 1
+          value: 0
         });
         for(let i = index + 2; i < this.data.itemQuestion.length; i++) {
           options.push({

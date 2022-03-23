@@ -752,11 +752,17 @@ export default {
     },
 
     getItemCount(item, index) {
-      if (item.itemViewDetails[index].respondentCharacteristics) {
-        return item.itemViewDetails[index].respondentCharacteristics
-          .totalReplies;
-      } else {
-        return 0;
+      try {
+        if (item.itemViewDetails[index].respondentCharacteristics) {
+          return item.itemViewDetails[index].respondentCharacteristics
+            .totalReplies;
+        } else {
+          return 0;
+        }
+      } catch(e) {
+        console.log('----------------')
+        console.log(item);
+        console.log(index);
       }
     },
 
