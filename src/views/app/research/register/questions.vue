@@ -223,6 +223,7 @@ export default {
     },
     onCopyView(index, vIndex) {
       var temp = {...this.data.itemQuestion[index].itemView[vIndex]};
+      delete temp._id;
       temp.order = this.data.itemQuestion[index].itemView.length;
       this.data.itemQuestion[index].itemView.push(temp);
     },
@@ -255,6 +256,7 @@ export default {
     },
     onCopyViewOther(index, vIndex) {
       var temp = {...this.data.itemQuestion[index].itemViewOther[vIndex]};
+      delete temp._id;
       temp.order = this.data.itemQuestion[index].itemViewOther.length;
       this.data.itemQuestion[index].itemView.push(temp);
       this.$forceUpdate();
@@ -294,6 +296,7 @@ export default {
     },
     onCopyItem(index) {
       var temp = {...this.data.itemQuestion[index]};
+      delete temp._id;
       temp.order = this.data.itemQuestion.length;
       this.data.itemQuestion.push(temp);
       this.$forceUpdate();
