@@ -296,6 +296,14 @@ export default {
     },
     onCopyItem(index) {
       var temp = {...this.data.itemQuestion[index]};
+      let tmpViews = [];
+      temp.itemView.forEach(view => {
+        let tmpView = {...view};
+        delete tmpView._id;
+        tmpViews.push(tmpView);
+      })
+      delete temp.itemView;
+      temp.itemView = tmpViews;
       delete temp._id;
       temp.order = this.data.itemQuestion.length;
       this.data.itemQuestion.push(temp);
@@ -380,7 +388,7 @@ export default {
           .then((response) => response.json())
           .then((result) => {
             view.imageLink = result.filename;
-            view.content = input.files[0].name.split('.').slice(0, -1).join('.');
+            // view.content = input.files[0].name.split('.').slice(0, -1).join('.');
             this.$forceUpdate();
             console.log(view);
           })
@@ -398,8 +406,8 @@ export default {
       }
     },
     onChangeMaxValue(item) {
-      if(item.max > this.data.itemQuestion.length) {
-        item.max = this.data.itemQuestion.length;
+      if(item.max > item.itemView.length) {
+        item.max = item.itemView.length;
       }
     },
     onChangeType2(item) {
