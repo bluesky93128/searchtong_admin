@@ -217,7 +217,7 @@ export default {
     onAddView(index) {
       this.data.itemQuestion[index].itemView.push({
         content: "",
-        nextItemQuestionOrder: 1,
+        nextItemQuestionOrder: 0,
         order: this.data.itemQuestion[index].itemView.length
       });
     },
@@ -249,7 +249,7 @@ export default {
       }
       this.data.itemQuestion[index].itemViewOther.push({
         content: "",
-        nextItemQuestionOrder: 1,
+        nextItemQuestionOrder: 0,
         order: this.data.itemQuestion[index].itemViewOther.length
       });
       this.$forceUpdate();
