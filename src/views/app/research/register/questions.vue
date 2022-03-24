@@ -236,7 +236,7 @@ export default {
         this.data.itemQuestion[index].itemView.push({
           order: 0,
           content: "",
-          nextItemQuestionOrder: 1,
+          nextItemQuestionOrder: 0,
           imageLinks: [""],
           isMain: true,
         })
@@ -330,7 +330,7 @@ export default {
                 // _id: Schema.Types.ObjectId
                 order: 0, // 순서
                 content: "", // 본문
-                nextItemQuestionOrder: 1, // 다음문항순서 (itemQuestion.order)
+                nextItemQuestionOrder: 0, // 다음문항순서 (itemQuestion.order)
                 imageLinks: [""], // 이메지링크목록
                 isMain: true, // 기본물음인가? (true: 기본물음, false: 기타물음)
               },
