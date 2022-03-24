@@ -83,7 +83,7 @@
                       </div>
                     </div>
                   </div>
-                  <b-form-select v-model="view.nextItemQuestionOrder" :options="calcNextItemOptions(index)"  plain class="ml-2 mr-2" />
+                  <b-form-select v-model="view.nextItemQuestionOrder" v-if="index != data.itemQuestion.length-1" :options="calcNextItemOptions(index)"  plain class="ml-2 mr-2" />
                   <span class="view-icon cursor-pointer mr-1" @click="onAddView(index)"><i class="simple-icon-plus" /></span>
                   <span class="view-icon cursor-pointer mr-1" @click="onCopyView(index, vIndex)"><i class="iconsminds-files" /></span>
                   <span class="view-icon cursor-pointer mr-1" @click="onDeleteView(index, vIndex)"><i class="iconsminds-close" /></span>
@@ -95,7 +95,7 @@
                 <b-input-group class="mb-3 d-flex align-items-center">
                   <div class="view-other">기타 {{view.order + 1}}</div>
                   <b-form-input class="w-50" v-model="view.content"></b-form-input>
-                  <b-form-select v-model="view.nextItemQuestionOrder" :options="calcNextItemOptions(index)"  plain class="ml-2 mr-2" />
+                  <!-- <b-form-select v-model="view.nextItemQuestionOrder" :options="calcNextItemOptions(index)"  plain class="ml-2 mr-2" /> -->
                   <span class="view-icon cursor-pointer mr-1" @click="onAddViewOther(index)"><i class="simple-icon-plus" /></span>
                   <span class="view-icon cursor-pointer mr-1" @click="onCopyViewOther(index, vIndex)"><i class="iconsminds-files" /></span>
                   <span class="view-icon cursor-pointer mr-1" @click="onDeleteViewOther(index, vIndex)"><i class="iconsminds-close" /></span>
@@ -300,6 +300,7 @@ export default {
       temp.itemView.forEach(view => {
         let tmpView = {...view};
         delete tmpView._id;
+        tmpView.nextItemQuestionOrder = -1;
         tmpViews.push(tmpView);
       })
       delete temp.itemView;
@@ -313,6 +314,9 @@ export default {
       this.data.itemQuestion.splice(index, 1);
       this.data.itemQuestion.forEach((item, i) => {
         item.order = i;
+        if(item.nextItemQuestionOrder == index) {
+          item.nextItemQuestionOrder = 0;
+        }
       });
       if(!this.data.itemQuestion.length) {
         this.data.itemQuestion.push({

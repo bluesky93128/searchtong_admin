@@ -368,13 +368,13 @@
                           </b-colxx>
                           <b-colxx xxs="5" class="mt-4">
                             <doughnut-chart
-                              :data="doughnutChartData"
+                              :data="doughnutChartData[index]"
                               containerClass="chart-container"
                             />
                           </b-colxx>
                           <b-colxx xxs="7" class="mt-4">
                             <bar-chart
-                              :data="barChartData"
+                              :data="barChartData[index]"
                               shadow
                               containerClass="chart-container"
                             />
@@ -525,10 +525,10 @@
                             <b-td>{{ sido }}</b-td>
                             <b-td>{{item.respondentCharacteristics.byRegion[region][sido]}}</b-td>
                             <b-td v-for="detailItem in item.itemViewDetails">
-                              {{((detailItem.respondentCharacteristics && detailItem.respondentCharacteristics.byRegion[region][sido] ? detailItem.respondentCharacteristics.byRegion[region][sido] : 0) /item.respondentCharacteristics.totalReplies) *100}}%
+                              {{((detailItem.respondentCharacteristics.byRegion[region] && detailItem.respondentCharacteristics.byRegion[region][sido] ? detailItem.respondentCharacteristics.byRegion[region][sido] : 0) /item.respondentCharacteristics.totalReplies) *100}}%
                             </b-td>
                             <b-td v-for="detailItem in item.itemViewOtherDetails">
-                              {{((detailItem.respondentCharacteristics && detailItem.respondentCharacteristics.byRegion[region][sido] ? detailItem.respondentCharacteristics.byRegion[region][sido] : 0) /item.respondentCharacteristics.totalReplies) *100}}%
+                              {{((detailItem.respondentCharacteristics.byRegion[region] && detailItem.respondentCharacteristics.byRegion[region][sido] ? detailItem.respondentCharacteristics.byRegion[region][sido] : 0) /item.respondentCharacteristics.totalReplies) *100}}%
                             </b-td>
                           </b-tr>
                         </template>
@@ -576,36 +576,8 @@ export default {
         itemReward: {}
       },
       analyticsData: null,
-      doughnutChartData: {
-        labels: ["남자", "여자"],
-        datasets: [
-          {
-            label: "",
-            borderColor: ["#ed7d31", "#9dc3e6"],
-            backgroundColor: ["#ed7d31", "#9dc3e6"],
-            borderWidth: 2,
-            data: [15, 25]
-          }
-        ]
-      },
-      barChartData: {
-        labels: [
-          "18세 이하",
-          "18세 이상~29세 이하",
-          "30대",
-          "40대",
-          "50대",
-          "60대"
-        ],
-        datasets: [
-          {
-            borderColor: "#4990cf",
-            backgroundColor: "#4990cf",
-            data: [456, 479, 324, 569, 702, 600],
-            borderWidth: 2
-          }
-        ]
-      }
+      doughnutChartData: [],
+      barChartData: []
     };
   },
   mounted() {
@@ -642,6 +614,46 @@ export default {
         .then(result => {
           console.log("analyticsData = ", result);
           this.analyticsData = result;
+
+          this.analyticsData.itemQuestionDetails.forEach(item => {
+            this.doughnutChartData.push({
+              labels: ["남자", "여자"],
+              datasets: [
+                {
+                  label: "",
+                  borderColor: ["#ed7d31", "#9dc3e6"],
+                  backgroundColor: ["#ed7d31", "#9dc3e6"],
+                  borderWidth: 2,
+                  data: [item.respondentCharacteristics.bySex.male, item.respondentCharacteristics.bySex.female]
+                }
+              ]
+            });
+            this.barChartData.push({
+              labels: [
+                "18세 이하",
+                "18세 이상~29세 이하",
+                "30대",
+                "40대",
+                "50대",
+                "60대"
+              ],
+              datasets: [
+                {
+                  borderColor: "#4990cf",
+                  backgroundColor: "#4990cf",
+                  data: [
+                    item.respondentCharacteristics.byAge.byAge10,
+                    item.respondentCharacteristics.byAge.byAge20,
+                    item.respondentCharacteristics.byAge.byAge30,
+                    item.respondentCharacteristics.byAge.byAge40,
+                    item.respondentCharacteristics.byAge.byAge50,
+                    item.respondentCharacteristics.byAge.byAge60
+                  ],
+                  borderWidth: 2
+                }
+              ]
+            })
+          })
         })
         .catch(error => console.log("error", error));
     }
@@ -729,18 +741,19 @@ export default {
       let question = this.data.itemQuestion.find(
         x => x._id == item.itemQuestionId
       );
-      this.doughnutChartData.datasets[0].data = [
-        item.respondentCharacteristics.bySex.male,
-        item.respondentCharacteristics.bySex.female
-      ];
-      this.barChartData.datasets[0].data = [
-        item.respondentCharacteristics.byAge.byAge10,
-        item.respondentCharacteristics.byAge.byAge20,
-        item.respondentCharacteristics.byAge.byAge30,
-        item.respondentCharacteristics.byAge.byAge40,
-        item.respondentCharacteristics.byAge.byAge50,
-        item.respondentCharacteristics.byAge.byAge60
-      ];
+      // this.doughnutChartData.datasets[0].data = [
+      //   item.respondentCharacteristics.bySex.male,
+      //   item.respondentCharacteristics.bySex.female
+      // ];
+      // this.barChartData.datasets[0].data = [
+      //   item.respondentCharacteristics.byAge.byAge10,
+      //   item.respondentCharacteristics.byAge.byAge20,
+      //   item.respondentCharacteristics.byAge.byAge30,
+      //   item.respondentCharacteristics.byAge.byAge40,
+      //   item.respondentCharacteristics.byAge.byAge50,
+      //   item.respondentCharacteristics.byAge.byAge60
+      // ];
+      // console.log('chartData = ', this.doughnutChartData);
       return question;
     },
 

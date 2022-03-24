@@ -59,10 +59,10 @@
             <b-card>
               <div class="d-flex justify-content-between align-items-center">
                 <span class="card-text font-weight-semibold"
-                  >보유중인 통통코인: {{ data.coin }} TTC</span
+                  >보유중인 통통코인: {{ balance }} TTC</span
                 >
                 <span class="card-text font-weight-semibold"
-                  >통통지갑: {{ data.wallet_addr }}</span
+                  >통통지갑: {{ user_data.wallet_addr }}</span
                 >
               </div>
             </b-card>
@@ -203,10 +203,14 @@ export default {
       endMinute: 0,
       downloadUrl: downloadUrl,
       thumbnailKey: "",
-      today: new Date()
+      today: new Date(),
+      user_data: {},
+      balance: 0,
     };
   },
   mounted() {
+    this.getCoinBallance();
+    this.user_data = JSON.parse(localStorage.getItem('user'));
     this.startDate = new Date(
       new Date(this.data.startAt).getFullYear(),
       new Date(this.data.startAt).getMonth(),
@@ -305,6 +309,32 @@ export default {
         
       };
       input.click();
+    },
+    getCoinBallance() {
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+      let user = JSON.parse(localStorage.getItem('user'));
+      console.log('userdata = ', user);
+
+      var urlencoded = new URLSearchParams();
+      urlencoded.append("phonenum", "01012347788");
+      urlencoded.append("wallet_name", user.wallet_addr);
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: urlencoded,
+        redirect: 'follow'
+      };
+
+      fetch(apiUrl + "/tongtongcoin/wallet_account_balance/", requestOptions)
+        .then(response => response.json())
+        .then(result => {
+          console.log('ballance info = ', result)
+          this.balance = result.data.balance;
+        })
+        .catch(error => console.log('error', error));
     },
   },
   watch: {

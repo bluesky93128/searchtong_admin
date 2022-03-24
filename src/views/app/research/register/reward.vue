@@ -12,8 +12,8 @@
       <b-colxx xxs="7">
         <b-card>
           <div class="d-flex justify-content-between">
-            <span>보유중인 통통코인: {{}} TTC</span>
-            <span>통통지갑: {{}}</span>
+            <span>보유중인 통통코인: {{balance}} TTC</span>
+            <span>통통지갑: {{user_data.wallet_addr}}</span>
           </div>
           <b-form-group
             label-cols="2"
@@ -87,6 +87,7 @@
 import "quill/dist/quill.core.css";
 import "quill/dist/quill.snow.css";
 import "quill/dist/quill.bubble.css";
+import { apiUrl } from "../../../../constants/config";
 
 import { quillEditor } from "vue-quill-editor";
 
@@ -123,10 +124,14 @@ export default {
       ],
       paymentAmountOption: [
         { text: '1인당', value: 0 },
-      ]
+      ],
+      user_data: {},
+      balance: 0,
     };
   },
   mounted() {
+    this.getCoinBallance();
+    this.user_data = JSON.parse(localStorage.getItem('user'));
     var startAt = new Date(this.data.itemFinish.benefitsStartAt);
     var endAt = new Date(this.data.itemFinish.benefitsEndAt);
     this.startDate = startAt;
@@ -146,6 +151,32 @@ export default {
       this.data.itemFinish.benefitsEndAt = new Date(this.endDate);
       this.data.itemFinish.benefitsEndAt.setHours(this.endHour);
       this.data.itemFinish.benefitsEndAt.setMinutes(this.endMinute);
+    },
+    getCoinBallance() {
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+      let user = JSON.parse(localStorage.getItem('user'));
+      console.log('userdata = ', user);
+
+      var urlencoded = new URLSearchParams();
+      urlencoded.append("phonenum", "01012347788");
+      urlencoded.append("wallet_name", user.wallet_addr);
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: urlencoded,
+        redirect: 'follow'
+      };
+
+      fetch(apiUrl + "/tongtongcoin/wallet_account_balance/", requestOptions)
+        .then(response => response.json())
+        .then(result => {
+          console.log('ballance info = ', result)
+          this.balance = result.data.balance;
+        })
+        .catch(error => console.log('error', error));
     },
   },
   computed: {

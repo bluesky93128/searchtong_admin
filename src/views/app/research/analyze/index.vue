@@ -413,21 +413,21 @@ export default {
           {
             key: "attendCount",
             label: "응답자수",
-            sortable: false,
+            sortable: true,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
           },
           {
             key: "createdAt",
             label: "등록일",
-            sortable: false,
+            sortable: true,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
           },
           {
             key: "duration",
             label: "진행기간",
-            sortable: false,
+            sortable: true,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
           },
@@ -451,7 +451,7 @@ export default {
     },
     dataProvider(ctx) {
       const params = this.apiParamsConverter(ctx);
-      let promise = axios.get(apiUrl + "/research?status=0,3,4", {
+      let promise = axios.get(apiUrl + "/research?isDraft=0&status=0,3,4", {
         params: params,
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
@@ -546,7 +546,9 @@ export default {
         apiParams.page = params.currentPage;
       }
       if (params.sortBy && params.sortBy.length > 0) {
-        apiParams.sort = `${params.sortBy}|${params.sortDesc ? "desc" : "asc"}`;
+        // apiParams.sort = `${params.sortBy}|${params.sortDesc ? "desc" : "asc"}`;
+        apiParams.sortField = params.sortBy;
+        apiParams.sortType = params.sortDesc ? 1 : -1;
       }
       if (params.filter && Object.keys(params.filter).length > 0) {
         // Optional
