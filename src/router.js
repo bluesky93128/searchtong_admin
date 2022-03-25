@@ -133,6 +133,10 @@ const routes = [
   {
     path: "*",
     component: () => import(/* webpackChunkName: "error" */ "./views/Error")
+  },
+  {
+    path: "/privacy-policy",
+    component: () => import(/* webpackChunkName: "privacy-policy" */ "./views/PrivacyPolicy")
   }
 ];
 
