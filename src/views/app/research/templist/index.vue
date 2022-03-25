@@ -437,7 +437,7 @@ export default {
           this.data.itemResearcher = this.data.itemResearcher || {};
           this.data.itemReward = this.data.itemReward || {};
           this.addNotification("success filled", "설문 복사", "설문이 복사 되었습니다");
-          this.$forceUpdate();
+          this.tableKey++;
         })
         .catch((error) => console.log("error", error));
     },

@@ -23,17 +23,17 @@
                   <main-page :data="data" />
                 </div>
               </tab>
-              <tab name="2. 본문설정">
+              <tab name="2. 본문설정" v-if="(data.isDraft) || ((status != 0) && (status != 3))">
                 <div class="wizard-basic-step">
                   <text-page :data="data" :gotoHome="gotoHome" />
                 </div>
               </tab>
-              <tab name="3. 문항설정">
+              <tab name="3. 문항설정" v-if="(data.isDraft) || ((status != 0) && (status != 3))">
                 <div class="wizard-basic-step">
                   <questions-page :data="data" :gotoHome="gotoHome" />
                 </div>
               </tab>
-              <tab name="4. 종료글 설정">
+              <tab name="4. 종료글 설정" v-if="(data.isDraft) || ((status != 0) && (status != 3))">
                 <div class="wizard-basic-step">
                   <finish-text-page :data="data" :gotoHome="gotoHome" />
                 </div>
@@ -88,7 +88,8 @@ export default {
     return {
       data: null,
       current_page: 0,
-      key: 0
+      key: 0,
+      status: 1
     };
   },
   mounted() {
@@ -118,6 +119,7 @@ export default {
           this.data.itemFinish = this.data.itemFinish || {};
           this.data.itemResearcher = this.data.itemResearcher || {};
           this.data.itemReward = this.data.itemReward || {};
+          this.status = this.data.status;
         })
         .catch((error) => console.log("error", error));
     } else {
@@ -187,7 +189,7 @@ export default {
 
         let today = new Date();
         today.setHours(0, 0, 0);
-        if(this.data.startAt > today) {
+        if(new Date(this.data.startAt) > today) {
           if(this.data.isSetPeriodLater) {
             this.data.status = 2;
           } else {

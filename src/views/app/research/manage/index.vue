@@ -125,7 +125,7 @@
                         <i class="simple-icon-pencil" />
                       </router-link>
                     </div>
-                    <div class="manage-icon-container ml-1">
+                    <div class="manage-icon-container ml-1" v-if="(item.status != 0) && (item.status != 3)">
                       <i class="simple-icon-trash" @click="deleteItem(item)" />
                     </div>
                     <div class="manage-icon-container ml-1">
@@ -199,7 +199,7 @@
                         <i class="simple-icon-pencil" />
                       </router-link>
                     </div>
-                    <div class="manage-icon-container ml-1">
+                    <div class="manage-icon-container ml-1" v-if="(item.status != 0) && (item.status != 3)">
                       <i class="simple-icon-trash" @click="deleteItem(item)" />
                     </div>
                     <div class="manage-icon-container ml-1">
@@ -273,7 +273,7 @@
                         <i class="simple-icon-pencil" />
                       </router-link>
                     </div>
-                    <div class="manage-icon-container ml-1">
+                    <div class="manage-icon-container ml-1" v-if="(item.status != 0) && (item.status != 3)">
                       <i class="simple-icon-trash" @click="deleteItem(item)" />
                     </div>
                     <div class="manage-icon-container ml-1">
@@ -347,7 +347,7 @@
                         <i class="simple-icon-pencil" />
                       </router-link>
                     </div>
-                    <div class="manage-icon-container ml-1">
+                    <div class="manage-icon-container ml-1" v-if="(item.status != 0) && (item.status != 3)">
                       <i class="simple-icon-trash" @click="deleteItem(item)" />
                     </div>
                     <div class="manage-icon-container ml-1">
@@ -421,7 +421,7 @@
                         <i class="simple-icon-pencil" />
                       </router-link>
                     </div>
-                    <div class="manage-icon-container ml-1">
+                    <div class="manage-icon-container ml-1" v-if="(item.status != 0) && (item.status != 3)">
                       <i class="simple-icon-trash" @click="deleteItem(item)" />
                     </div>
                     <div class="manage-icon-container ml-1">
@@ -495,7 +495,7 @@
                         <i class="simple-icon-pencil" />
                       </router-link>
                     </div>
-                    <div class="manage-icon-container ml-1">
+                    <div class="manage-icon-container ml-1" v-if="(item.status != 0) && (item.status != 3)">
                       <i class="simple-icon-trash" @click="deleteItem(item)" />
                     </div>
                     <div class="manage-icon-container ml-1">

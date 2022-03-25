@@ -60,13 +60,18 @@
             <label class="text-center w-100">참여조건으로 설정할 지역을 선택해주세요.</label>
             <label class="text-center w-100">(선택한 지역의 회원만 참여 가능하도록 설정됩니다.)</label>
             <b-row class="region-content">
-              <b-col colxx="6" class="list-container py-2">
+              <b-col colxx="4" class="list-container py-2">
                 <div :class="'sido-item ' + (selectedSido == item ? 'active' : '')" v-for="item in sidoList" :key="item.code" @click="onClickRegion(item)">
                   <span>{{item.name}}</span>
                 </div>
               </b-col>
-              <b-col colxx="6" class="list-container py-2">
-                <div :class="'gungu-item ' + (isSelectedGungu(item) >= 0 ? 'active' : '')" v-for="item in gunguList" :key="item.code" @click="onClickRegionGungu(item)">
+              <b-col colxx="4" class="list-container py-2">
+                <div :class="'gungu-item ' + (selectedGungu == item ? 'active' : '')" v-for="item in gunguList" :key="item.code" @click="onClickRegionGungu(item)">
+                  <span>{{item.name}}</span>
+                </div>
+              </b-col>
+              <b-col colxx="4" class="list-container py-2">
+                <div :class="'dong-item ' + (isSelectedDong(item) >= 0 ? 'active' : '')" v-for="item in dongList" :key="item.code" @click="onClickRegionDong(item)">
                   <span>{{item.name}}</span>
                 </div>
               </b-col>
@@ -194,7 +199,9 @@ export default {
       sidoList: [],
       selectedSido: null,
       gunguList: [],
-      selectedGunguList: []
+      selectedGunguList: [],
+      dongList: [],
+      selectedDongList: []
     };
   },
   mounted() {
@@ -209,13 +216,23 @@ export default {
 
     if(this.data && this.data.itemResearcher.regionList) {
       this.data.itemResearcher.regionList.forEach(x => {
-        this.selectedGunguList.push({
+        let gunguCode = x.sidoCode + x.gunguCode + '00000';
+        
+        if(this.selectedGunguList.find(x => x.code == gunguCode) < 0) {
+          this.selectedGunguList.push({
           code: x.sidoCode + x.gunguCode + '00000'
+        })
+        }
+        // this.selectedGunguList.push({
+        //   code: x.sidoCode + x.gunguCode + '00000'
+        // })
+        this.selectedDongList.push({
+          code: x.sidoCode + x.gunguCode + x.dongCode
         })
       })
     }
 
-    console.log('---------', this.selectedGunguList);
+    console.log('---------', this.selectedDongList);
 
     axios.get("https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes?regcode_pattern=*00000000")
       .then((result) => result.data)
@@ -239,13 +256,15 @@ export default {
       this.data.itemFinish.benefitsEndAt.setMinutes(this.endMinute);
     },
     onClickSelectRegion() {
-      let list = this.selectedGunguList.filter(x => x.name != '전체');
+      let list = this.selectedDongList.filter(x => x.name != '전체');
       this.data.itemResearcher.regionList = list.map(x => {
         return {
           sidoCode: x.code.slice(0, 2),
-          gunguCode: x.code.slice(2, 5)
+          gunguCode: x.code.slice(2, 5),
+          dongCode: x.code.slice(5, 10)
         }
       })
+      console.log('selected list = ', this.data.itemResearcher.regionList);
     },
     onClickRegion(item) {
       this.selectedSido = item;
@@ -256,12 +275,13 @@ export default {
       .then((data) => {
         console.log(data);
         this.gunguList = data.regcodes;
+        this.gunguList.splice(0, 1);
         this.gunguList.forEach((item, idx) => {
-          if(idx == 0) {
-            item.name = "전체";
-          } else {
+          // if(idx == 0) {
+          //   item.name = "전체";
+          // } else {
             item.name = item.name.split(' ')[1];
-          }
+          // }
         })
       })
       .catch((_error) => {
@@ -269,61 +289,142 @@ export default {
       });
     },
     onClickRegionGungu(item) {
+      this.selectedGungu = item;
+      this.sigunguCode = this.selectedGungu.code.slice(0, 5);
+      axios.get("https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes?regcode_pattern=" + this.sigunguCode + "*")
+      .then((result) => result.data)
+      .then((data) => {
+        console.log(data);
+        this.dongList = data.regcodes;
+        this.dongList.forEach((item, idx) => {
+          if(idx == 0) {
+            item.name = "전체";
+          } else {
+            item.name = item.name.split(' ')[2];
+          }
+        })
+      })
+      .catch((_error) => {
+        console.log(_error);
+      });
+    },
+    // onClickRegionGungu(item) {
+    //   if(item.name == '전체') {
+    //     if(this.selectedGunguList.indexOf(item) >= 0) {
+    //       this.gunguList.forEach(x => {
+    //         let index = this.selectedGunguList.findIndex(y => y.code == x.code);
+    //         if(index >= 0) { 
+    //           this.selectedGunguList.splice(index, 1);
+    //         } else {
+              
+    //         }
+    //       })
+    //     } else {
+    //       this.gunguList.forEach(x => {
+    //         let index = this.selectedGunguList.findIndex(y => y.code == x.code);
+    //         if(index >= 0) { 
+
+    //         } else {
+    //           this.selectedGunguList.push(x);
+    //         }
+    //       })
+    //     }
+    //   } else {
+    //     let index = this.selectedGunguList.findIndex(x => x.code == item.code);
+    //     if(index >= 0) {
+    //       this.selectedGunguList.splice(index, 1);
+    //     } else {
+    //       this.selectedGunguList.push(item);
+    //     }
+    //     let itemCnt = 0;
+    //     this.gunguList.forEach((x, idx) => {
+    //       if(idx != 0) {
+    //         let index = this.selectedGunguList.findIndex(y => y.code == x.code);
+    //         if(index >= 0) {
+    //           itemCnt++;
+    //         }
+    //       }
+    //     })
+    //     if(itemCnt < this.gunguList.length - 1) {
+    //       let index = this.selectedGunguList.findIndex(y => y.code == this.gunguList[0].code);
+    //       if(index >= 0) {
+    //         this.selectedGunguList.splice(index, 1);
+    //       }
+    //     } else {
+    //       let index = this.selectedGunguList.findIndex(y => y.code == this.gunguList[0].code);
+    //       if(index < 0) {
+    //         this.selectedGunguList.push(this.gunguList[0]);
+    //       }
+    //     }
+    //   }
+    //   console.log(this.selectedGunguList);
+    //   this.$forceUpdate();
+    // },
+    onClickRegionDong(item) {
       if(item.name == '전체') {
-        if(this.selectedGunguList.indexOf(item) >= 0) {
-          this.gunguList.forEach(x => {
-            let index = this.selectedGunguList.findIndex(y => y.code == x.code);
+        if(this.selectedDongList.indexOf(item) >= 0) {
+          this.dongList.forEach(x => {
+            let index = this.selectedDongList.findIndex(y => y.code == x.code);
             if(index >= 0) { 
-              this.selectedGunguList.splice(index, 1);
+              this.selectedDongList.splice(index, 1);
             } else {
               
             }
           })
         } else {
-          this.gunguList.forEach(x => {
-            let index = this.selectedGunguList.findIndex(y => y.code == x.code);
+          this.dongList.forEach(x => {
+            let index = this.selectedDongList.findIndex(y => y.code == x.code);
             if(index >= 0) { 
 
             } else {
-              this.selectedGunguList.push(x);
+              this.selectedDongList.push(x);
             }
           })
         }
       } else {
-        let index = this.selectedGunguList.findIndex(x => x.code == item.code);
+        let index = this.selectedDongList.findIndex(x => x.code == item.code);
         if(index >= 0) {
-          this.selectedGunguList.splice(index, 1);
+          this.selectedDongList.splice(index, 1);
         } else {
-          this.selectedGunguList.push(item);
+          this.selectedDongList.push(item);
         }
         let itemCnt = 0;
-        this.gunguList.forEach((x, idx) => {
+        this.dongList.forEach((x, idx) => {
           if(idx != 0) {
-            let index = this.selectedGunguList.findIndex(y => y.code == x.code);
+            let index = this.selectedDongList.findIndex(y => y.code == x.code);
             if(index >= 0) {
               itemCnt++;
             }
           }
         })
-        if(itemCnt < this.gunguList.length - 1) {
-          let index = this.selectedGunguList.findIndex(y => y.code == this.gunguList[0].code);
+        if(itemCnt < this.dongList.length - 1) {
+          let index = this.selectedDongList.findIndex(y => y.code == this.dongList[0].code);
           if(index >= 0) {
-            this.selectedGunguList.splice(index, 1);
+            this.selectedDongList.splice(index, 1);
           }
         } else {
-          let index = this.selectedGunguList.findIndex(y => y.code == this.gunguList[0].code);
+          let index = this.selectedDongList.findIndex(y => y.code == this.dongList[0].code);
           if(index < 0) {
-            this.selectedGunguList.push(this.gunguList[0]);
+            this.selectedDongList.push(this.dongList[0]);
           }
         }
       }
-      console.log(this.selectedGunguList);
+      console.log(this.selectedDongList);
       this.$forceUpdate();
     },
     isSelectedGungu(item) {
       let index = -1;
       this.selectedGunguList.forEach((gungu, idx) => {
         if(gungu.code == item.code) {
+          index = idx;
+        }
+      })
+      return index;
+    },
+    isSelectedDong(item) {
+      let index = -1;
+      this.selectedDongList.forEach((dong, idx) => {
+        if(dong.code == item.code) {
           index = idx;
         }
       })
@@ -387,6 +488,12 @@ export default {
   height: 20px;
 }
 .gungu-item.active {
+  background-color: #d7d7d7;
+}
+.dong-item {
+  height: 20px;
+}
+.dong-item.active {
   background-color: #d7d7d7;
 }
 </style>

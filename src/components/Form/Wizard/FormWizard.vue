@@ -101,9 +101,27 @@ export default {
             }
         },
         register() {
-            this.data.isDraft = false;
-            this.save();
-            this.$router.push('/app/research/manage');
+            console.log('data = ', this.data);
+            if((new Date(this.data.startAt) < new Date()) && !this.data.isSetPeriodLater) {
+                if(confirm('진행 시작일이 지났습니다. 지금 바로 진행을 시작하시겠습니까?')) {
+                    this.data.isDraft = false;
+                    this.data.status = 0;
+                    this.save();
+                    this.$router.push('/app/research/manage');
+                } else {
+                    this.clickedTab(0);
+                }
+            } else {
+                this.data.isDraft = false;
+                if(this.data.isSetPeriodLater) {
+                    this.data.status = 2;
+                } else {
+                    this.data.status = 1;
+                }
+                this.save();
+                this.$router.push('/app/research/manage');
+            }
+            
         },
         saveData() {
             this.save();
