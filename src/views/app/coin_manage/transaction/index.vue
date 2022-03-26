@@ -382,9 +382,9 @@ export default {
         .then((result) => result.data)
         .then((data) => {
           // console.log('list = ', data);
-          this.currentPage = data.data.current_page;
+          this.currentPage = data.current_page;
           // this.perPage = data.per_page;
-          this.totalRows = data.data.total;
+          this.totalRows = data.total;
           const items = data.data;
           this.sentPrice = data.totalAmountSent;
           return items;
