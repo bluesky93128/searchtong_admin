@@ -64,7 +64,7 @@
           </div>
           <div class="d-flex justify-content-between mt-4">
             <span>{{$t('research.paymentCount')}}</span>
-            <span>{{data.itemReward.paymentCount}}TTC</span>
+            <span>{{data.itemReward.paymentCount}} 명</span>
           </div>
           <div class="d-flex justify-content-between mt-4">
             <span>{{$t('research.researchBudget')}}</span>
@@ -72,11 +72,11 @@
           </div>
           <div class="d-flex justify-content-between">
             <span>{{$t('research.fee')}}</span>
-            <span>{{data.itemReward.paymentCount * data.itemReward.paymentAmount * 0.1}}TTC</span>
+            <span>{{formatNumber(data.itemReward.paymentCount * data.itemReward.paymentAmount * 0.1)}}TTC</span>
           </div>
           <div class="d-flex justify-content-between">
             <span>{{$t('research.totalPrice')}}</span>
-            <span>{{data.itemReward.paymentCount * data.itemReward.paymentAmount * 1.1}}TTC</span>
+            <span>{{formatNumber(data.itemReward.paymentCount * data.itemReward.paymentAmount * 1.1)}}TTC</span>
           </div>
         </b-card>
       </b-colxx>
@@ -151,6 +151,9 @@ export default {
       this.data.itemFinish.benefitsEndAt = new Date(this.endDate);
       this.data.itemFinish.benefitsEndAt.setHours(this.endHour);
       this.data.itemFinish.benefitsEndAt.setMinutes(this.endMinute);
+    },
+    formatNumber(num) {
+      return num.toFixed(2);
     },
     getCoinBallance() {
       var myHeaders = new Headers();

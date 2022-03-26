@@ -62,7 +62,68 @@
       </b-colxx>
       <b-colxx xs="12">
         <b-card class="">
-          <b-form @submit.prevent="onHorizontalSubmit">
+          <b-row>
+            <b-colxx xxs="6">
+              <b-form-group label="설문제목 또는 ID" :label-cols="2">
+                <b-form-input v-model="searchForm.search_word" />
+              </b-form-group>
+            </b-colxx>
+            <b-colxx xxs="6">
+              <b-form-group label="등록일" :label-cols="2">
+                <div class="d-flex">
+                  <b-datepicker
+                    locale="ko-KR"
+                    v-model="searchForm.periodFrom"
+                    :placeholder="$t('search.all')"
+                    :max="disabledFrom"
+                  />
+                  <span class="span-center-text mx-2">~</span>
+                  <b-datepicker
+                    locale="ko-KR"
+                    v-model="searchForm.periodTo"
+                    :placeholder="$t('search.all')"
+                    :min="disabledTo"
+                  />
+                </div>
+              </b-form-group>
+            </b-colxx>
+          </b-row>
+          <b-row>
+            <b-colxx xxs="6">
+              <b-form-group label="진행기간" :label-cols="2">
+                <div class="d-flex">
+                  <b-datepicker
+                    locale="ko-KR"
+                    v-model="searchForm.registerFrom"
+                    :placeholder="$t('search.all')"
+                    :max="disabledFrom"
+                  />
+                  <span class="span-center-text mx-2">~</span>
+                  <b-datepicker
+                    locale="ko-KR"
+                    v-model="searchForm.registerTo"
+                    :placeholder="$t('search.all')"
+                    :min="disabledTo"
+                  />
+                </div>
+              </b-form-group>
+            </b-colxx>
+            <b-colxx xxs="6">
+              <b-form-group label="설문유형" :label-cols="2">
+                <div class="d-flex justify-content-between">
+                  <v-select
+                    v-model="searchForm.type"
+                    :options="type_options"
+                    placeholder="전체"
+                    :reduce="(item) => item.value"
+                    class="research-type"
+                  />
+                  <b-button class="primary" @click="onClickSearch()">검색</b-button>
+                </div>
+              </b-form-group>
+            </b-colxx>
+          </b-row>
+          <!-- <b-form @submit.prevent="onHorizontalSubmit">
             <b-form-group
               label-cols="1"
               content-cols="4"
@@ -155,7 +216,7 @@
                 </b-colxx>
               </b-row>
             </b-form-group>
-          </b-form>
+          </b-form> -->
         </b-card>
       </b-colxx>
       <b-colxx xs="12">
@@ -485,12 +546,8 @@ export default {
       ko: ko,
       disabledFrom: null,
       disabledTo: null,
-      searchForm: {
-        search_term: this.$t("search.all"),
-        search_word: "",
-        fromDate: new Date(),
-        toDate: new Date(),
-      },
+      searchForm: {},
+      filter: null,
       type_options: [
         {
           label: "여론조사",
@@ -811,8 +868,12 @@ export default {
       }
       return apiParams;
     },
+    onClickSearch() {
+      this.filter = {...this.searchForm};
+      console.log(this.filter);
+    },
     formatDate(date) {
-      return moment(date).format("YYYY.MM.DD.");
+      return moment(date).format("YYYY.MM.DD hh:mm");
     },
     onRestore() {
       this.hideModal('restoreModal');

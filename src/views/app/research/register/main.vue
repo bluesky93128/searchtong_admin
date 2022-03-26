@@ -160,6 +160,7 @@
                 <!-- <b-img :src="image" /> -->
                 <div class="d-flex">
                   <img
+                    v-if="data.thumbnailUrl"
                     :src="downloadUrl + '/' + data.thumbnailUrl"
                     class-name="card-img"
                     style="
@@ -172,6 +173,15 @@
                     alt="이미지"
                     :key = thumbnailKey
                   />
+                  <div v-else
+                    style="
+                      width: 200px;
+                      height: 150px;
+                      border: 1px solid #d7d7d7;
+                      justify-content: center;
+                      display: flex;
+                    "
+                  ></div>
                   <b-button
                     variant="primary"
                     class="ml-2"

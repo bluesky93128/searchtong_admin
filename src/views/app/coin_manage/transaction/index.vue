@@ -62,7 +62,7 @@
       </b-colxx>
       <b-colxx xs="12">
         <b-card class="">
-          <b-form @submit.prevent="onHorizontalSubmit">
+          <b-form @submit.prevent="onClickSearch">
             <b-form-group
               label-cols="1"
               content-cols="4"
@@ -70,7 +70,7 @@
               :label="$t('search.search')"
             >
               <b-input-group class="mb-2 pl-0">
-                <b-input-group-prepend>
+                <!-- <b-input-group-prepend>
                   <b-dropdown
                     :text="searchForm.search_term"
                     variant="outline-secondary"
@@ -79,11 +79,11 @@
                     <b-dropdown-item @click="onClickOptions('이름')">이름</b-dropdown-item>
                     <b-dropdown-item @click="onClickOptions('아이디')">아이디</b-dropdown-item>
                   </b-dropdown>
-                </b-input-group-prepend>
+                </b-input-group-prepend> -->
                 <b-form-input v-model="searchForm.search_word" />
               </b-input-group>
             </b-form-group>
-            <b-form-group label-cols="1" horizontal label="신청일자">
+            <b-form-group label-cols="1" horizontal label="발생일시">
               <b-row>
                 <b-colxx xxs="6">
                   <div class="d-flex">
@@ -175,12 +175,13 @@
           selectable
           :select-mode="bootstrapTable.selectMode"
           selectedVariant="primary"
+          :filter="filter"
         >
           <template #cell(no)="{item, index}">
             {{index + 1}}
           </template>
           <template #cell(createdAt)="{item}">
-            {{formatDate(item.createdAt)}}
+            {{formatDateWithMin(item.createdAt)}}
           </template>
           <template #cell(sent)="{item}">
             {{item.coin}}
@@ -238,6 +239,7 @@ export default {
         fromDate: new Date(),
         toDate: new Date(),
       },
+      filter: null, 
       secretWords: "",
       user_data: {},
       sentPrice: 0,
@@ -353,6 +355,7 @@ export default {
     dataProvider(ctx) {
       let user = JSON.parse(localStorage.getItem('user'));
       const params = this.apiParamsConverter(ctx);
+      console.log('params = ', params);
       params.wallet_addr = user.wallet_addr;
 
       var config = {
@@ -362,11 +365,12 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded',
           Authorization: "Bearer " + localStorage.getItem("token")
         },
-        params : {
-        'wallet_addr': user.wallet_addr,
-        'page': params.page,
-        'pagesize': params.per_page 
-      }
+        params: params
+        // params : {
+        //   'wallet_addr': user.wallet_addr,
+        //   'page': params.page,
+        //   'pagesize': params.per_page 
+        // }
       };
 
       let promise = axios(config);
@@ -462,13 +466,30 @@ export default {
         apiParams.sortField = params.sortBy;
         apiParams.sortType = params.sortDesc ? 1 : -1;
       }
-      if (params.filter && params.filter.length > 0) {
+      if (params.filter && Object.keys(params.filter).length > 0) {
         // Optional
+        if(params.filter.search_word) {
+          apiParams.search_word = params.filter.search_word;
+        }
+        if(params.filter.fromDate) {
+          var from = new Date(params.filter.fromDate);
+          from.setHours(0, 0, 0);
+          apiParams.attendFrom = from.toUTCString();
+        }
+        if(params.filter.toDate) {
+          var to = new Date(params.filter.toDate);
+          to.setHours(23, 59, 59);
+          apiParams.attendTo = to.toUTCString();
+        }
       }
       return apiParams;
     },
+    onClickSearch() {
+      this.filter = {...this.searchForm};
+      console.log(this.filter);
+    },
     formatDate(date) {
-      return moment(date).format("YYYY.MM.DD.");
+      return moment(date).format("YYYY.MM.DD");
     },
     onRestore() {
       this.hideModal('restoreModal');
@@ -482,6 +503,9 @@ export default {
       if (refname === "modalnestedinline") {
         this.$refs["modalnested"].show();
       }
+    },
+    formatDateWithMin(date) {
+      return moment(date).format("YYYY.MM.DD hh:mm");
     },
   },
   watch: {
