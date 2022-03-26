@@ -1,8 +1,11 @@
 <template>
   <div>
+    <div class="loader-container" v-show="isLoading">
+      <div class="loader"></div>
+    </div>
     <b-row>
       <b-colxx xxs="12">
-        <h2>{{$t('menu.research.manage')}}</h2>
+        <h2>통계관리</h2>
         <div class="separator mb-5"></div>
       </b-colxx>
     </b-row>
@@ -343,6 +346,7 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       searchForm: {},
       filter: null,
       disabledTo: null,
@@ -450,6 +454,7 @@ export default {
       return moment(date).format("YYYY.MM.DD hh:mm");
     },
     dataProvider(ctx) {
+      this.isLoading = true;
       const params = this.apiParamsConverter(ctx);
       let promise = axios.get(apiUrl + "/research?isDraft=0&status=0,3,4", {
         params: params,
@@ -465,13 +470,16 @@ export default {
           // this.perPage = data.per_page;
           this.totalRows = data.total;
           const items = data.data;
+          this.isLoading = false;
           return items;
         })
         .catch((_error) => {
+          this.isLoading = false;
           return [];
         });
     },
     dataProviderWorking(ctx) {
+      this.isLoading = true;
       const params = this.apiParamsConverter(ctx);
       let promise = axios.get(apiUrl + "/research?isDraft=0&status=0", {
         params: params,
@@ -487,13 +495,16 @@ export default {
           // this.perPage = data.per_page;
           this.totalWorkingRows = data.total;
           const items = data.data;
+          this.isLoading = false;
           return items;
         })
         .catch((_error) => {
+          this.isLoading = false;
           return [];
         });
     },
     dataProviderStopped(ctx) {
+      this.isLoading = true;
       const params = this.apiParamsConverter(ctx);
       let promise = axios.get(apiUrl + "/research?isDraft=0&status=3", {
         params: params,
@@ -509,13 +520,16 @@ export default {
           // this.perPage = data.per_page;
           this.totalStoppedRows = data.total;
           const items = data.data;
+          this.isLoading = false;
           return items;
         })
         .catch((_error) => {
+          this.isLoading = false;
           return [];
         });
     },
     dataProviderFinished(ctx) {
+      this.isLoading = true;
       const params = this.apiParamsConverter(ctx);
       let promise = axios.get(apiUrl + "/research?isDraft=0&status=4", {
         params: params,
@@ -531,9 +545,11 @@ export default {
           // this.perPage = data.per_page;
           this.totalFinishedRows = data.total;
           const items = data.data;
+          this.isLoading = false;
           return items;
         })
         .catch((_error) => {
+          this.isLoading = false;
           return [];
         });
     },

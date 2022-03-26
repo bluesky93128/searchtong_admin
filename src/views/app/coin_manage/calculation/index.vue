@@ -256,7 +256,7 @@
                 </template>
                 <template #cell(action)="{ item }">
                   <div class="d-flex flex-column">
-                    {{item.responseCost}} TTC
+                    {{formatNumber(item.responseCost)}} TTC
                     <router-link :to="{ path: 'detail', query: { id: item._id } }" class="text-link">
                       보기
                     </router-link>
@@ -314,7 +314,7 @@
                 </template>
                 <template #cell(action)="{ item }">
                   <div class="d-flex flex-column">
-                    {{item.responseCost}} TTC
+                    {{formatNumber(item.responseCost)}} TTC
                     <router-link :to="{ path: 'detail', query: { id: item._id } }" class="text-link">
                       보기
                     </router-link>
@@ -372,7 +372,7 @@
                 </template>
                 <template #cell(action)="{ item }">
                   <div class="d-flex flex-column">
-                    {{item.responseCost}} TTC
+                    {{formatNumber(item.responseCost)}} TTC
                     <router-link :to="{ path: 'detail', query: { id: item._id } }" class="text-link">
                       보기
                     </router-link>
@@ -430,7 +430,7 @@
                 </template>
                 <template #cell(action)="{ item }">
                   <div class="d-flex flex-column">
-                    {{item.responseCost}} TTC
+                    {{formatNumber(item.responseCost)}} TTC
                     <router-link :to="{ path: 'detail', query: { id: item._id } }" class="text-link">
                       보기
                     </router-link>
@@ -656,6 +656,9 @@ export default {
   methods: {
     onClickOptions(option) {
       this.searchForm.search_term = option;
+    },
+    formatNumber(num) {
+      return num.toFixed(2);
     },
     onToday() {
       this.searchForm.fromDate = new Date();

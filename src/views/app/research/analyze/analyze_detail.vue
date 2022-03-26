@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div class="loader-container" v-show="isLoading">
+      <div class="loader"></div>
+    </div>
     <b-row>
       <b-colxx xxs="12">
         <b-card class="mb-4">
@@ -48,7 +51,7 @@
         <b-card
           class="mb-4"
           no-body
-          v-if="analyticsData && analyticsData.respondentCharacteristics"
+          v-if="analyticsData && analyticsData.respondentCharacteristics && data.attendCount"
         >
           <b-tabs card no-fade>
             <b-tab title="분석" active>
@@ -588,6 +591,7 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       typeOption: ["여론조사", "서베이", "광고"],
       isReport: false,
       data: {
@@ -608,6 +612,7 @@ export default {
   mounted() {
     this.id = this.$route.query.id;
     if (this.id) {
+      this.isLoading = true;
       var myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       myHeaders.append(
@@ -631,9 +636,14 @@ export default {
           this.data.itemFinish = this.data.itemFinish || {};
           this.data.itemResearcher = this.data.itemResearcher || {};
           this.data.itemReward = this.data.itemReward || {};
+          this.isLoading = false;
         })
-        .catch(error => console.log("error", error));
+        .catch(error => {
+          console.log("error", error)
+          this.isLoading = false;
+        });
 
+      this.isLoading = true;
       fetch(apiUrl + "/research/analytics/" + this.id, requestOptions)
         .then(response => response.json())
         .then(result => {
@@ -679,8 +689,12 @@ export default {
               ]
             })
           })
+          this.isLoading = false;
         })
-        .catch(error => console.log("error", error));
+        .catch(error => {
+          console.log("error", error)
+          this.isLoading = false;
+        });
     }
   },
   methods: {

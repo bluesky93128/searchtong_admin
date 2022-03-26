@@ -1,9 +1,12 @@
 <template>
   <div>
+    <div class="loader-container" v-show="isLoading">
+      <div class="loader"></div>
+    </div>
     <b-row>
       <b-colxx xxs="12">
         <!-- <piaf-breadcrumb :heading="$t('menu.research.title')" /> -->
-        <h2>{{ $t("menu.research.title") }}</h2>
+        <h2>설문등록</h2>
         <div class="separator mb-5"></div>
       </b-colxx>
     </b-row>
@@ -89,13 +92,15 @@ export default {
       data: null,
       current_page: 0,
       key: 0,
-      status: 1
+      status: 1,
+      isLoading: false
     };
   },
   mounted() {
     console.log(this.$route.query.id);
     this.id = this.$route.query.id;
     if(this.id) {
+      this.isLoading = true;
       var myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       myHeaders.append(
@@ -120,8 +125,12 @@ export default {
           this.data.itemResearcher = this.data.itemResearcher || {};
           this.data.itemReward = this.data.itemReward || {};
           this.status = this.data.status;
+          this.isLoading = false;
         })
-        .catch((error) => console.log("error", error));
+        .catch((error) => {
+          this.isLoading = false;
+          console.log("error", error)
+        });
     } else {
       this.data = {
         type: 0,
@@ -180,6 +189,7 @@ export default {
     onSubmitMain() {
       console.log(this.data);
       if (this.data._id) {
+        this.isLoading = true;
         var myHeaders = new Headers();
         myHeaders.append(
           "Authorization",
@@ -211,9 +221,14 @@ export default {
           .then((result) => {
             console.log(result)
             this.addNotification("success filled", "설문 저장", "저장 되었습니다");
+            this.isLoading = false;
           })
-          .catch((error) => console.log("error", error));
+          .catch((error) => {
+            console.log("error", error)
+            this.isLoading = false;
+          });
       } else {
+        this.isLoading = true;
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         myHeaders.append(
@@ -241,8 +256,12 @@ export default {
             this.data.itemResearcher = this.data.itemResearcher || {};
             this.data.itemReward = this.data.itemReward || {};
             this.addNotification("success filled", "설문 저장", "저장 되었습니다");
+            this.isLoading = false;
           })
-          .catch((error) => console.log("error", error));
+          .catch((error) => {
+            console.log("error", error)
+            this.isLoading = false;
+          });
       }
     },
     gotoHome() {

@@ -1,8 +1,11 @@
 <template>
   <div>
+    <div class="loader-container" v-show="isLoading">
+      <div class="loader"></div>
+    </div>
     <b-row>
       <b-colxx xxs="12">
-        <h2>{{$t('menu.research.manage')}}</h2>
+        <h2>임시저장</h2>
         <div class="separator mb-5"></div>
       </b-colxx>
     </b-row>
@@ -210,6 +213,7 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       searchForm: {},
       filter: null,
       disabledTo: null,
@@ -318,6 +322,7 @@ export default {
       return moment(date).format("YYYY.MM.DD hh:mm");
     },
     dataProvider(ctx) {
+      this.isLoading = true;
       const params = this.apiParamsConverter(ctx);
       let promise = axios.get(apiUrl + "/research?isDraft=1", {
         params: params,
@@ -333,9 +338,11 @@ export default {
           // this.perPage = data.per_page;
           this.totalRows = data.total;
           const items = data.data;
+          this.isLoading = false;
           return items;
         })
         .catch((_error) => {
+          this.isLoading = false;
           return [];
         });
     },
@@ -379,6 +386,7 @@ export default {
           this.addNotification("error filled", "설문 삭제", "진행중인 설문은 삭제할수 없읍니다!");
           return;
         }
+        this.isLoading = true;
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
 
@@ -399,11 +407,16 @@ export default {
             } else {
               self.addNotification("error filled", "설문 삭제", "설문을 삭제하는 중에 오류가 발생했습니다!");
             }
+            this.isLoading = false;
           })
-          .catch(error => console.log('error', error));
+          .catch(error => {
+            console.log('error', error)
+            this.isLoading = false;
+          });
       }
     },
     duplicateItem(item) {
+      this.isLoading = true;
       var myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       myHeaders.append(
@@ -438,8 +451,12 @@ export default {
           this.data.itemReward = this.data.itemReward || {};
           this.addNotification("success filled", "설문 복사", "설문이 복사 되었습니다");
           this.tableKey++;
+          this.isLoading = false;
         })
-        .catch((error) => console.log("error", error));
+        .catch((error) => {
+          console.log("error", error)
+          this.isLoading = false;
+        });
     },
     getStatus(option) {
       switch(option) {

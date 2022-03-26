@@ -24,7 +24,7 @@
             </b-col>
             <b-col xxs="4">
               <!-- <span>{{data.itemReward ? '응답비용:' + data.responseCost + '/' +  (data.itemReward.paymentCount * data.itemReward.paymentAmount) : '설정되지 않음'}}</span> -->
-              <span>응답비용: {{data.responseCost}}</span>
+              <span>응답비용: {{formatNumber(data.responseCost)}}</span>
             </b-col>
           </b-row>
         </b-card>
@@ -223,6 +223,9 @@ export default {
       return moment(date).format("YYYY.MM.DD");
     },
 
+    formatNumber(num) {
+      return num.toFixed(2);
+    },
     formatDateWithMin(date) {
       return moment(date).format("YYYY.MM.DD hh:mm");
     },
