@@ -5,13 +5,11 @@
         <div class="rounded">
           <b-card>
             <div class="d-flex justify-content-between align-items-center">
-              <span class="card-text font-weight-semibold"
+              <span class="card-text font-weight-semibold w-30"
                 >보유중인 통통코인: {{ balance }} TTC</span
               >
-              <div class="d-flex">
-                <span class="card-text font-weight-semibold ml-4"
-                  >통통지갑: {{ user_data.wallet_addr }}</span
-                >
+              <div class="d-flex w-70 align-items-center justify-content-end">
+                <span class="card-text font-weight-semibold mr-4">통통지갑: {{ user_data.wallet_addr }}</span>
                 <b-button
                   variant="primary"
                   class="w-30"
@@ -37,14 +35,14 @@
         </template>
       </b-modal>
     </b-row>
-    <b-row class="mt-3">
+    <!-- <b-row class="mt-3">
       <b-colxx xxs="12">
         <h2>통통코인</h2>
         <div class="separator mb-5"></div>
       </b-colxx>
-    </b-row>
-    <b-row>
-      <b-colxx xxs="8">
+    </b-row> -->
+    <b-row class="mt-4">
+      <!-- <b-colxx xxs="8">
         <b-table-simple>
           <b-thead>
             <b-tr>
@@ -59,7 +57,7 @@
             </b-tr>
           </b-tbody>
         </b-table-simple>
-      </b-colxx>
+      </b-colxx> -->
       <b-colxx xs="12">
         <b-card class="">
           <b-row>
@@ -613,15 +611,15 @@ export default {
             key: "type",
             label: "설문유형",
             sortable: false,
-            thClass: "bg-dark text-white text-center",
-            tdClass: " text-center",
+            thClass: "bg-dark text-white text-center min-100",
+            tdClass: " text-center min-100",
           },
           {
             key: "attendCount",
             label: "참여자수",
             sortable: true,
-            thClass: "bg-dark text-white text-center",
-            tdClass: " text-center",
+            thClass: "bg-dark text-white text-center min-100",
+            tdClass: " text-center min-100",
           },
           {
             key: "createdAt",
@@ -641,8 +639,8 @@ export default {
             key: "action",
             label: "응답비용",
             sortable: true,
-            thClass: "bg-dark text-white text-center",
-            tdClass: " text-center",
+            thClass: "bg-dark text-white text-center min-100",
+            tdClass: " text-center min-100",
           },
         ],
       },
