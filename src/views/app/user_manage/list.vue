@@ -263,7 +263,7 @@ export default {
     },
     dataProvider(ctx) {
       const params = this.apiParamsConverter(ctx);
-      let promise = axios.get(apiUrl + "/user", {
+      let promise = axios.get(apiUrl + "/user?accepted=true", {
         params: params,
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
