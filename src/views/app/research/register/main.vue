@@ -98,7 +98,7 @@
                     :min="today"
                     style="flex: 8; margin-right: 10px"
                     v-model="startDate"
-                    :disabled="data.isSetPeriodLater"
+                    :disabled="data.isSetPeriodLater || (data.status == 0 || data.status == 3)"
                     @change="onStartDateChanged()"
                   />
                   <b-input
@@ -107,7 +107,7 @@
                     max="23"
                     v-model="startHour"
                     style="flex: 2; margin-right: 10px"
-                    :disabled="data.isSetPeriodLater"
+                    :disabled="data.isSetPeriodLater || (data.status == 0 || data.status == 3)"
                     @change="onStartDateChanged()"
                   />
                   <b-input
@@ -116,7 +116,7 @@
                     max="59"
                     v-model="startMinute"
                     style="flex: 2; margin-right: 10px"
-                    :disabled="data.isSetPeriodLater"
+                    :disabled="data.isSetPeriodLater || (data.status == 0 || data.status == 3)"
                     @change="onStartDateChanged()"
                   />
                   <span class="span-center-text mx-2">~</span>
@@ -152,7 +152,7 @@
                     @change="onEndDateChanged()"
                   />
                 </div>
-                <b-check class="col-3 mt-2" v-model="data.isSetPeriodLater">
+                <b-check class="col-3 mt-2" v-model="data.isSetPeriodLater" :disabled="data.status == 0 || data.status == 3">
                   {{ $t("research.isSetPeriodLater") }}
                 </b-check>
               </b-form-group>
@@ -241,6 +241,10 @@ export default {
   },
   methods: {
     setType(type) {
+      if(this.data.status == 0 || this.data.status == 3) {
+        this.addNotification("error filled", "설문유형 변경", "진행중/중지 상태의 설문은 설문유형변경이 불가합니다.");
+        return;
+      }
       if(this.data.type == 0) {
         if(type == 1) {
           if(confirm('설문유형을 서베이로 변경합니다. 계속하시겠습니까?')) {
@@ -345,6 +349,13 @@ export default {
           this.balance = result.data.balance;
         })
         .catch(error => console.log('error', error));
+    },
+    addNotification(
+      type = "success",
+      title = "This is Notify Title",
+      message = "This is Notify Message,<br>with html."
+    ) {
+      this.$notify(type, title, message, { duration: 3000, permanent: false });
     },
   },
   watch: {

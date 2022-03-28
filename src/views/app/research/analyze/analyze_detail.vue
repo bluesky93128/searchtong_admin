@@ -27,16 +27,13 @@
                 >응답자수:
                 {{
                   data.attendCount +
-                    "/" +
-                    (data.itemReward
-                      ? data.itemReward.paymentCount
-                      : "설정되지 않음")
+                    (data.itemReward ? "/" + data.itemReward.paymentCount : "")
                 }}</span
               >
             </b-col>
             <b-col xxs="4">
               <!-- <span>{{data.itemReward ? '응답비용:' + data.responseCost + '/' +  (data.itemReward.paymentCount * data.itemReward.paymentAmount) : '설정되지 않음'}}</span> -->
-              <span>응답비용: {{ data.responseCost }}</span>
+              <span>응답비용: {{ formatNumber(data.responseCost) }}</span>
             </b-col>
           </b-row>
         </b-card>
@@ -51,7 +48,11 @@
         <b-card
           class="mb-4"
           no-body
-          v-if="analyticsData && analyticsData.respondentCharacteristics && data.attendCount"
+          v-if="
+            analyticsData &&
+              analyticsData.respondentCharacteristics &&
+              data.attendCount
+          "
         >
           <b-tabs card no-fade>
             <b-tab title="분석" active>
@@ -94,10 +95,12 @@
                     }}</b-td>
                     <b-td
                       >{{
-                        (analyticsData.respondentCharacteristics.bySex.male /
-                          analyticsData.respondentCharacteristics
-                            .totalReplies) *
-                          100
+                        formatNumber(
+                          (analyticsData.respondentCharacteristics.bySex.male /
+                            analyticsData.respondentCharacteristics
+                              .totalReplies) *
+                            100
+                        )
                       }}%</b-td
                     >
                   </b-tr>
@@ -108,10 +111,13 @@
                     }}</b-td>
                     <b-td
                       >{{
-                        (analyticsData.respondentCharacteristics.bySex.female /
-                          analyticsData.respondentCharacteristics
-                            .totalReplies) *
-                          100
+                        formatNumber(
+                          (analyticsData.respondentCharacteristics.bySex
+                            .female /
+                            analyticsData.respondentCharacteristics
+                              .totalReplies) *
+                            100
+                        )
                       }}%</b-td
                     >
                   </b-tr>
@@ -123,10 +129,13 @@
                     }}</b-td>
                     <b-td
                       >{{
-                        (analyticsData.respondentCharacteristics.byAge.byAge10 /
-                          analyticsData.respondentCharacteristics
-                            .totalReplies) *
-                          100
+                        formatNumber(
+                          (analyticsData.respondentCharacteristics.byAge
+                            .byAge10 /
+                            analyticsData.respondentCharacteristics
+                              .totalReplies) *
+                            100
+                        )
                       }}%</b-td
                     >
                   </b-tr>
@@ -139,10 +148,13 @@
                     }}</b-td>
                     <b-td
                       >{{
-                        (analyticsData.respondentCharacteristics.byAge.byAge20 /
-                          analyticsData.respondentCharacteristics
-                            .totalReplies) *
-                          100
+                        formatNumber(
+                          (analyticsData.respondentCharacteristics.byAge
+                            .byAge20 /
+                            analyticsData.respondentCharacteristics
+                              .totalReplies) *
+                            100
+                        )
                       }}%</b-td
                     >
                   </b-tr>
@@ -153,10 +165,13 @@
                     }}</b-td>
                     <b-td
                       >{{
-                        (analyticsData.respondentCharacteristics.byAge.byAge30 /
-                          analyticsData.respondentCharacteristics
-                            .totalReplies) *
-                          100
+                        formatNumber(
+                          (analyticsData.respondentCharacteristics.byAge
+                            .byAge30 /
+                            analyticsData.respondentCharacteristics
+                              .totalReplies) *
+                            100
+                        )
                       }}%</b-td
                     >
                   </b-tr>
@@ -167,10 +182,13 @@
                     }}</b-td>
                     <b-td
                       >{{
-                        (analyticsData.respondentCharacteristics.byAge.byAge40 /
-                          analyticsData.respondentCharacteristics
-                            .totalReplies) *
-                          100
+                        formatNumber(
+                          (analyticsData.respondentCharacteristics.byAge
+                            .byAge40 /
+                            analyticsData.respondentCharacteristics
+                              .totalReplies) *
+                            100
+                        )
                       }}%</b-td
                     >
                   </b-tr>
@@ -181,10 +199,13 @@
                     }}</b-td>
                     <b-td
                       >{{
-                        (analyticsData.respondentCharacteristics.byAge.byAge50 /
-                          analyticsData.respondentCharacteristics
-                            .totalReplies) *
-                          100
+                        formatNumber(
+                          (analyticsData.respondentCharacteristics.byAge
+                            .byAge50 /
+                            analyticsData.respondentCharacteristics
+                              .totalReplies) *
+                            100
+                        )
                       }}%</b-td
                     >
                   </b-tr>
@@ -195,10 +216,13 @@
                     }}</b-td>
                     <b-td
                       >{{
-                        (analyticsData.respondentCharacteristics.byAge.byAge60 /
-                          analyticsData.respondentCharacteristics
-                            .totalReplies) *
-                          100
+                        formatNumber(
+                          (analyticsData.respondentCharacteristics.byAge
+                            .byAge60 /
+                            analyticsData.respondentCharacteristics
+                              .totalReplies) *
+                            100
+                        )
                       }}%</b-td
                     >
                   </b-tr>
@@ -209,10 +233,13 @@
                     }}</b-td>
                     <b-td
                       >{{
-                        (analyticsData.respondentCharacteristics.byAge.byAge60 /
-                          analyticsData.respondentCharacteristics
-                            .totalReplies) *
-                          100
+                        formatNumber(
+                          (analyticsData.respondentCharacteristics.byAge
+                            .byAge60 /
+                            analyticsData.respondentCharacteristics
+                              .totalReplies) *
+                            100
+                        )
                       }}%</b-td
                     >
                   </b-tr>
@@ -233,12 +260,23 @@
                         >{{ region }}</b-td
                       >
                     </b-tr>
-                    <template v-for="sido in Object.keys(analyticsData.respondentCharacteristics.byRegion[region])">
+                    <template
+                      v-for="sido in Object.keys(
+                        analyticsData.respondentCharacteristics.byRegion[region]
+                      )"
+                    >
                       <b-tr :key="sido">
-                        <b-td :rowspan="calcDongCount(region, sido)">{{ sido }}</b-td>
+                        <b-td :rowspan="calcDongCount(region, sido)">{{
+                          sido
+                        }}</b-td>
                       </b-tr>
                       <b-tr
-                        v-for="dong in Object.keys(analyticsData.respondentCharacteristics.byRegion[region][sido])" :key="dong"
+                        v-for="dong in Object.keys(
+                          analyticsData.respondentCharacteristics.byRegion[
+                            region
+                          ][sido]
+                        )"
+                        :key="dong"
                       >
                         <b-td>{{ dong }}</b-td>
                         <b-td>{{
@@ -248,12 +286,14 @@
                         }}</b-td>
                         <b-td
                           >{{
-                            (analyticsData.respondentCharacteristics.byRegion[
-                              region
-                            ][sido][dong] /
-                              analyticsData.respondentCharacteristics
-                                .totalReplies) *
-                              100
+                            formatNumber(
+                              (analyticsData.respondentCharacteristics.byRegion[
+                                region
+                              ][sido][dong] /
+                                analyticsData.respondentCharacteristics
+                                  .totalReplies) *
+                                100
+                            )
                           }}%</b-td
                         >
                       </b-tr>
@@ -277,7 +317,10 @@
                     <b-th :colspan="getMaxViewitems() + 1" class="main-header"
                       >보기문항</b-th
                     >
-                    <b-th :colspan="getMaxOtherViewitems()" v-if="getMaxOtherViewitems()" class="main-header"
+                    <b-th
+                      :colspan="getMaxOtherViewitems()"
+                      v-if="getMaxOtherViewitems()"
+                      class="main-header"
                       >기타문항</b-th
                     >
                     <b-th rowspan="2" class="main-header">합계</b-th>
@@ -316,7 +359,9 @@
                       >{{ getOtherDetailCount(item, subIndex - 1) }}</b-td
                     >
                     <b-td>{{
-                      item.respondentCharacteristics ? item.respondentCharacteristics.totalReplies : 0
+                      item.respondentCharacteristics
+                        ? item.respondentCharacteristics.totalReplies
+                        : 0
                     }}</b-td>
                   </b-tr>
                 </b-tbody>
@@ -355,22 +400,21 @@
                                     class="count-bar"
                                     :style="
                                       'width: ' +
-                                        (getItemCount(item, subIndex) /
-                                          item.respondentCharacteristics
-                                            .totalReplies) *
-                                          100 +
+                                        formatNumber(
+                                          (getItemCount(item, subIndex) /
+                                            item.respondentCharacteristics
+                                              .totalReplies) *
+                                            100
+                                        ) +
                                         '%'
                                     "
                                   ></div>
                                 </b-colxx>
-                                <b-colxx xxs="2" class="text-center">
+                                <!-- <b-colxx xxs="2" class="text-center">
                                   {{
-                                    (getItemCount(item, subIndex) /
-                                      item.respondentCharacteristics
-                                        .totalReplies) *
-                                      100
+                                    formatNumber((getItemCount(item, subIndex) / item.respondentCharacteristics.totalReplies) * 100)
                                   }}%
-                                </b-colxx>
+                                </b-colxx> -->
                                 <b-colxx xxs="2" class="text-center">
                                   ({{ getItemCount(item, subIndex) }}명)
                                 </b-colxx>
@@ -428,7 +472,12 @@
                       </div>
                     </div>
 
-                    <b-table-simple v-if="getQuestion(item).type1 == 0" small responsive class="text-center mt-4">
+                    <b-table-simple
+                      v-if="getQuestion(item).type1 == 0"
+                      small
+                      responsive
+                      class="text-center mt-4"
+                    >
                       <b-thead head-variant="dark">
                         <b-tr>
                           <b-th colspan="4" class="main-header">구분</b-th>
@@ -437,14 +486,14 @@
                             class="main-header"
                             v-for="(item, i) in item.itemViewDetails"
                             :key="i"
-                            >보기문항 {{ i+1 }}</b-th
-                          >
+                            >보기문항 {{ i + 1 }}
+                          </b-th>
                           <b-th
                             class="main-header"
                             v-for="(item, i) in item.itemViewOtherDetails"
                             :key="i"
-                            >기타문항 {{ i+1 }}</b-th
-                          >
+                            >기타문항 {{ i + 1 }}
+                          </b-th>
                         </b-tr>
                       </b-thead>
                       <b-tbody>
@@ -457,77 +506,366 @@
                           <b-td
                             v-for="(detailItem, i) in item.itemViewDetails"
                             :key="i"
-                            >{{ (detailItem.respondentCharacteristics? detailItem.respondentCharacteristics.totalReplies : 0) / item.respondentCharacteristics.totalReplies * 100}} %</b-td
+                            >{{
+                              formatNumber(
+                                ((detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics
+                                      .totalReplies
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies) *
+                                  100
+                              )
+                            }}
+                            %</b-td
                           >
                           <b-td
                             v-for="(detailItem, i) in item.itemViewOtherDetails"
                             :key="i"
-                            >{{ (detailItem.respondentCharacteristics? detailItem.respondentCharacteristics.totalReplies : 0) / item.respondentCharacteristics.totalReplies * 100}} %</b-td
+                            >{{
+                            formatNumber((detailItem.respondentCharacteristics?
+                            detailItem.respondentCharacteristics.totalReplies :
+                            0) / item.respondentCharacteristics.totalReplies *
+                            100})} %</b-td
                           >
                         </b-tr>
                         <b-tr>
                           <b-td rowspan="2" class="item-header">성별</b-td>
                           <b-td colspan="3" class="subitem-header">남성</b-td>
-                          <b-td>{{item.respondentCharacteristics ? item.respondentCharacteristics.bySex.male : 0}}</b-td>
-                          <b-td v-for="detailItem in item.itemViewDetails">{{((detailItem.respondentCharacteristics? detailItem.respondentCharacteristics.bySex.male : 0) / item.respondentCharacteristics.totalReplies) * 100}}%</b-td>
-                          <b-td v-for="detailItem in item.itemViewOtherDetails">{{((detailItem.respondentCharacteristics ? detailItem.respondentCharacteristics.bySex.male : 0) / item.respondentCharacteristics.totalReplies) * 100}}%</b-td>
+                          <b-td>{{
+                            item.respondentCharacteristics
+                              ? item.respondentCharacteristics.bySex.male
+                              : 0
+                          }}</b-td>
+                          <b-td
+                            v-for="detailItem in item.itemViewDetails"
+                            :key="detailItem.itemViewId"
+                            >{{
+                              formatNumber(
+                                ((detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics.bySex
+                                      .male
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies) *
+                                  100
+                              )
+                            }}%</b-td
+                          >
+                          <b-td
+                            v-for="detailItem in item.itemViewOtherDetails"
+                            :key="detailItem.itemViewId"
+                            >{{
+                              formatNumber(
+                                ((detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics.bySex
+                                      .male
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies) *
+                                  100
+                              )
+                            }}%</b-td
+                          >
                         </b-tr>
                         <b-tr>
                           <b-td colspan="3" class="subitem-header">여성</b-td>
-                          <b-td>{{item.respondentCharacteristics ? item.respondentCharacteristics.bySex.female : 0}}</b-td>
-                          <b-td v-for="detailItem in item.itemViewDetails">{{((detailItem.respondentCharacteristics? detailItem.respondentCharacteristics.bySex.female : 0) / item.respondentCharacteristics.totalReplies) * 100}}%</b-td>
-                          <b-td v-for="detailItem in item.itemViewOtherDetails">{{((detailItem.respondentCharacteristics ? detailItem.respondentCharacteristics.bySex.female : 0) / item.respondentCharacteristics.totalReplies) * 100}}%</b-td>
+                          <b-td>{{
+                            item.respondentCharacteristics
+                              ? item.respondentCharacteristics.bySex.female
+                              : 0
+                          }}</b-td>
+                          <b-td
+                            v-for="detailItem in item.itemViewDetails"
+                            :key="detailItem.itemViewId"
+                            >{{
+                              formatNumber(
+                                ((detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics.bySex
+                                      .female
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies) *
+                                  100
+                              )
+                            }}%</b-td
+                          >
+                          <b-td
+                            v-for="detailItem in item.itemViewOtherDetails"
+                            :key="detailItem.itemViewId"
+                            >{{
+                              formatNumber(
+                                (detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics.bySex
+                                      .female
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies
+                              ) * 100
+                            }}%</b-td
+                          >
                         </b-tr>
                         <b-tr>
                           <b-td rowspan="7" class="item-header">연령</b-td>
-                          <b-td colspan="3" class="subitem-header">18세 이하</b-td>
-                          <b-td>{{item.respondentCharacteristics ? item.respondentCharacteristics.byAge.byAge10 : 0}}</b-td>
-                          <b-td v-for="detailItem in item.itemViewDetails">{{((detailItem.respondentCharacteristics? detailItem.respondentCharacteristics.byAge.byAge10 : 0) / item.respondentCharacteristics.totalReplies) * 100}}%</b-td>
-                          <b-td v-for="detailItem in item.itemViewOtherDetails">{{((detailItem.respondentCharacteristics ? detailItem.respondentCharacteristics.byAge.byAge10 : 0) / item.respondentCharacteristics.totalReplies) * 100}}%</b-td>
+                          <b-td colspan="3" class="subitem-header"
+                            >18세 이하</b-td
+                          >
+                          <b-td>{{
+                            item.respondentCharacteristics
+                              ? item.respondentCharacteristics.byAge.byAge10
+                              : 0
+                          }}</b-td>
+                          <b-td
+                            v-for="detailItem in item.itemViewDetails"
+                            :key="detailItem.itemViewId"
+                            >{{
+                              formatNumber(
+                                ((detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics.byAge
+                                      .byAge10
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies) *
+                                  100
+                              )
+                            }}%</b-td
+                          >
+                          <b-td
+                            v-for="detailItem in item.itemViewOtherDetails"
+                            :key="detailItem.itemViewId"
+                            >{{
+                              formatNumber(
+                                ((detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics.byAge
+                                      .byAge10
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies) *
+                                  100
+                              )
+                            }}%</b-td
+                          >
                         </b-tr>
 
                         <b-tr>
-                          <b-td colspan="3" class="subitem-header">18세 이상 ~ 29세 이하</b-td>
-                          <b-td>{{item.respondentCharacteristics ? item.respondentCharacteristics.byAge.byAge10 : 0}}</b-td>
-                          <b-td v-for="detailItem in item.itemViewDetails">{{((detailItem.respondentCharacteristics? detailItem.respondentCharacteristics.byAge.byAge20 : 0) / item.respondentCharacteristics.totalReplies) * 100}}%</b-td>
-                          <b-td v-for="detailItem in item.itemViewOtherDetails">{{((detailItem.respondentCharacteristics ? detailItem.respondentCharacteristics.byAge.byAge20 : 0) / item.respondentCharacteristics.totalReplies) * 100}}%</b-td>
+                          <b-td colspan="3" class="subitem-header"
+                            >18세 이상 ~ 29세 이하</b-td
+                          >
+                          <b-td>{{
+                            item.respondentCharacteristics
+                              ? item.respondentCharacteristics.byAge.byAge10
+                              : 0
+                          }}</b-td>
+                          <b-td
+                            v-for="detailItem in item.itemViewDetails"
+                            :key="detailItem.itemViewId"
+                            >{{
+                              formatNumber(
+                                ((detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics.byAge
+                                      .byAge20
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies) *
+                                  100
+                              )
+                            }}%</b-td
+                          >
+                          <b-td
+                            v-for="detailItem in item.itemViewOtherDetails"
+                            :key="detailItem.itemViewId"
+                            >{{
+                              formatNumber(
+                                ((detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics.byAge
+                                      .byAge20
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies) *
+                                  100
+                              )
+                            }}%</b-td
+                          >
                         </b-tr>
 
                         <b-tr>
                           <b-td colspan="3" class="subitem-header">30대</b-td>
-                          <b-td>{{item.respondentCharacteristics ? item.respondentCharacteristics.byAge.byAge10 : 0}}</b-td>
-                          <b-td v-for="detailItem in item.itemViewDetails">{{((detailItem.respondentCharacteristics? detailItem.respondentCharacteristics.byAge.byAge30 : 0) / item.respondentCharacteristics.totalReplies) * 100}}%</b-td>
-                          <b-td v-for="detailItem in item.itemViewOtherDetails">{{((detailItem.respondentCharacteristics ? detailItem.respondentCharacteristics.byAge.byAge30 : 0) / item.respondentCharacteristics.totalReplies) * 100}}%</b-td>
+                          <b-td>{{
+                            item.respondentCharacteristics
+                              ? item.respondentCharacteristics.byAge.byAge10
+                              : 0
+                          }}</b-td>
+                          <b-td
+                            v-for="detailItem in item.itemViewDetails"
+                            :key="detailItem.itemViewId"
+                            >{{
+                              formatNumber(
+                                ((detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics.byAge
+                                      .byAge30
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies) *
+                                  100
+                              )
+                            }}%</b-td
+                          >
+                          <b-td
+                            v-for="detailItem in item.itemViewOtherDetails"
+                            :key="detailItem.itemViewId"
+                            >{{
+                              formatNumber(
+                                ((detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics.byAge
+                                      .byAge30
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies) *
+                                  100
+                              )
+                            }}%</b-td
+                          >
                         </b-tr>
 
                         <b-tr>
                           <b-td colspan="3" class="subitem-header">40대</b-td>
-                          <b-td>{{item.respondentCharacteristics ? item.respondentCharacteristics.byAge.byAge10 : 0}}</b-td>
-                          <b-td v-for="detailItem in item.itemViewDetails">{{((detailItem.respondentCharacteristics? detailItem.respondentCharacteristics.byAge.byAge40 : 0) / item.respondentCharacteristics.totalReplies) * 100}}%</b-td>
-                          <b-td v-for="detailItem in item.itemViewOtherDetails">{{((detailItem.respondentCharacteristics ? detailItem.respondentCharacteristics.byAge.byAge40 : 0) / item.respondentCharacteristics.totalReplies) * 100}}%</b-td>
+                          <b-td>{{
+                            item.respondentCharacteristics
+                              ? item.respondentCharacteristics.byAge.byAge10
+                              : 0
+                          }}</b-td>
+                          <b-td
+                            v-for="detailItem in item.itemViewDetails"
+                            :key="detailItem.itemViewId"
+                            >{{
+                              formatNumber(
+                                ((detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics.byAge
+                                      .byAge40
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies) *
+                                  100
+                              )
+                            }}%</b-td
+                          >
+                          <b-td
+                            v-for="detailItem in item.itemViewOtherDetails"
+                            :key="detailItem.itemViewId"
+                            >{{
+                              formatNumber(
+                                ((detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics.byAge
+                                      .byAge40
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies) *
+                                  100
+                              )
+                            }}%</b-td
+                          >
                         </b-tr>
 
                         <b-tr>
                           <b-td colspan="3" class="subitem-header">50대</b-td>
-                          <b-td>{{item.respondentCharacteristics ? item.respondentCharacteristics.byAge.byAge10 : 0}}</b-td>
-                          <b-td v-for="detailItem in item.itemViewDetails">{{((detailItem.respondentCharacteristics? detailItem.respondentCharacteristics.byAge.byAge50 : 0) / item.respondentCharacteristics.totalReplies) * 100}}%</b-td>
-                          <b-td v-for="detailItem in item.itemViewOtherDetails">{{((detailItem.respondentCharacteristics ? detailItem.respondentCharacteristics.byAge.byAge50 : 0) / item.respondentCharacteristics.totalReplies) * 100}}%</b-td>
+                          <b-td>{{
+                            item.respondentCharacteristics
+                              ? item.respondentCharacteristics.byAge.byAge10
+                              : 0
+                          }}</b-td>
+                          <b-td
+                            v-for="detailItem in item.itemViewDetails"
+                            :key="detailItem.itemViewId"
+                            >{{
+                              formatNumber(
+                                ((detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics.byAge
+                                      .byAge50
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies) *
+                                  100
+                              )
+                            }}%</b-td
+                          >
+                          <b-td
+                            v-for="detailItem in item.itemViewOtherDetails"
+                            :key="detailItem.itemViewId"
+                            >{{
+                              formatNumber(
+                                ((detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics.byAge
+                                      .byAge50
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies) *
+                                  100
+                              )
+                            }}%</b-td
+                          >
                         </b-tr>
 
                         <b-tr>
                           <b-td colspan="3" class="subitem-header">60대</b-td>
-                          <b-td>{{item.respondentCharacteristics ? item.respondentCharacteristics.byAge.byAge10 : 0}}</b-td>
-                          <b-td v-for="detailItem in item.itemViewDetails">{{((detailItem.respondentCharacteristics? detailItem.respondentCharacteristics.byAge.byAge60 : 0) / item.respondentCharacteristics.totalReplies) * 100}}%</b-td>
-                          <b-td v-for="detailItem in item.itemViewOtherDetails">{{((detailItem.respondentCharacteristics ? detailItem.respondentCharacteristics.byAge.byAge60 : 0) / item.respondentCharacteristics.totalReplies) * 100}}%</b-td>
+                          <b-td>{{
+                            item.respondentCharacteristics
+                              ? item.respondentCharacteristics.byAge.byAge10
+                              : 0
+                          }}</b-td>
+                          <b-td
+                            v-for="detailItem in item.itemViewDetails"
+                            :key="detailItem.itemViewId"
+                            >{{
+                              formatNumber(
+                                ((detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics.byAge
+                                      .byAge60
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies) *
+                                  100
+                              )
+                            }}%</b-td
+                          >
+                          <b-td
+                            v-for="detailItem in item.itemViewOtherDetails"
+                            :key="detailItem.itemViewId"
+                            >{{
+                              formatNumber(
+                                ((detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics.byAge
+                                      .byAge60
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies) *
+                                  100
+                              )
+                            }}%</b-td
+                          >
                         </b-tr>
 
                         <b-tr>
-                          <b-td colspan="3" class="subitem-header">70대 이상</b-td>
-                          <b-td>{{item.respondentCharacteristics ? item.respondentCharacteristics.byAge.byAge10 : 0}}</b-td>
-                          <b-td v-for="detailItem in item.itemViewDetails">{{((detailItem.respondentCharacteristics? detailItem.respondentCharacteristics.byAge.byAge70 : 0) / item.respondentCharacteristics.totalReplies) * 100}}%</b-td>
-                          <b-td v-for="detailItem in item.itemViewOtherDetails">{{((detailItem.respondentCharacteristics ? detailItem.respondentCharacteristics.byAge.byAge70 : 0) / item.respondentCharacteristics.totalReplies) * 100}}%</b-td>
+                          <b-td colspan="3" class="subitem-header"
+                            >70대 이상</b-td
+                          >
+                          <b-td>{{
+                            item.respondentCharacteristics
+                              ? item.respondentCharacteristics.byAge.byAge10
+                              : 0
+                          }}</b-td>
+                          <b-td
+                            v-for="detailItem in item.itemViewDetails"
+                            :key="detailItem.itemViewId"
+                            >{{
+                              formatNumber(
+                                ((detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics.byAge
+                                      .byAge70
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies) *
+                                  100
+                              )
+                            }}%</b-td
+                          >
+                          <b-td
+                            v-for="detailItem in item.itemViewOtherDetails"
+                            :key="detailItem.itemViewId"
+                            >{{
+                              formatNumber(
+                                ((detailItem.respondentCharacteristics
+                                  ? detailItem.respondentCharacteristics.byAge
+                                      .byAge70
+                                  : 0) /
+                                  item.respondentCharacteristics.totalReplies) *
+                                  100
+                              )
+                            }}%</b-td
+                          >
                         </b-tr>
-                        
+
                         <b-tr>
                           <b-td
                             :rowspan="calcTotalRegionCount()"
@@ -535,7 +873,11 @@
                             >지역</b-td
                           >
                         </b-tr>
-                        <template v-for="region in Object.keys(item.respondentCharacteristics.byRegion)">
+                        <template
+                          v-for="region in Object.keys(
+                            item.respondentCharacteristics.byRegion
+                          )"
+                        >
                           <b-tr :key="region">
                             <b-td
                               :rowspan="calcRegionCount(region)"
@@ -544,18 +886,67 @@
                               {{ region }}
                             </b-td>
                           </b-tr>
-                          <template v-for="sido in Object.keys(item.respondentCharacteristics.byRegion[region])">
+                          <template
+                            v-for="sido in Object.keys(
+                              item.respondentCharacteristics.byRegion[region]
+                            )"
+                          >
                             <b-tr :key="sido">
-                              <b-td :rowspan="calcDongCount(region, sido)">{{ sido }}</b-td>
+                              <b-td :rowspan="calcDongCount(region, sido)">{{
+                                sido
+                              }}</b-td>
                             </b-tr>
-                            <b-tr v-for="dong in Object.keys(item.respondentCharacteristics.byRegion[region][sido])" :key="dong">
-                              <b-td>{{dong}}</b-td>
-                              <b-td>{{item.respondentCharacteristics.byRegion[region][sido][dong]}}</b-td>
-                              <b-td v-for="detailItem in item.itemViewDetails">
-                                {{((detailItem.respondentCharacteristics.byRegion[region] && detailItem.respondentCharacteristics.byRegion[region][sido] ? detailItem.respondentCharacteristics.byRegion[region][sido][dong] : 0) /item.respondentCharacteristics.totalReplies) *100}}%
+                            <b-tr
+                              v-for="dong in Object.keys(
+                                item.respondentCharacteristics.byRegion[region][
+                                  sido
+                                ]
+                              )"
+                              :key="dong"
+                            >
+                              <b-td>{{ dong }}</b-td>
+                              <b-td>{{
+                                item.respondentCharacteristics.byRegion[region][
+                                  sido
+                                ][dong]
+                              }}</b-td>
+                              <b-td
+                                v-for="detailItem in item.itemViewDetails"
+                                :key="detailItem.itemViewId"
+                              >
+                                {{
+                                  formatNumber(
+                                    ((detailItem.respondentCharacteristics
+                                      .byRegion[region] &&
+                                    detailItem.respondentCharacteristics
+                                      .byRegion[region][sido]
+                                      ? detailItem.respondentCharacteristics
+                                          .byRegion[region][sido][dong]
+                                      : 0) /
+                                      item.respondentCharacteristics
+                                        .totalReplies) *
+                                      100
+                                  )
+                                }}%
                               </b-td>
-                              <b-td v-for="detailItem in item.itemViewOtherDetails">
-                                {{((detailItem.respondentCharacteristics.byRegion[region] && detailItem.respondentCharacteristics.byRegion[region][sido] ? detailItem.respondentCharacteristics.byRegion[region][sido][dong] : 0) /item.respondentCharacteristics.totalReplies) *100}}%
+                              <b-td
+                                v-for="detailItem in item.itemViewOtherDetails"
+                                :key="detailItem.itemViewId"
+                              >
+                                {{
+                                  formatNumber(
+                                    ((detailItem.respondentCharacteristics
+                                      .byRegion[region] &&
+                                    detailItem.respondentCharacteristics
+                                      .byRegion[region][sido]
+                                      ? detailItem.respondentCharacteristics
+                                          .byRegion[region][sido][dong]
+                                      : 0) /
+                                      item.respondentCharacteristics
+                                        .totalReplies) *
+                                      100
+                                  )
+                                }}%
                               </b-td>
                             </b-tr>
                           </template>
@@ -639,7 +1030,7 @@ export default {
           this.isLoading = false;
         })
         .catch(error => {
-          console.log("error", error)
+          console.log("error", error);
           this.isLoading = false;
         });
 
@@ -659,7 +1050,10 @@ export default {
                   borderColor: ["#ed7d31", "#9dc3e6"],
                   backgroundColor: ["#ed7d31", "#9dc3e6"],
                   borderWidth: 2,
-                  data: [item.respondentCharacteristics.bySex.male, item.respondentCharacteristics.bySex.female]
+                  data: [
+                    item.respondentCharacteristics.bySex.male,
+                    item.respondentCharacteristics.bySex.female
+                  ]
                 }
               ]
             });
@@ -687,12 +1081,12 @@ export default {
                   borderWidth: 2
                 }
               ]
-            })
-          })
+            });
+          });
           this.isLoading = false;
         })
         .catch(error => {
-          console.log("error", error)
+          console.log("error", error);
           this.isLoading = false;
         });
     }
@@ -725,7 +1119,7 @@ export default {
       let totalCnt = 0;
       Object.keys(regionData[region]).forEach(sido => {
         totalCnt += Object.keys(regionData[region][sido]).length + 1;
-      })
+      });
       return totalCnt + 1;
     },
 
@@ -771,9 +1165,9 @@ export default {
         x => x._id == item.itemQuestionId
       );
       if (!question.type1) {
-        if (item.itemViewDetails[index]) {
-          if (item.itemViewDetails[index].respondentCharacteristics) {
-            return item.itemViewDetails[index].respondentCharacteristics
+        if (item.itemViewOtherDetails[index]) {
+          if (item.itemViewOtherDetails[index].respondentCharacteristics) {
+            return item.itemViewOtherDetails[index].respondentCharacteristics
               .totalReplies;
           } else {
             return 0;
@@ -821,8 +1215,8 @@ export default {
         } else {
           return 0;
         }
-      } catch(e) {
-        console.log('----------------')
+      } catch (e) {
+        console.log("----------------");
         console.log(item);
         console.log(index);
       }
@@ -856,6 +1250,10 @@ export default {
         }
       });
       return max;
+    },
+
+    formatNumber(num) {
+      return num.toFixed(2);
     },
 
     addNotification(

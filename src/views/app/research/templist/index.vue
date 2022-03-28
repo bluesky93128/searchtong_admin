@@ -225,6 +225,10 @@ export default {
       items: [],
       type_options: [
         {
+          label: "전체",
+          value: -1,
+        },
+        {
           label: "여론조사",
           value: 0,
         },

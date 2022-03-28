@@ -277,6 +277,12 @@ export default {
             thClass: "bg-dark text-white",
           },
           {
+            key: "user.wallet_addr",
+            label: "지갑주소",
+            sortable: false,
+            thClass: "bg-dark text-white",
+          },
+          {
             key: "sent",
             label: "보내기",
             sortable: false,

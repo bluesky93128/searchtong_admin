@@ -133,6 +133,7 @@ export default {
         },
 
         nextTab() {
+            this.totalTabs = this.tabs.filter(x => x.type != "done").length;
             let valid = true;
             if (this.withValidate) {
                 valid = this.tabs[this.currentActive].validate();
