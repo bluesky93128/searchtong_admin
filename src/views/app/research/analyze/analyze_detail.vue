@@ -43,7 +43,13 @@
       <b-colxx xxs="12">
         <div class="button-container">
           <b-button class="primary">주관식 답변 내보내기</b-button>
-          <b-button class="primary ml-2">전체결과 내보내기</b-button>
+          <!-- <b-button class="primary ml-2">전체결과 내보내기</b-button> -->
+          <download-csv
+            class="btn btn-primary ml-2"
+            :data="json_data"
+            :name="id + '.csv'"
+          >전체결과 내보내기
+          </download-csv>
         </div>
         <b-card
           class="mb-4"
@@ -525,7 +531,7 @@
                             formatNumber((detailItem.respondentCharacteristics?
                             detailItem.respondentCharacteristics.totalReplies :
                             0) / item.respondentCharacteristics.totalReplies *
-                            100})} %</b-td
+                            100)}} %</b-td
                           >
                         </b-tr>
                         <b-tr>
@@ -974,11 +980,13 @@ import axios from "axios";
 import moment from "moment";
 import DoughnutChart from "../../../../components/Charts/Doughnut";
 import BarChart from "../../../../components/Charts/Bar";
+import JsonCSV from "vue-json-csv";
 
 export default {
   components: {
     "doughnut-chart": DoughnutChart,
-    "bar-chart": BarChart
+    "bar-chart": BarChart,
+    "download-csv": JsonCSV
   },
   data() {
     return {
@@ -997,7 +1005,8 @@ export default {
       },
       analyticsData: null,
       doughnutChartData: [],
-      barChartData: []
+      barChartData: [],
+      json_data: []
     };
   },
   mounted() {
@@ -1089,6 +1098,23 @@ export default {
           console.log("error", error);
           this.isLoading = false;
         });
+
+      var myHeaders = new Headers();
+      myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
+
+      var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+      };
+
+      fetch(apiUrl + "/research/analyticsTotal/" + this.id, requestOptions)
+        .then(response => response.json())
+        .then(result => {
+          console.log(result)
+          this.json_data = this.getExportExcel(result.result);
+        })
+        .catch(error => console.log('error', error));
     }
   },
   methods: {
@@ -1250,6 +1276,31 @@ export default {
         }
       });
       return max;
+    },
+
+    getExportExcel(data) {
+      var json_data = [];
+      let curYear = new Date().getFullYear();
+      data.forEach((item, index) => {
+        var new_item = {
+          번호: index + 1,
+          '사용자 ID': item.user.decPhoneNum,
+          성별: item.user.panelInfo.gender,
+          나이: curYear - item.user.panelInfo.birthYear + 1,
+          지역1: item.user.panelInfo.postData.sido,
+          지역2: item.user.panelInfo.postData.sigungu,
+          지역3: item.user.panelInfo.postData.bname,
+          직업: item.user.userResearchInfo? item.user.userResearchInfo.job: "",
+          소득수준: item.user.userResearchInfo? item.user.userResearchInfo.salary: "",
+          시작시간: this.formatDateWithMin(new Date(item.researchStart)),
+          종료시간: this.formatDateWithMin(new Date(item.researchEnd)),
+        }
+        Object.keys(item.researchAnswerResult).forEach((key, i) => {
+          new_item['문항'+(i + 1)] = item.researchAnswerResult[key];
+        })
+        json_data.push(new_item);
+      })
+      return json_data;
     },
 
     formatNumber(num) {
