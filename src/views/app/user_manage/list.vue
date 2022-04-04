@@ -84,7 +84,7 @@
               {{calcAge(item)}}
             </template>
             <template #cell(postalCode)="{ item }">
-              {{ item.panelInfo && item.panelInfo.postData.sigunguCode }}
+              {{ item.panelInfo && item.panelInfo.postData && item.panelInfo.postData.sigunguCode }}
             </template>
             <template #cell(action)="{ item }">
               <router-link :to="{ path: 'detail', query: { id: item._id } }" class="text-link">
