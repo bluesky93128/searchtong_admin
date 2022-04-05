@@ -10,8 +10,8 @@
       <b-colxx xxs="12">
         <b-card class="mb-4">
           <b-row>
-            <b-colxx xxs="6">
-              <b-form-group label="설문제목 또는 ID" :label-cols="2">
+            <b-colxx xxs="4">
+              <b-form-group label="제목" :label-cols="2">
                 <b-form-input v-model="searchForm.title" />
               </b-form-group>
             </b-colxx>
@@ -34,40 +34,10 @@
                 </div>
               </b-form-group>
             </b-colxx>
-          </b-row>
-          <b-row>
-            <b-colxx xxs="6">
-              <b-form-group label="진행기간" :label-cols="2">
-                <div class="d-flex">
-                  <b-datepicker
-                    locale="ko-KR"
-                    v-model="searchForm.fromDate"
-                    :placeholder="$t('search.all')"
-                    :max="disabledFrom"
-                  />
-                  <span class="span-center-text mx-2">~</span>
-                  <b-datepicker
-                    locale="ko-KR"
-                    v-model="searchForm.toDate"
-                    :placeholder="$t('search.all')"
-                    :min="disabledTo"
-                  />
-                </div>
-              </b-form-group>
-            </b-colxx>
-            <b-colxx xxs="6">
-              <b-form-group label="설문유형" :label-cols="2">
-                <div class="d-flex justify-content-between">
-                  <v-select
-                    v-model="searchForm.type"
-                    :options="type_options"
-                    placeholder="전체"
-                    :reduce="(item) => item.value"
-                    class="research-type"
-                  />
-                  <b-button class="primary">검색</b-button>
-                </div>
-              </b-form-group>
+            <b-colxx xxs="2">
+              <div class="d-flex justify-content-end">
+                <b-button class="primary" @click="onClickSearch()">검색</b-button>
+              </div>
             </b-colxx>
           </b-row>
         </b-card>
@@ -183,6 +153,7 @@ export default {
       status_text: ["비공개", "공개"],
       status_variant: ["outline-primary", "primary"],
       searchForm: {},
+      filter: null,
       disabledTo: null,
       disabledFrom: null,
       type_options: [
@@ -253,6 +224,9 @@ export default {
     rowSelected(items) {
       this.noticesTable.selected = items;
     },
+    onClickSearch() {
+      this.filter = {...this.searchForm};
+    },
     dataProvider(ctx) {
       const params = this.apiParamsConverter(ctx);
       let promise = axios.get(apiUrl + "/notice", {
@@ -283,12 +257,18 @@ export default {
       if (params.sortBy && params.sortBy.length > 0) {
         apiParams.sort = `${params.sortBy}|${params.sortDesc ? "desc" : "asc"}`;
       }
-      if (params.filter) {
+      if (params.filter && Object.keys(params.filter).length > 0) {
         // Optional
-        apiParams.search_option = params.filter.search_term;
-        apiParams.search_word = params.filter.search_word;
-        apiParams.from = params.filter.fromDate;
-        apiParams.to = params.filter.toDate;
+        if(params.filter.title) {
+          apiParams.search_word = params.filter.title;
+          apiParams.search_option = 'all';
+        }
+        if(params.filter.fromDate) {
+          apiParams.fromDate = params.filter.fromDate;
+        }
+        if(params.filter.toDate) {
+          apiParams.toDate = params.filter.toDate;
+        }
       }
       return apiParams;
     },

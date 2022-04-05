@@ -9,7 +9,112 @@
     <b-row>
       <b-colxx xxs="12">
         <b-card class="mb-4">
-          <b-row>
+          <b-form @submit.prevent="onHorizontalSubmit">
+            <b-row>
+              <b-colxx xs="6">
+                <b-form-group
+                  label-cols="2"
+                  horizontal
+                  :label="$t('search.search')"
+                >
+                  <b-input-group class="mb-2 pl-0">
+                    <b-input-group-prepend>
+                      <b-dropdown
+                        :text="$t('search.' + searchForm.search_term)"
+                        variant="outline-secondary"
+                      >
+                        <b-dropdown-item @click="onClickSearchOption('all')">전체</b-dropdown-item>
+                        <b-dropdown-item @click="onClickSearchOption('title')">제목</b-dropdown-item>
+                      </b-dropdown>
+                    </b-input-group-prepend>
+                    <b-form-input v-model="searchForm.search_word" />
+                  </b-input-group>
+                </b-form-group>
+              </b-colxx>
+              <b-colxx xs="3">
+                <b-form-group label-cols="4" label="처리상태" horizontal>
+                  <v-select
+                    v-model="searchForm.refund_status"
+                    :options="['전체', '미처리', '처리완료']"
+                    placeholder="전체"
+                  />
+                </b-form-group>
+              </b-colxx>
+            </b-row>
+            <b-form-group label-cols="1" horizontal label="기간">
+              <b-row>
+                <b-colxx xxs="6">
+                  <div class="d-flex">
+                    <b-datepicker
+                      locale="ko-KR"
+                      v-model="searchForm.fromDate"
+                      :placeholder="$t('search.all')"
+                      :max="disabledFrom"
+                    />
+                    <span class="span-center-text mx-2">~</span>
+                    <b-datepicker
+                      locale="ko-KR"
+                      v-model="searchForm.toDate"
+                      :placeholder="$t('search.all')"
+                      :min="disabledTo"
+                    />
+                  </div>
+                </b-colxx>
+                <b-colxx xxs="5" class="d-flex">
+                  <b-input-group class="mb-2">
+                    <b-input-group-prepend>
+                      <b-button
+                        size="sm"
+                        class="search-days"
+                        variant="outline-secondary"
+                        @click="onToday"
+                        >{{ $t("search.today") }}</b-button
+                      >
+                      <b-button
+                        size="sm"
+                        class="search-days"
+                        variant="outline-secondary"
+                        @click="onWeek"
+                        >{{ $t("search.week") }}</b-button
+                      >
+                      <b-button
+                        size="sm"
+                        class="search-days"
+                        variant="outline-secondary"
+                        @click="onMonth"
+                        >{{ $t("search.month") }}</b-button
+                      >
+                      <b-button
+                        size="sm"
+                        class="search-days"
+                        variant="outline-secondary"
+                        @click="onHalfYear"
+                        >{{ $t("search.halfyear") }}</b-button
+                      >
+                    </b-input-group-prepend>
+                    <b-input-group-append>
+                      <b-button
+                        size="sm"
+                        class="search-days"
+                        variant="outline-secondary"
+                        style="border-left: none"
+                        @click="onTotal"
+                        >{{ $t("search.all") }}</b-button
+                      >
+                    </b-input-group-append>
+                  </b-input-group>
+                  <b-button
+                    type="submit"
+                    variant="primary"
+                    class="w-30"
+                    style="height: 35px"
+                    >{{ $t("search.submit") }}</b-button
+                  >
+                </b-colxx>
+              </b-row>
+            </b-form-group>
+          </b-form>
+          <!-- <b-row>
             <b-colxx xxs="6">
               <b-form-group label="설문제목 또는 ID" :label-cols="2">
                 <b-form-input v-model="searchForm.title" />
@@ -65,11 +170,11 @@
                     :reduce="(item) => item.value"
                     class="research-type"
                   />
-                  <b-button class="primary">검색</b-button>
+                  <b-button class="primary" @click="onClickSearch()">검색</b-button>
                 </div>
               </b-form-group>
             </b-colxx>
-          </b-row>
+          </b-row> -->
         </b-card>
       </b-colxx>
 
@@ -83,7 +188,7 @@
             ref="myTable"
             class="text-center mt-4"
             :fields="customer_centerTable.fields"
-            :items="items"
+            :items="dataProvider"
             :per-page="perPage"
             :current-page="currentPage"
             sort-by="createdAt"
@@ -92,6 +197,7 @@
             selectable
             :select-mode="customer_centerTable.selectMode"
             selectedVariant="primary"
+            :filter="filter"
           >
             <template #cell(no)="{ item, index }">
               {{ perPage * (currentPage - 1) + index + 1 }}
@@ -154,7 +260,14 @@ export default {
       ko: ko,
       status_text: ["미처리", "처리완료"],
       status_variant: ["outline-primary", "success"],
-      searchForm: {},
+      searchForm: {
+        search_term: "all",
+        search_word: "",
+        fromDate: null,
+        toDate: null,
+        refund_status: ""
+      },
+      filter: null,
       disabledTo: null,
       disabledFrom: null,
       type_options: [
@@ -220,31 +333,32 @@ export default {
     };
   },
   methods: {
-    getList() {
-      let promise = axios.get(apiUrl + "/customer_center?role=admin&page="+this.currentPage+"&per_page="+this.perPage, {
-        params: this.searchForm,
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      });
+    // getList() {
+    //   let promise = axios.get(apiUrl + "/customer_center?role=admin&page="+this.currentPage+"&per_page="+this.perPage, {
+    //     params: this.searchForm,
+    //     headers: {
+    //       Authorization: "Bearer " + localStorage.getItem("token"),
+    //     },
+    //   });
 
-      return promise
-        .then((result) => result.data)
-        .then((data) => {
-          this.currentPage = data.current_page;
-          // this.perPage = data.per_page;
-          this.totalRows = data.total;
-          const items = data.data;
-          this.items = items;
-          return items;
-        })
-        .catch((_error) => {
-          return [];
-        });
-    },
+    //   return promise
+    //     .then((result) => result.data)
+    //     .then((data) => {
+    //       this.currentPage = data.current_page;
+    //       // this.perPage = data.per_page;
+    //       this.totalRows = data.total;
+    //       const items = data.data;
+    //       this.items = items;
+    //       return items;
+    //     })
+    //     .catch((_error) => {
+    //       return [];
+    //     });
+    // },
     onHorizontalSubmit() {
-      console.log(this.searchForm);
-      this.getList();
+      // console.log(this.searchForm);
+      // this.getList();
+      this.filter = {...this.searchForm};
     },
     onClickSearchOption(option) {
       this.searchForm.search_term = option;
@@ -311,8 +425,25 @@ export default {
       if (params.sortBy && params.sortBy.length > 0) {
         apiParams.sort = `${params.sortBy}|${params.sortDesc ? "desc" : "asc"}`;
       }
-      if (params.filter && params.filter.length > 0) {
+      if (params.filter && Object.keys(params.filter).length > 0) {
         // Optional
+        if(params.filter.search_word) {
+          apiParams.search_word = params.filter.search_word;
+        } else {
+          apiParams.search_word = "";
+        }
+        if(params.filter.search_term) {
+          apiParams.search_term = params.filter.search_term;
+        }
+        if(params.filter.refund_status) {
+          apiParams.refund_status = params.filter.refund_status;
+        }
+        if(params.filter.fromDate) {
+          apiParams.fromDate = params.filter.fromDate;
+        }
+        if(params.filter.toDate) {
+          apiParams.toDate = params.filter.toDate;
+        }
       }
       return apiParams;
     },

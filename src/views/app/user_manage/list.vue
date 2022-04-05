@@ -17,14 +17,14 @@
               </b-form-group>
             </b-colxx>
             <b-colxx xxs="6">
-              <b-form-group label="회원이름" :label-cols="2">
+              <b-form-group label="회원닉네임" :label-cols="2">
                 <b-form-input v-model="searchForm.username" />
               </b-form-group>
             </b-colxx>
           </b-row>
           <b-row>
             <b-colxx xxs="12">
-              <b-form-group label="진행기간" :label-cols="1">
+              <b-form-group label="등록일" :label-cols="1">
                 <div class="d-flex justify-content-between">
                   <div class="d-flex">
                     <b-datepicker
@@ -264,7 +264,6 @@ export default {
       }
     },
     onClickSearch() {
-      console.log(this.searchForm);
       this.filter = {...this.searchForm};
     },
     dataProvider(ctx) {

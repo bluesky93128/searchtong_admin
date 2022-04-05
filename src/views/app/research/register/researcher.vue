@@ -265,6 +265,7 @@ export default {
         }
       })
       console.log('selected list = ', this.data.itemResearcher.regionList);
+      this.hideModal("regionSelectModal")
     },
     onClickRegion(item) {
       this.selectedSido = item;
@@ -438,9 +439,17 @@ export default {
         if(index >= 0) {
           this.data.itemResearcher.age.splice(index, 1);
         }
-        this.data.itemResearcher.age.push(value);
+        index = this.data.itemResearcher.age.findIndex(x => x == value);
+        if(index >= 0) {
+          this.data.itemResearcher.age.splice(index, 1);
+        } else {
+          this.data.itemResearcher.age.push(value);
+        }
       }
       console.log(this.data.itemResearcher.age);  
+    },
+    hideModal(refname) {
+      this.$refs[refname].hide();
     }
   },
   computed: {

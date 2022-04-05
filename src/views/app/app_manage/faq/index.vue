@@ -10,64 +10,15 @@
       <b-colxx xxs="12">
         <b-card class="mb-4">
           <b-row>
-            <b-colxx xxs="6">
-              <b-form-group label="설문제목 또는 ID" :label-cols="2">
-                <b-form-input v-model="searchForm.title" />
+            <b-colxx xxs="8">
+              <b-form-group label="제목 또는 내용" :label-cols="3">
+                <b-form-input v-model="searchForm.search_word" />
               </b-form-group>
             </b-colxx>
-            <b-colxx xxs="6">
-              <b-form-group label="등록일" :label-cols="2">
-                <div class="d-flex">
-                  <b-datepicker
-                    locale="ko-KR"
-                    v-model="searchForm.fromDate"
-                    :placeholder="$t('search.all')"
-                    :max="disabledFrom"
-                  />
-                  <span class="span-center-text mx-2">~</span>
-                  <b-datepicker
-                    locale="ko-KR"
-                    v-model="searchForm.toDate"
-                    :placeholder="$t('search.all')"
-                    :min="disabledTo"
-                  />
-                </div>
-              </b-form-group>
-            </b-colxx>
-          </b-row>
-          <b-row>
-            <b-colxx xxs="6">
-              <b-form-group label="진행기간" :label-cols="2">
-                <div class="d-flex">
-                  <b-datepicker
-                    locale="ko-KR"
-                    v-model="searchForm.fromDate"
-                    :placeholder="$t('search.all')"
-                    :max="disabledFrom"
-                  />
-                  <span class="span-center-text mx-2">~</span>
-                  <b-datepicker
-                    locale="ko-KR"
-                    v-model="searchForm.toDate"
-                    :placeholder="$t('search.all')"
-                    :min="disabledTo"
-                  />
-                </div>
-              </b-form-group>
-            </b-colxx>
-            <b-colxx xxs="6">
-              <b-form-group label="설문유형" :label-cols="2">
-                <div class="d-flex justify-content-between">
-                  <v-select
-                    v-model="searchForm.type"
-                    :options="type_options"
-                    placeholder="전체"
-                    :reduce="(item) => item.value"
-                    class="research-type"
-                  />
-                  <b-button class="primary">검색</b-button>
-                </div>
-              </b-form-group>
+            <b-colxx xxs="4">
+              <div class="d-flex justify-content-end">
+                <b-button class="primary" @click="onClickSearch()">검색</b-button>
+              </div>
             </b-colxx>
           </b-row>
         </b-card>
@@ -89,7 +40,7 @@
             ref="custom-table"
             class="text-center"
             :fields="faqTable.fields"
-            :items="items"
+            :items="dataProvider"
             :per-page="perPage"
             :current-page="currentPage"
             sort-by="order"
@@ -99,6 +50,7 @@
             :select-mode="faqTable.selectMode"
             selectedVariant="primary"
             :key="tableKey"
+            :filter="filter"
           >
             <template #cell(no)="{ item, index }">
               {{ perPage * (currentPage - 1) + index + 1 }}
@@ -162,6 +114,11 @@ export default {
   data() {
     return {
       searchForm: {
+        type: "전체",
+        search_term: "all",
+        search_word: "",
+      },
+      filter: {
         type: "전체",
         search_term: "all",
         search_word: "",
@@ -241,9 +198,36 @@ export default {
     };
   },
   methods: {
-    getList() {
-        let promise = axios.get(apiUrl + "/faq?role=admin&page="+this.currentPage+"&per_page="+this.perPage, {
-        params: this.searchForm,
+    // getList() {
+    //     let promise = axios.get(apiUrl + "/faq?role=admin&page="+this.currentPage+"&per_page="+this.perPage, {
+    //     params: this.searchForm,
+    //     headers: {
+    //       Authorization: "Bearer " + localStorage.getItem("token"),
+    //     },
+    //   });
+
+    //   return promise
+    //     .then((result) => result.data)
+    //     .then((data) => {
+    //       this.currentPage = data.current_page;
+    //       // this.perPage = data.per_page;
+    //       this.totalRows = data.total;
+    //       const items = data.data;
+    //       this.items = items;
+    //       return items;
+    //     })
+    //     .catch((_error) => {
+    //       return [];
+    //     });
+    // },
+    onClickSearch() {
+      this.filter = {...this.searchForm};
+    },
+    dataProvider(ctx) {
+      const params = this.apiParamsConverter(ctx);
+        console.log(params);
+      let promise = axios.get(apiUrl + "/faq", {
+        params: params,
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
@@ -256,12 +240,40 @@ export default {
           // this.perPage = data.per_page;
           this.totalRows = data.total;
           const items = data.data;
-          this.items = items;
           return items;
         })
         .catch((_error) => {
           return [];
         });
+    },
+    apiParamsConverter(params) {
+      let apiParams = {};
+      if (params.perPage !== 0) {
+        apiParams.per_page = params.perPage;
+      }
+      if (params.currentPage >= 1) {
+        apiParams.page = params.currentPage;
+      }
+      if (params.sortBy && params.sortBy.length > 0) {
+        apiParams.sort = `${params.sortBy}|${params.sortDesc ? "desc" : "asc"}`;
+      }
+      if (params.filter && Object.keys(params.filter).length > 0) {
+        // Optional
+        if(params.filter.search_word) {
+          apiParams.search_word = params.filter.search_word;
+        } else {
+          apiParams.search_word = "";
+        }
+        apiParams.search_term = 'all';
+        apiParams.type = "전체";
+        if(params.filter.fromDate) {
+          apiParams.fromDate = params.filter.fromDate;
+        }
+        if(params.filter.toDate) {
+          apiParams.toDate = params.filter.toDate;
+        }
+      }
+      return apiParams;
     },
     rowSelected(items) {
       this.faqTable.selected = items;
@@ -311,7 +323,7 @@ export default {
     },
   },
   mounted() {
-    this.getList();
+    // this.getList();
   }
 };
 </script>
