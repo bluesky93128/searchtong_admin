@@ -41,7 +41,7 @@
                       :min="disabledTo"
                     />
                   </div>
-                  <b-button class="primary">검색</b-button>
+                  <b-button class="primary" @click="onClickSearch()">검색</b-button>
                 </div>
               </b-form-group>
             </b-colxx>
@@ -73,6 +73,7 @@
             selectable
             select-mode="single"
             :key="tableKey"
+            :filter="filter"
           >
             <template #cell(gender)="{ item }">
               {{item.panelInfo && item.panelInfo.gender ? '여자' : '남자'}}
@@ -154,6 +155,7 @@ export default {
   data() {
     return {
       searchForm: {},
+      filter: null,
       disabledTo: null,
       disabledFrom: null,
       tableKey: 0,
@@ -255,11 +257,15 @@ export default {
     },
     calcAge(item) {
       let now = new Date();
-      if(item.panelInfo) {
+      if(item.panelInfo.birthYear) {
         return now.getFullYear() - item.panelInfo.birthYear;
       } else {
         return 0;
       }
+    },
+    onClickSearch() {
+      console.log(this.searchForm);
+      this.filter = {...this.searchForm};
     },
     dataProvider(ctx) {
       const params = this.apiParamsConverter(ctx);
@@ -297,8 +303,20 @@ export default {
       if (params.sortBy && params.sortBy.length > 0) {
         apiParams.sort = `${params.sortBy}|${params.sortDesc ? "desc" : "asc"}`;
       }
-      if (params.filter && params.filter.length > 0) {
+      if (params.filter && Object.keys(params.filter).length > 0) {
         // Optional
+        if(params.filter.userId) {
+          apiParams.phoneNum = params.filter.userId;
+        }
+        if(params.filter.username) {
+          apiParams.nickname = params.filter.username;
+        }
+        if(params.filter.fromDate) {
+          apiParams.fromDate = params.filter.fromDate;
+        }
+        if(params.filter.toDate) {
+          apiParams.toDate = params.filter.toDate;
+        }
       }
       return apiParams;
     },
