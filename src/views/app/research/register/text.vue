@@ -19,6 +19,7 @@
             ref="refBenefitsDescription"
             :options="editorOption"
             v-model="data.itemText.benefitsDescription"
+            :disabled="isView"
           >
           </quill-editor>
         </b-form-group>
@@ -33,6 +34,7 @@
               }"
               style="flex: 8; margin-right: 10px"
               v-model="startDate"
+              :disabled="isView"
               @change="onStartDateChanged()"
             />
             <b-input
@@ -40,6 +42,7 @@
               min="0"
               max="23"
               v-model="startHour"
+              :disabled="isView"
               style="flex: 2; margin-right: 10px"
               @change="onStartDateChanged()"
             />
@@ -48,6 +51,7 @@
               min="0"
               max="59"
               v-model="startMinute"
+              :disabled="isView"
               style="flex: 2; margin-right: 10px"
               @change="onStartDateChanged()"
             />
@@ -60,6 +64,7 @@
                 day: 'numeric',
               }"
               v-model="endDate"
+              :disabled="isView"
               style="flex: 8; margin-left: 10px"
               @change="onEndDateChanged()"
             />
@@ -68,6 +73,7 @@
               min="0"
               max="23"
               v-model="endHour"
+              :disabled="isView"
               style="flex: 2; margin-left: 10px"
               @change="onEndDateChanged()"
             />
@@ -76,6 +82,7 @@
               min="0"
               max="59"
               v-model="endMinute"
+              :disabled="isView"
               style="flex: 2; margin-left: 10px"
               @change="onEndDateChanged()"
             />
@@ -85,7 +92,7 @@
           :label="$t('research.benefitsLink')"
           label-cols="2"
         >
-          <b-form-input v-model="data.itemText.benefitsLink" />
+          <b-form-input v-model="data.itemText.benefitsLink" :disabled="isView" />
         </b-form-group>
       </b-form>
     </b-card>
@@ -94,6 +101,7 @@
       ref="myTextEditor"
       :options="editorOption"
       v-model="data.itemText.content"
+      :disabled="isView"
     >
     </quill-editor>
     <h3 class="mt-4">{{ $t("research.participate-notice") }}</h3>
@@ -102,6 +110,7 @@
       ref="myTextEditor"
       v-model="data.itemText.description"
       :options="editorOption"
+      :disabled="isView"
     >
     </quill-editor>
   </div>
@@ -117,7 +126,7 @@ export default {
   components: {
     "quill-editor": quillEditor,
   },
-  props: ["data", "gotoHome"],
+  props: ["data", "gotoHome", "isView"],
   data() {
     return {
       editorOption: {
@@ -142,7 +151,8 @@ export default {
       startMinute: 0,
       endDate: null,
       endHour: 0,
-      endMinute: 0
+      endMinute: 0,
+      isView: false
     };
   },
   mounted() {

@@ -20,35 +20,36 @@
               :data="data"
               :currentActive="current_page"
               :key="key"
+              :isView="isView"
             >
               <tab name="1. 기본설정" :selected="true">
                 <div class="wizard-basic-step">
-                  <main-page :data="data" />
+                  <main-page :data="data" :isView="isView" />
                 </div>
               </tab>
-              <tab name="2. 본문설정" v-if="(data.isDraft) || ((status != 0) && (status != 3))">
+              <tab name="2. 본문설정" v-if="isView || (data.isDraft) || ((status != 0) && (status != 3))">
                 <div class="wizard-basic-step">
-                  <text-page :data="data" :gotoHome="gotoHome" />
+                  <text-page :data="data" :gotoHome="gotoHome" :isView="isView" />
                 </div>
               </tab>
-              <tab name="3. 문항설정" v-if="((data.isDraft) || ((status != 0) && (status != 3))) && data.type != 2">
+              <tab name="3. 문항설정" v-if="isView || ((data.isDraft) || ((status != 0) && (status != 3))) && data.type != 2">
                 <div class="wizard-basic-step">
-                  <questions-page :data="data" :gotoHome="gotoHome" />
+                  <questions-page :data="data" :gotoHome="gotoHome" :isView="isView" />
                 </div>
               </tab>
-              <tab name="4. 종료글 설정" v-if="((data.isDraft) || ((status != 0) && (status != 3))) && data.type != 2">
+              <tab name="4. 종료글 설정" v-if="isView || ((data.isDraft) || ((status != 0) && (status != 3))) && data.type != 2">
                 <div class="wizard-basic-step">
-                  <finish-text-page :data="data" :gotoHome="gotoHome" />
+                  <finish-text-page :data="data" :gotoHome="gotoHome" :isView="isView" />
                 </div>
               </tab>
-              <tab name="5. 조사대상 설정" v-if="(data.type != 2)">
+              <tab name="5. 조사대상 설정" v-if="isView || (data.type != 2)">
                 <div class="wizard-basic-step">
-                  <researcher-page :data="data" :gotoHome="gotoHome" />
+                  <researcher-page :data="data" :gotoHome="gotoHome" :isView="isView" />
                 </div>
               </tab>
               <tab name="6. 리워드 및 등록">
                 <div class="wizard-basic-step">
-                  <reward-page :data="data" :gotoHome="gotoHome" />
+                  <reward-page :data="data" :gotoHome="gotoHome" :isView="isView" />
                 </div>
               </tab>
               <tab type="done">
@@ -93,12 +94,14 @@ export default {
       current_page: 0,
       key: 0,
       status: 1,
-      isLoading: false
+      isLoading: false,
+      isView: false
     };
   },
   mounted() {
     console.log(this.$route.query.id);
     this.id = this.$route.query.id;
+    this.isView = this.$route.query.isView;
     if(this.id) {
       this.isLoading = true;
       var myHeaders = new Headers();

@@ -16,22 +16,24 @@
         <b-form-radio-group
           v-model="data.itemResearcher.condition"
           :options="conditionOptions"
+          :disabled="isView"
         ></b-form-radio-group>
       </b-form-group>
       <b-form-group
         :label="$t('research.gender')"
         label-cols="2"
-        :disabled="!!data.itemResearcher.condition"
+        :disabled="!!data.itemResearcher.condition || isView"
       >
         <b-form-radio-group
           v-model="data.itemResearcher.gender"
           :options="genderOptions"
+          :disabled="isView"
         ></b-form-radio-group>
       </b-form-group>
       <b-form-group
         :label="$t('research.age')"
         label-cols="2"
-        :disabled="!!data.itemResearcher.condition"
+        :disabled="!!data.itemResearcher.condition || isView"
       >
         <b-form-checkbox-group
           v-model="data.itemResearcher.age"
@@ -42,7 +44,7 @@
       <b-form-group
         :label="$t('research.region')"
         label-cols="2"
-        :disabled="!!data.itemResearcher.condition"
+        :disabled="!!data.itemResearcher.condition || isView"
       >
         <div class="d-flex">
           <!-- <b-form-radio-group
@@ -85,7 +87,7 @@
       <b-form-group
         :label="$t('research.job')"
         label-cols="2"
-        :disabled="!!data.itemResearcher.condition"
+        :disabled="!!data.itemResearcher.condition || isView"
       >
         <b-form-radio-group
           v-model="data.itemResearcher.job"
@@ -95,7 +97,7 @@
       <b-form-group
         :label="$t('research.education')"
         label-cols="2"
-        :disabled="!!data.itemResearcher.condition"
+        :disabled="!!data.itemResearcher.condition || isView"
       >
         <b-form-radio-group
           v-model="data.itemResearcher.education"
@@ -105,7 +107,7 @@
       <b-form-group
         :label="$t('research.salary')"
         label-cols="2"
-        :disabled="!!data.itemResearcher.condition"
+        :disabled="!!data.itemResearcher.condition || isView"
       >
         <b-form-radio-group
           v-model="data.itemResearcher.salary"
@@ -115,6 +117,7 @@
       <b-form-group
         :label="$t('research.targetReplyCount')"
         label-cols="2"
+        :disabled="isView"
       >
         <div class="d-flex">
           <b-form-radio-group
@@ -140,7 +143,7 @@ export default {
   components: {
     "quill-editor": quillEditor,
   },
-  props: ["data", "gotoHome"],
+  props: ["data", "gotoHome", "isView"],
   data() {
     return {
       editorOption: {
@@ -246,16 +249,19 @@ export default {
   },
   methods: {
     onStartDateChanged() {
+      if(this.isView) return;
       this.data.itemFinish.benefitsStartAt = new Date(this.startDate);
       this.data.itemFinish.benefitsStartAt.setHours(this.startHour);
       this.data.itemFinish.benefitsStartAt.setMinutes(this.startMinute);
     },
     onEndDateChanged() {
+      if(this.isView) return;
       this.data.itemFinish.benefitsEndAt = new Date(this.endDate);
       this.data.itemFinish.benefitsEndAt.setHours(this.endHour);
       this.data.itemFinish.benefitsEndAt.setMinutes(this.endMinute);
     },
     onClickSelectRegion() {
+      if(this.isView) return;
       let list = this.selectedDongList.filter(x => x.name != '전체');
       this.data.itemResearcher.regionList = list.map(x => {
         return {
@@ -268,6 +274,7 @@ export default {
       this.hideModal("regionSelectModal")
     },
     onClickRegion(item) {
+      if(this.isView) return;
       this.selectedSido = item;
       this.sidoCode = this.selectedSido.code.slice(0, 2);
       console.log(this.sidoCode);
@@ -290,6 +297,7 @@ export default {
       });
     },
     onClickRegionGungu(item) {
+      if(this.isView) return;
       this.selectedGungu = item;
       this.sigunguCode = this.selectedGungu.code.slice(0, 5);
       axios.get("https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes?regcode_pattern=" + this.sigunguCode + "*")
@@ -362,6 +370,7 @@ export default {
     //   this.$forceUpdate();
     // },
     onClickRegionDong(item) {
+      if(this.isView) return;
       if(item.name == '전체') {
         if(this.selectedDongList.indexOf(item) >= 0) {
           this.dongList.forEach(x => {
@@ -414,6 +423,7 @@ export default {
       this.$forceUpdate();
     },
     isSelectedGungu(item) {
+      if(this.isView) return;
       let index = -1;
       this.selectedGunguList.forEach((gungu, idx) => {
         if(gungu.code == item.code) {
@@ -423,6 +433,7 @@ export default {
       return index;
     },
     isSelectedDong(item) {
+      if(this.isView) return;
       let index = -1;
       this.selectedDongList.forEach((dong, idx) => {
         if(dong.code == item.code) {
@@ -432,6 +443,7 @@ export default {
       return index;
     },
     onChangeAgeOption(value) {
+      if(this.isView) return;
       if(value == 0) {
         this.data.itemResearcher.age = [0];
       } else {

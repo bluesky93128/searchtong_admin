@@ -19,6 +19,7 @@
             ref="refBenefitsDescription"
             :options="editorOption"
             v-model="data.itemFinish.benefitsDescription"
+            :disabled="isView"
           >
           </quill-editor>
         </b-form-group>
@@ -33,6 +34,7 @@
               }"
               style="flex: 8; margin-right: 10px"
               v-model="startDate"
+              :disabled="isView"
               @change="onStartDateChanged()"
             />
             <b-input
@@ -41,6 +43,7 @@
               max="23"
               v-model="startHour"
               style="flex: 2; margin-right: 10px"
+              :disabled="isView"
               @change="onStartDateChanged()"
             />
             <b-input
@@ -49,6 +52,7 @@
               max="59"
               v-model="startMinute"
               style="flex: 2; margin-right: 10px"
+              :disabled="isView"
               @change="onStartDateChanged()"
             />
             <span class="span-center-text mx-2">~</span>
@@ -61,6 +65,7 @@
               }"
               v-model="endDate"
               style="flex: 8; margin-left: 10px"
+              :disabled="isView"
               @change="onEndDateChanged()"
             />
             <b-input
@@ -69,6 +74,7 @@
               max="23"
               v-model="endHour"
               style="flex: 2; margin-left: 10px"
+              :disabled="isView"
               @change="onEndDateChanged()"
             />
             <b-input
@@ -78,6 +84,7 @@
               v-model="endMinute"
               style="flex: 2; margin-left: 10px"
               @change="onEndDateChanged()"
+              :disabled="isView"
             />
           </div>
         </b-form-group>
@@ -85,7 +92,7 @@
           :label="$t('research.benefitsLink')"
           label-cols="2"
         >
-          <b-form-input v-model="data.itemFinish.benefitsLink" />
+          <b-form-input v-model="data.itemFinish.benefitsLink" :disabled="isView" />
         </b-form-group>
       </b-form>
     </b-card>
@@ -94,6 +101,7 @@
       ref="myTextEditor"
       :options="editorOption"
       v-model="data.itemFinish.content"
+      :disabled="isView"
     >
     </quill-editor>
   </div>
@@ -109,7 +117,7 @@ export default {
   components: {
     "quill-editor": quillEditor,
   },
-  props: ["data", "gotoHome"],
+  props: ["data", "gotoHome", "isView"],
   data() {
     return {
       editorOption: {
@@ -149,11 +157,13 @@ export default {
   },
   methods: {
     onStartDateChanged() {
+      if(this.isView) return;
       this.data.itemFinish.benefitsStartAt = new Date(this.startDate);
       this.data.itemFinish.benefitsStartAt.setHours(this.startHour);
       this.data.itemFinish.benefitsStartAt.setMinutes(this.startMinute);
     },
     onEndDateChanged() {
+      if(this.isView) return;
       this.data.itemFinish.benefitsEndAt = new Date(this.endDate);
       this.data.itemFinish.benefitsEndAt.setHours(this.endHour);
       this.data.itemFinish.benefitsEndAt.setMinutes(this.endMinute);

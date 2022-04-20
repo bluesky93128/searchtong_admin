@@ -12,7 +12,7 @@
       <b-colxx xxs="4" class="body">
         <div class="content left">
           <h5 class="list-item">총 {{data.itemQuestion.length}}개 문항</h5>
-          <draggable type="ul" class="list-unstyled" handle=".handle" v-model="data.itemQuestion" @change="onChangeItemOrder()">
+          <draggable type="ul" class="list-unstyled" handle=".handle" v-model="data.itemQuestion" @change="onChangeItemOrder()" :disabled="isView">
             <li v-for="item in data.itemQuestion" :key="item.order" class="list-item">
               <span class="handle mr-1"><i class="simple-icon-cursor-move" /></span>
               <span>{{item.title}}</span>
@@ -24,7 +24,7 @@
         <div class="content">
           <div v-for="(item, index) in data.itemQuestion" :key="item.order" class="content-item">
             <h5>Q{{item.order + 1}}</h5>
-            <b-form-input placeholder="문항 내용을 입력하세요" v-model="item.title" />
+            <b-form-input placeholder="문항 내용을 입력하세요" v-model="item.title" :disabled="isView" />
             <b-form-group
               label="문항유형"
               label-cols="2"
@@ -33,27 +33,29 @@
               <b-form-radio-group
                 v-model="item.type1"
                 :options="type1Options"
+                :disabled="isView"
               ></b-form-radio-group>
               <b-row v-if="item.type1 == 0">
                 <b-colxx xxs="6">
                   <b-form-radio-group
                     v-model="item.type2"
                     :options="type2Options"
+                    :disabled="isView"
                     @change="onChangeType2(item)"
                   ></b-form-radio-group>
                 </b-colxx>
                 <b-colxx xxs="6" class="d-flex align-items-center">
                   <span class="mr-1">최소</span>
-                  <b-input type="number" class="w-20" v-model="item.min" min="1" :max="data.itemQuestion.length" :disabled="item.type2==0" @change="onChangeMinValue(item)" />
+                  <b-input type="number" class="w-20" v-model="item.min" min="1" :max="data.itemQuestion.length" :disabled="isView || item.type2==0" @change="onChangeMinValue(item)" />
                   <span class="ml-1">개</span>
                   <span class="mx-2">~</span>
                   <span class="mr-1">최대</span>
-                  <b-input type="number" class="w-20" v-model="item.max" :min="item.min" :max="data.itemQuestion.length" :disabled="item.type2==0" @change="onChangeMaxValue(item)" />
+                  <b-input type="number" class="w-20" v-model="item.max" :min="item.min" :max="data.itemQuestion.length" :disabled="isView || item.type2==0" @change="onChangeMaxValue(item)" />
                   <span class="ml-1">개</span>
                 </b-colxx>
               </b-row>
             </b-form-group>
-            <b-form-textarea v-model="item.answerGuide" v-if="item.type1 == 1" placeholder="답변을 입력해주세요" />
+            <b-form-textarea v-model="item.answerGuide" v-if="item.type1 == 1" placeholder="답변을 입력해주세요" :disabled="isView" />
             <b-form-group
               label="보기문항"
               label-cols="2"
@@ -62,28 +64,29 @@
               <b-form-radio-group
                 v-model="item.viewType"
                 :options="viewTypeOptions"
+                :disabled="isView"
               ></b-form-radio-group>
             </b-form-group>
             <draggable v-if="item.type1 == 0" type="ul" class="list-unstyled" handle=".handle" v-model="data.itemQuestion[index].itemView" @change="onChangeItemViewOrder(item)">
               <li v-for="(view, vIndex) in item.itemView" :key="view.order" class="view-item">
-                <b-input-group class="mb-3 d-flex align-items-center">
+                <b-input-group class="mb-3 d-flex align-items-center" :disabled="isView">
                   <div class="d-flex w-70">
                     <div class="view-handle handle">{{view.order + 1}}</div>
-                    <b-form-input class="w-80" v-if="item.viewType==0" v-model="view.content"></b-form-input>
+                    <b-form-input class="w-80" v-if="item.viewType==0" v-model="view.content" :disabled="isView"></b-form-input>
                     <div class="remove-image-btn" @click="onRemoveImage(view)" v-if="item.viewType == 1 && view.imageLink">
                       <div class="glyph-icon simple-icon-close"></div>
                     </div>
                     <div class="image-container w-100" v-if="item.viewType==1">
                       <img :src="downloadUrl + '/' + view.imageLink" v-if="view.imageLink" width="100" height="70" />
                       <!-- <span v-if="view.imageLink" class="ml-4">{{view.content}}</span> -->
-                      <b-form-input class="w-70" v-if="view.imageLink" v-model="view.content"></b-form-input>
+                      <b-form-input class="w-70" v-if="view.imageLink" v-model="view.content" :disabled="isView"></b-form-input>
                       <div v-if="!view.imageLink" class="add-image-button" @click="onUploadImage(view)">
                         <label>+</label>
                         <label>파일첨부</label>
                       </div>
                     </div>
                   </div>
-                  <b-form-select v-model="view.nextItemQuestionOrder" v-if="index != data.itemQuestion.length-1" :options="calcNextItemOptions(index)"  plain class="ml-2 mr-2" />
+                  <b-form-select v-model="view.nextItemQuestionOrder" v-if="index != data.itemQuestion.length-1" :options="calcNextItemOptions(index)"  plain class="ml-2 mr-2" :disabled="isView" />
                   <span class="view-icon cursor-pointer mr-1" @click="onAddView(index)"><i class="simple-icon-plus" /></span>
                   <span class="view-icon cursor-pointer mr-1" @click="onCopyView(index, vIndex)"><i class="iconsminds-files" /></span>
                   <span class="view-icon cursor-pointer mr-1" @click="onDeleteView(index, vIndex)"><i class="iconsminds-close" /></span>
@@ -94,7 +97,7 @@
               <li v-for="(view, vIndex) in item.itemViewOther" :key="'other-' + view.order" class="view-item">
                 <b-input-group class="mb-3 d-flex align-items-center">
                   <div class="view-other">기타 {{view.order + 1}}</div>
-                  <b-form-input class="w-50" v-model="view.content"></b-form-input>
+                  <b-form-input class="w-50" v-model="view.content" :disabled="isView"></b-form-input>
                   <!-- <b-form-select v-model="view.nextItemQuestionOrder" :options="calcNextItemOptions(index)"  plain class="ml-2 mr-2" /> -->
                   <span class="view-icon cursor-pointer mr-1" @click="onAddViewOther(index)"><i class="simple-icon-plus" /></span>
                   <span class="view-icon cursor-pointer mr-1" @click="onCopyViewOther(index, vIndex)"><i class="iconsminds-files" /></span>
@@ -108,11 +111,11 @@
             <div class="d-flex justify-content-between">
               <div class="d-flex align-items-center">
                 <p>필수답변</p>
-                <switches v-model="item.isRequireAnswer" theme="custom" color="primary-inverse" class="vue-switcher ml-2 mr-4"></switches>
+                <switches v-model="item.isRequireAnswer" theme="custom" color="primary-inverse" class="vue-switcher ml-2 mr-4" :disabled="isView"></switches>
                 <p v-if="item.type1 == 0">보기섞기</p>
-                <switches v-if="item.type1 == 0" v-model="item.isRequireMix" theme="custom" color="primary-inverse" class="vue-switcher ml-2 mr-4"></switches>
+                <switches v-if="item.type1 == 0" v-model="item.isRequireMix" theme="custom" color="primary-inverse" class="vue-switcher ml-2 mr-4" :disabled="isView"></switches>
                 <p v-if="item.type1 == 0">기타보기유지</p>
-                <switches v-if="item.type1 == 0" v-model="item.isKeedExtraView" theme="custom" color="primary-inverse" class="vue-switcher ml-2 mr-4"></switches>
+                <switches v-if="item.type1 == 0" v-model="item.isKeedExtraView" theme="custom" color="primary-inverse" class="vue-switcher ml-2 mr-4" :disabled="isView"></switches>
               </div>
               <div class="d-flex align-items-center">
                 <span class="item-icon cursor-pointer mr-2" @click="onAddItem()"><i class="simple-icon-plus" /></span>
@@ -142,7 +145,7 @@ export default {
     "quill-editor": quillEditor,
     switches: Switches
   },
-  props: ["data", "gotoHome"],
+  props: ["data", "gotoHome", "isView"],
   data() {
     return {
       editorOption: {
@@ -195,26 +198,41 @@ export default {
   },
   methods: {
     onStartDateChanged() {
+      if(this.isView) {
+        return;
+      }
       this.data.itemText.benefitsStartAt = new Date(this.startDate);
       this.data.itemText.benefitsStartAt.setHours(this.startHour);
       this.data.itemText.benefitsStartAt.setMinutes(this.startMinute);
     },
     onEndDateChanged() {
+      if(this.isView) {
+        return;
+      }
       this.data.itemText.benefitsEndAt = new Date(this.endDate);
       this.data.itemText.benefitsEndAt.setHours(this.endHour);
       this.data.itemText.benefitsEndAt.setMinutes(this.endMinute);
     },
     onChangeItemOrder() {
+      if(this.isView) {
+        return;
+      }
       this.data.itemQuestion.forEach((item, index) => {
         item.order = index;
       })
     },
     onChangeItemViewOrder(item) {
+      if(this.isView) {
+        return;
+      }
       item.itemView.forEach((view, index) => {
         view.order = index;
       })
     },
     onAddView(index) {
+      if(this.isView) {
+        return;
+      }
       this.data.itemQuestion[index].itemView.push({
         content: "",
         nextItemQuestionOrder: 0,
@@ -222,12 +240,18 @@ export default {
       });
     },
     onCopyView(index, vIndex) {
+      if(this.isView) {
+        return;
+      }
       var temp = {...this.data.itemQuestion[index].itemView[vIndex]};
       delete temp._id;
       temp.order = this.data.itemQuestion[index].itemView.length;
       this.data.itemQuestion[index].itemView.push(temp);
     },
     onDeleteView(index, vIndex) {
+      if(this.isView) {
+        return;
+      }
       this.data.itemQuestion[index].itemView.splice(vIndex, 1);
       this.data.itemQuestion[index].itemView.forEach((item, i) => {
         item.order = i;
@@ -243,6 +267,9 @@ export default {
       }
     },
     onAddViewOther(index) {
+      if(this.isView) {
+        return;
+      }
       console.log('other view add');
       if (!this.data.itemQuestion[index].itemViewOther) {
         this.data.itemQuestion[index].itemViewOther = [];
@@ -255,6 +282,9 @@ export default {
       this.$forceUpdate();
     },
     onCopyViewOther(index, vIndex) {
+      if(this.isView) {
+        return;
+      }
       var temp = {...this.data.itemQuestion[index].itemViewOther[vIndex]};
       delete temp._id;
       temp.order = this.data.itemQuestion[index].itemViewOther.length;
@@ -262,6 +292,9 @@ export default {
       this.$forceUpdate();
     },
     onDeleteViewOther(index, vIndex) {
+      if(this.isView) {
+        return;
+      }
       this.data.itemQuestion[index].itemViewOther.splice(vIndex, 1);
       this.data.itemQuestion[index].itemViewOther.forEach((item, i) => {
         item.order = i;
@@ -269,6 +302,9 @@ export default {
       this.$forceUpdate();
     },
     onAddItem() {
+      if(this.isView) {
+        return;
+      }
       this.data.itemQuestion.push({
         order: this.data.itemQuestion.length,
         title: "",
@@ -295,6 +331,9 @@ export default {
       this.$forceUpdate();
     },
     onCopyItem(index) {
+      if(this.isView) {
+        return;
+      }
       var temp = {...this.data.itemQuestion[index]};
       let tmpViews = [];
       temp.itemView.forEach(view => {
@@ -311,6 +350,9 @@ export default {
       this.$forceUpdate();
     },
     onDeleteItem(index) {
+      if(this.isView) {
+        return;
+      }
       this.data.itemQuestion.splice(index, 1);
       this.data.itemQuestion.forEach((item, i) => {
         item.order = i;
@@ -347,6 +389,9 @@ export default {
       this.$forceUpdate();
     },
     calcNextItemOptions(index) {
+      if(this.isView) {
+        return;
+      }
       let options = [];
       if(index >= this.data.itemQuestion.length-1) {
         options.push({
@@ -372,6 +417,9 @@ export default {
       return options;
     },
     onUploadImage(view) {
+      if(this.isView) {
+        return;
+      }
       let input = document.createElement("input");
       input.accept = ".jpg, .jpeg, .gif, .png";
       input.type = "file";
@@ -401,20 +449,32 @@ export default {
       input.click();
     },
     onRemoveImage(view) {
+      if(this.isView) {
+        return;
+      }
       view.imageLink = null;
       view.content = '';
     },
     onChangeMinValue(item) {
+      if(this.isView) {
+        return;
+      }
       if(item.min < 1) {
         item.min = 1;
       }
     },
     onChangeMaxValue(item) {
+      if(this.isView) {
+        return;
+      }
       if(item.max > item.itemView.length) {
         item.max = item.itemView.length;
       }
     },
     onChangeType2(item) {
+      if(this.isView) {
+        return;
+      }
       if(item.type2 == 1) {
         item.min = 1;
         item.max = 1;

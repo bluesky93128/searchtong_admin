@@ -80,7 +80,7 @@
                 horizontal
                 :label="$t('research.title')"
               >
-                <b-form-input v-model="data.title" required></b-form-input>
+                <b-form-input v-model="data.title" required :disabled="isView"></b-form-input>
               </b-form-group>
               <b-form-group
                 label-cols="2"
@@ -98,7 +98,7 @@
                     :min="today"
                     style="flex: 8; margin-right: 10px"
                     v-model="startDate"
-                    :disabled="data.isSetPeriodLater || (data.status == 0 || data.status == 3)"
+                    :disabled="isView || data.isSetPeriodLater || (data.status == 0 || data.status == 3)"
                     @change="onStartDateChanged()"
                   />
                   <b-input
@@ -107,7 +107,7 @@
                     max="23"
                     v-model="startHour"
                     style="flex: 2; margin-right: 10px"
-                    :disabled="data.isSetPeriodLater || (data.status == 0 || data.status == 3)"
+                    :disabled="isView || data.isSetPeriodLater || (data.status == 0 || data.status == 3)"
                     @change="onStartDateChanged()"
                   />
                   <b-input
@@ -116,7 +116,7 @@
                     max="59"
                     v-model="startMinute"
                     style="flex: 2; margin-right: 10px"
-                    :disabled="data.isSetPeriodLater || (data.status == 0 || data.status == 3)"
+                    :disabled="isView || data.isSetPeriodLater || (data.status == 0 || data.status == 3)"
                     @change="onStartDateChanged()"
                   />
                   <span class="span-center-text mx-2">~</span>
@@ -130,7 +130,7 @@
                     :min="startDate"
                     v-model="endDate"
                     style="flex: 8; margin-left: 10px"
-                    :disabled="data.isSetPeriodLater"
+                    :disabled="isView || data.isSetPeriodLater"
                     @change="onEndDateChanged()"
                   />
                   <b-input
@@ -139,7 +139,7 @@
                     max="23"
                     v-model="endHour"
                     style="flex: 2; margin-left: 10px"
-                    :disabled="data.isSetPeriodLater"
+                    :disabled="isView || data.isSetPeriodLater"
                     @change="onEndDateChanged()"
                   />
                   <b-input
@@ -148,7 +148,7 @@
                     max="59"
                     v-model="endMinute"
                     style="flex: 2; margin-left: 10px"
-                    :disabled="data.isSetPeriodLater"
+                    :disabled="isView || data.isSetPeriodLater"
                     @change="onEndDateChanged()"
                   />
                 </div>
@@ -187,6 +187,7 @@
                     class="ml-2"
                     style="height: 32px;"
                     @click="onClickSelectFile()"
+                    :disabled="isView"
                     >이미지 업로드</b-button
                   >
                 </div>
@@ -202,7 +203,7 @@
 import { apiUrl, downloadUrl } from "../../../../constants/config";
 
 export default {
-  props: ["data"],
+  props: ["data", "isView"],
   data() {
     return {
       startDate: null,
@@ -241,6 +242,10 @@ export default {
   },
   methods: {
     setType(type) {
+      if(this.isView) {
+        this.addNotification("error filled", "설문유형 변경", "보기상태에서는 설문유형변경이 불가합니다.");
+        return;
+      }
       if(this.data.status == 0 || this.data.status == 3) {
         this.addNotification("error filled", "설문유형 변경", "진행중/중지 상태의 설문은 설문유형변경이 불가합니다.");
         return;

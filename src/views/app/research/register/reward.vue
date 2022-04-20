@@ -18,6 +18,7 @@
           <b-form-group
             label-cols="2"
             :label="$t('research.paymentMethod')"
+            :disabled="isView"
           >
             <b-form-radio-group
               v-model="data.itemReward.paymentMethod"
@@ -27,6 +28,7 @@
           <b-form-group
             label-cols="2"
             :label="$t('research.paymentCount')"
+            :disabled="isView"
           >
             <div class="d-flex align-items-center">
               <b-form-radio-group
@@ -40,6 +42,7 @@
           <b-form-group
             label-cols="2"
             :label="$t('research.paymentAmount')"
+            :disabled="isView"
           >
             <div class="d-flex align-items-center">
               <b-form-radio-group
@@ -95,7 +98,7 @@ export default {
   components: {
     "quill-editor": quillEditor,
   },
-  props: ["data", "gotoHome"],
+  props: ["data", "gotoHome", "isView"],
   data() {
     return {
       key: 0,
@@ -143,11 +146,13 @@ export default {
   },
   methods: {
     onStartDateChanged() {
+      if(this.isView) return;
       this.data.itemFinish.benefitsStartAt = new Date(this.startDate);
       this.data.itemFinish.benefitsStartAt.setHours(this.startHour);
       this.data.itemFinish.benefitsStartAt.setMinutes(this.startMinute);
     },
     onEndDateChanged() {
+      if(this.isView) return;
       this.data.itemFinish.benefitsEndAt = new Date(this.endDate);
       this.data.itemFinish.benefitsEndAt.setHours(this.endHour);
       this.data.itemFinish.benefitsEndAt.setMinutes(this.endMinute);

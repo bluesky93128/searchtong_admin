@@ -16,13 +16,13 @@
         <button type="button" class="mr-1 btn btn-primary" :disabled="!currentActive > 0" @click="previousTab()">
             {{$t('wizard.prev')}}
         </button>
-        <button type="button" class="mr-1 btn btn-primary" @click="save()">
+        <button type="button" class="mr-1 btn btn-primary" @click="save()" :disabled="isView">
             {{$t('wizard.save')}}
         </button>
         <button type="button" class="btn btn-primary" v-if="currentActive != totalTabs - 1" :disabled="currentActive > totalTabs - 1" @click="nextTab()">
             {{$t('wizard.next')}}
         </button>
-        <button type="button" class="btn btn-primary" v-if="currentActive == totalTabs - 1" @click="register()">
+        <button type="button" class="btn btn-primary" v-if="currentActive == totalTabs - 1" @click="register()" :disabled="isView">
             {{$t('wizard.register')}}
         </button>
     </div>
@@ -59,6 +59,9 @@ export default {
         },
         data: {
             default: {}
+        },
+        isView: {
+            default: false
         }
     },
     data() {
