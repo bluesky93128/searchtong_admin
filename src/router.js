@@ -28,6 +28,7 @@ const routes = [
           { path: 'analyze', component: () => import(/* webpackChunkName: "piaf" */ './views/app/research/analyze') },
           { path: 'analyze_detail', component: () => import(/* webpackChunkName: "research" */ './views/app/research/analyze/analyze_detail') },
           { path: 'templist', component: () => import(/* webpackChunkName: "piaf" */ './views/app/research/templist') },
+          { path: 'request_manage', component: () => import(/* webpackChunkName: "piaf" */ './views/app/research/request_manage') },
         ]
       },
       {

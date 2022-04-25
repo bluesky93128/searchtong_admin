@@ -24,6 +24,11 @@ const data = [{
     label: "menu.research.templist",
     to: "/app/research/templist"
   },
+  {
+    icon: "simple-icon-paper-plane",
+    label: "menu.research.request_manage",
+    to: "/app/research/request_manage"
+  },
   ]
 },
 {

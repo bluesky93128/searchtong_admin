@@ -149,7 +149,7 @@ export default {
       disabledTo: null,
       disabledFrom: null,
       tableKey: 0,
-      currentPage: 0,
+      currentPage: 1,
       perPage: 5,
       totalRows: 0,
       isLoading: false,

@@ -21,6 +21,7 @@
               :currentActive="current_page"
               :key="key"
               :isView="isView"
+              :isSetReward="isSetReward"
             >
               <tab name="1. 기본설정" :selected="true">
                 <div class="wizard-basic-step">
@@ -49,7 +50,7 @@
               </tab>
               <tab name="6. 리워드 및 등록">
                 <div class="wizard-basic-step">
-                  <reward-page :data="data" :gotoHome="gotoHome" :isView="isView" />
+                  <reward-page :data="data" :gotoHome="gotoHome" :isView="isView" :isSetReward="isSetReward" />
                 </div>
               </tab>
               <tab type="done">
@@ -95,13 +96,15 @@ export default {
       key: 0,
       status: 1,
       isLoading: false,
-      isView: false
+      isView: false,
+      isSetReward: false
     };
   },
   mounted() {
     console.log(this.$route.query.id);
     this.id = this.$route.query.id;
-    this.isView = this.$route.query.isView;
+    this.isView = this.$route.query.isView == 'true' || this.$route.query.isView == true ? true : false;
+    this.isSetReward = this.$route.query.isSetReward == 'true' || this.$route.query.isSetReward == true ? true : false;
     if(this.id) {
       this.isLoading = true;
       var myHeaders = new Headers();

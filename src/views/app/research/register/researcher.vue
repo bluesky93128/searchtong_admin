@@ -6,6 +6,7 @@
         typeOption[data.type]
       }}</b-badge>
       <span class="gray-text ml-2">설문지 ID: {{data._id}}</span>
+      <span class="gray-text ml-4">작성자 ID: {{data.creatorPhone}}</span>
     </div>
 
     <b-form>
@@ -89,12 +90,17 @@
         label-cols="2"
         :disabled="!!data.itemResearcher.condition || isView"
       >
-        <b-form-radio-group
+        <b-form-checkbox-group
+          v-model="data.itemResearcher.job"
+        >
+          <b-form-checkbox v-for="option in jobOptions" :key="option.value" :value="option.value" @change="onChangeJobOption(option.value)">{{option.text}}</b-form-checkbox>
+        </b-form-checkbox-group>
+        <!-- <b-form-radio-group
           v-model="data.itemResearcher.job"
           :options="jobOptions"
-        ></b-form-radio-group>
+        ></b-form-radio-group> -->
       </b-form-group>
-      <b-form-group
+      <!-- <b-form-group
         :label="$t('research.education')"
         label-cols="2"
         :disabled="!!data.itemResearcher.condition || isView"
@@ -103,16 +109,21 @@
           v-model="data.itemResearcher.education"
           :options="educationOptions"
         ></b-form-radio-group>
-      </b-form-group>
+      </b-form-group> -->
       <b-form-group
         :label="$t('research.salary')"
         label-cols="2"
         :disabled="!!data.itemResearcher.condition || isView"
       >
-        <b-form-radio-group
+        <b-form-checkbox-group
+          v-model="data.itemResearcher.salary"
+        >
+          <b-form-checkbox v-for="option in salaryOptions" :key="option.value" :value="option.value" @change="onChangeSalaryOption(option.value)">{{option.text}}</b-form-checkbox>
+        </b-form-checkbox-group>
+        <!-- <b-form-radio-group
           v-model="data.itemResearcher.salary"
           :options="salaryOptions"
-        ></b-form-radio-group>
+        ></b-form-radio-group> -->
       </b-form-group>
       <b-form-group
         :label="$t('research.targetReplyCount')"
@@ -187,13 +198,29 @@ export default {
         { text: '', value: 1 },
       ],
       jobOptions: [
-        { text: '무관', value: 0 },
+        { text: '무관', value: -1 },
+        { text: "농업/임업/어업", value: 0 },
+        { text: "자영업", value: 1 },
+        { text: "서비스/영업/판매", value: 2 },
+        { text: "생산/기능/노무직", value: 3 },
+        { text: "5급이상 공무직 또는 그에 준하는 전문직", value: 4 },
+        { text: "일반공무/사무/관리직", value: 5 },
+        { text: "주부", value: 6 },
+        { text: "학생", value: 7 },
+        { text: "없다", value: 8 },
+        { text: "기타 다른 직군", value: 9 }
       ],
       educationOptions: [
         { text: '무관', value: 0 },
       ],
       salaryOptions: [
-        { text: '무관', value: 0 },
+        { text: '무관', value: -1 },
+        { text: "월 100만원 미만", value: 0 },
+        { text: "100만원 이상 200만원 미만", value: 1 },
+        { text: "200만원 이상 300만원 미만", value: 2 },
+        { text: "300만원 이상 500만원 미만", value: 3 },
+        { text: "500만원 이상", value: 4 },
+        { text: "잘 모르겠다", value: 5 }
       ],
       targetReplyCountOptions: [
         { text: '제한없음', value: 0 },
@@ -459,6 +486,42 @@ export default {
         }
       }
       console.log(this.data.itemResearcher.age);  
+    },
+    onChangeJobOption(value) {
+      if(this.isView) return;
+      if(value == -1) {
+        this.data.itemResearcher.job = [-1];
+      } else {
+        let index = this.data.itemResearcher.job.findIndex(x => x == -1);
+        if(index >= 0) {
+          this.data.itemResearcher.job.splice(index, 1);
+        }
+        index = this.data.itemResearcher.job.findIndex(x => x == value);
+        if(index >= 0) {
+          this.data.itemResearcher.job.splice(index, 1);
+        } else {
+          this.data.itemResearcher.job.push(value);
+        }
+      }
+      console.log(this.data.itemResearcher.job);  
+    },
+    onChangeSalaryOption(value) {
+      if(this.isView) return;
+      if(value == -1) {
+        this.data.itemResearcher.salary = [-1];
+      } else {
+        let index = this.data.itemResearcher.salary.findIndex(x => x == -1);
+        if(index >= 0) {
+          this.data.itemResearcher.salary.splice(index, 1);
+        }
+        index = this.data.itemResearcher.salary.findIndex(x => x == value);
+        if(index >= 0) {
+          this.data.itemResearcher.salary.splice(index, 1);
+        } else {
+          this.data.itemResearcher.salary.push(value);
+        }
+      }
+      console.log(this.data.itemResearcher.salary);  
     },
     hideModal(refname) {
       this.$refs[refname].hide();

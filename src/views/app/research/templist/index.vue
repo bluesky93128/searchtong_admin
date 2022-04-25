@@ -128,7 +128,8 @@
               />
             </template>
             <template #cell(createdAt)="{ item }">
-              {{ formatDateWithMin(item.createdAt) }}
+              {{ formatDateWithMin(item.createdAt) }}<br>
+              {{ formatDateWithMin(item.updatedAt) }}(수정)
             </template>
             <template #cell(duration)="{ item }">
               {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}

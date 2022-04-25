@@ -116,9 +116,17 @@
                     :reduce="(item) => item.value"
                     class="research-type"
                   />
-                  <b-button class="primary" @click="onClickSearch()">검색</b-button>
+                  <!-- <b-button class="primary" @click="onClickSearch()">검색</b-button> -->
                 </div>
               </b-form-group>
+            </b-colxx>
+            <b-colxx xxs="6">
+              <b-form-group label="작성자 ID" :label-cols="2">
+                <b-form-input v-model="searchForm.creatorPhone" />
+              </b-form-group>
+            </b-colxx>
+            <b-colxx xxs="6">
+              <b-button class="primary float-right" @click="onClickSearch()">검색</b-button>
             </b-colxx>
           </b-row>
           <!-- <b-form @submit.prevent="onHorizontalSubmit">
@@ -244,7 +252,8 @@
                   </div>
                 </template>
                 <template #cell(createdAt)="{ item }">
-                  {{ formatDateWithMin(item.createdAt) }}
+                  {{ formatDateWithMin(item.createdAt) }}<br>
+                  {{ formatDateWithMin(item.updatedAt) }}(수정)
                 </template>
                 <template #cell(duration)="{ item }">
                   {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
@@ -302,7 +311,8 @@
                   </div>
                 </template>
                 <template #cell(createdAt)="{ item }">
-                  {{ formatDateWithMin(item.createdAt) }}
+                  {{ formatDateWithMin(item.createdAt) }}<br>
+                  {{ formatDateWithMin(item.updatedAt) }}(수정)
                 </template>
                 <template #cell(duration)="{ item }">
                   {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
@@ -360,7 +370,8 @@
                   </div>
                 </template>
                 <template #cell(createdAt)="{ item }">
-                  {{ formatDateWithMin(item.createdAt) }}
+                  {{ formatDateWithMin(item.createdAt) }}<br>
+                  {{ formatDateWithMin(item.updatedAt) }}(수정)
                 </template>
                 <template #cell(duration)="{ item }">
                   {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
@@ -418,7 +429,8 @@
                   </div>
                 </template>
                 <template #cell(createdAt)="{ item }">
-                  {{ formatDateWithMin(item.createdAt) }}
+                  {{ formatDateWithMin(item.createdAt) }}<br>
+                  {{ formatDateWithMin(item.updatedAt) }}(수정)
                 </template>
                 <template #cell(duration)="{ item }">
                   {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
@@ -542,6 +554,7 @@ export default {
     return {
       en: en,
       ko: ko,
+      tableKey: 0,
       disabledFrom: null,
       disabledTo: null,
       searchForm: {type: -1},
@@ -577,10 +590,10 @@ export default {
       sentPrice: 0,
       receivedPrice: 0,
       balance: 0,
-      currentPage: 0,
-      currentWorkingPage: 0,
-      currentStoppedPage: 0,
-      currentFinishedPage: 0,
+      currentPage: 1,
+      currentWorkingPage: 1,
+      currentStoppedPage: 1,
+      currentFinishedPage: 1,
       perPage: 5,
       totalRows: 0,
       totalWorkingRows: 0,
@@ -592,7 +605,7 @@ export default {
         fields: [
           {
             key: "status",
-            label: "",
+            label: "설문상태",
             sortable: false,
             thClass: "fix-width bg-dark text-white text-center w-10",
             tdClass: "text-center w-10",
@@ -600,6 +613,13 @@ export default {
           {
             key: "_id",
             label: "설문ID",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+          {
+            key: "creatorPhone",
+            label: "작성자ID",
             sortable: false,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
@@ -869,6 +889,9 @@ export default {
         }
         if(params.filter.type >= 0) {
           apiParams.type = params.filter.type;
+        }
+        if(params.filter.creatorPhone >= 0) {
+          apiParams.creatorPhone = params.filter.creatorPhone;
         }
       }
       return apiParams;

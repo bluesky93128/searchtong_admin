@@ -119,7 +119,8 @@
       "register": "설문등록",
       "manage": "설문관리",
       "analyze": "통계관리",
-      "templist": "임시저장"
+      "templist": "임시저장",
+      "request_manage": "심사내역"
     },
     "coin": {
       "title": "코인관리",

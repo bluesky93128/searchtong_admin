@@ -6,6 +6,7 @@
         typeOption[data.type]
       }}</b-badge>
       <span class="gray-text ml-2">설문지 ID: {{data._id}}</span>
+      <span class="gray-text ml-4">작성자 ID: {{data.creatorPhone}}</span>
     </div>
 
     <b-row>
@@ -18,7 +19,7 @@
           <b-form-group
             label-cols="2"
             :label="$t('research.paymentMethod')"
-            :disabled="isView"
+            :disabled="isSetReward ? false : isView"
           >
             <b-form-radio-group
               v-model="data.itemReward.paymentMethod"
@@ -28,21 +29,22 @@
           <b-form-group
             label-cols="2"
             :label="$t('research.paymentCount')"
-            :disabled="isView"
+            :disabled="isSetReward ? false : isView"
           >
             <div class="d-flex align-items-center">
               <b-form-radio-group
-                v-model="data.itemReward.paymentMethod"
+                v-model="hasPaymentCount"
                 :options="paymentCountOption"
+                @change="onChangePaymentCount()"
               ></b-form-radio-group>
-              <b-input class="ml-2 w-15" type="number" v-model="data.itemReward.paymentCount" @change="key++" />
+              <b-input class="ml-2 w-15" type="number" v-model="data.itemReward.paymentCount" @change="key++" :disabled="!hasPaymentCount" />
               <span class="ml-2">명</span>
             </div>
           </b-form-group>
           <b-form-group
             label-cols="2"
             :label="$t('research.paymentAmount')"
-            :disabled="isView"
+            :disabled="isSetReward ? false : isView"
           >
             <div class="d-flex align-items-center">
               <b-form-radio-group
@@ -98,7 +100,7 @@ export default {
   components: {
     "quill-editor": quillEditor,
   },
-  props: ["data", "gotoHome", "isView"],
+  props: ["data", "gotoHome", "isView", "isSetReward"],
   data() {
     return {
       key: 0,
@@ -123,13 +125,15 @@ export default {
         { text: '고정금액 지급', value: 0 },
       ],
       paymentCountOption: [
-        { text: '총', value: 0 },
+        { text: '코인소진시까지', value: 0 },
+        { text: '총', value: 1 },
       ],
       paymentAmountOption: [
         { text: '1인당', value: 0 },
       ],
       user_data: {},
       balance: 0,
+      hasPaymentCount: 0
     };
   },
   mounted() {
@@ -143,6 +147,7 @@ export default {
     this.endDate = endAt;
     this.endHour = endAt.getHours();
     this.endMinute = endAt.getMinutes();
+    this.hasPaymentCount = this.data.itemReward.paymentCount > 0 ? 1 : 0;
   },
   methods: {
     onStartDateChanged() {
@@ -186,6 +191,15 @@ export default {
         })
         .catch(error => console.log('error', error));
     },
+    onChangePaymentCount() {
+      console.log('hasPaymentCount = ', this.hasPaymentCount);
+      if(this.hasPaymentCount == 1) {
+        this.data.itemReward.paymentCount = 0;
+      } else {
+        this.data.itemReward.paymentCount = 1;
+      }
+      console.log(this.data.itemReward);
+    }
   },
   computed: {
     duration() {

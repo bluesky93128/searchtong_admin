@@ -5,7 +5,7 @@
     </div>
     <b-row>
       <b-colxx xxs="12">
-        <h2>{{$t('menu.research.manage')}}</h2>
+        <h2>{{$t('menu.research.request_manage')}}</h2>
         <div class="separator mb-5"></div>
       </b-colxx>
     </b-row>
@@ -19,7 +19,7 @@
               </b-form-group>
             </b-colxx>
             <b-colxx xxs="6">
-              <b-form-group label="등록일" :label-cols="2">
+              <b-form-group label="신청일" :label-cols="2">
                 <div class="d-flex">
                   <b-datepicker
                     locale="ko-KR"
@@ -39,7 +39,7 @@
             </b-colxx>
           </b-row>
           <b-row>
-            <b-colxx xxs="6">
+            <!-- <b-colxx xxs="6">
               <b-form-group label="진행기간" :label-cols="2">
                 <div class="d-flex">
                   <b-datepicker
@@ -57,29 +57,35 @@
                   />
                 </div>
               </b-form-group>
-            </b-colxx>
-            <b-colxx xxs="6">
-              <b-form-group label="설문유형" :label-cols="2">
-                <div class="d-flex justify-content-between">
-                  <v-select
-                    v-model="searchForm.type"
-                    :options="type_options"
-                    placeholder="전체"
-                    :reduce="(item) => item.value"
-                    class="research-type"
-                  />
-                  <!-- <b-button class="primary" @click="onClickSearch()">검색</b-button> -->
-                </div>
-              </b-form-group>
-            </b-colxx>
+            </b-colxx> -->
             <b-colxx xxs="6">
               <b-form-group label="작성자 ID" :label-cols="2">
                 <b-form-input v-model="searchForm.creatorPhone" />
               </b-form-group>
             </b-colxx>
             <b-colxx xxs="6">
-              <b-button class="primary float-right" @click="onClickSearch()">검색</b-button>
+              <b-form-group label="설문상태" :label-cols="2">
+                <div class="d-flex justify-content-between">
+                  <v-select
+                    v-model="searchForm.status"
+                    :options="status_options"
+                    label="text"
+                    placeholder="전체"
+                    :reduce="(item) => item.value"
+                    class="research-type"
+                  />
+                  <b-button class="primary" @click="onClickSearch()">검색</b-button>
+                </div>
+              </b-form-group>
             </b-colxx>
+            <!-- <b-colxx xxs="6">
+              <b-form-group label="작성자 ID" :label-cols="2">
+                <b-form-input v-model="searchForm.creatorPhone" />
+              </b-form-group>
+            </b-colxx>
+            <b-colxx xxs="6">
+              <b-button class="primary float-right" @click="onClickSearch()">검색</b-button>
+            </b-colxx> -->
           </b-row>
         </b-card>
       </b-colxx>
@@ -105,8 +111,20 @@
                 :key="tableKey"
                 :filter="filter"
               >
+                <template #cell(approvedStatus)="{ item }">
+                  <span class="approved" v-if="item.approvedStatus == 1 || item.approvedStatus == 3">승인완료</span>
+                  <span class="rejected text-link" v-else-if="item.approvedStatus == 2" @click="showRejectedDetail(item)">반려</span>
+                  <custom-select
+                    v-else
+                    :options="approved_status_options"
+                    :default="approved_status_options[item.approvedStatus]"
+                    @input="onChangeApprovedStatus(item, $event)"
+                    :key="'status_'+item._id"
+                  />
+                </template>
                 <template #cell(status)="{ item }">
                   <custom-select
+                    v-if="item.approvedStatus == 3"
                     :options="getStatusOptions(item.status)"
                     :default="status_options[item.status >= 0 ? item.status : 2]"
                     @input="onChangeStatus(item, $event)"
@@ -132,21 +150,10 @@
                 </template>
                 <template #cell(action)="{ item }">
                   <div class="d-flex align-items-center justify-content-center">
-                    <div class="manage-icon-container">
-                      <router-link :to="{ path: 'register', query: { id: item._id, isView: true } }" class="text-link">
-                        <i class="simple-icon-eye" />
-                      </router-link>
-                    </div>
                     <div class="manage-icon-container ml-1" v-if="item.status != 4">
-                      <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
+                      <router-link :to="{ path: 'register', query: { id: item._id, isView: true, isSetReward: true } }" class="text-link">
                         <i class="simple-icon-pencil" />
                       </router-link>
-                    </div>
-                    <div class="manage-icon-container ml-1" v-if="(item.status != 0) && (item.status != 3)">
-                      <i class="simple-icon-trash" @click="deleteItem(item)" />
-                    </div>
-                    <div class="manage-icon-container ml-1">
-                      <i class="simple-icon-docs" @click="duplicateItem(item)" />
                     </div>
                   </div>
                 </template>
@@ -172,21 +179,33 @@
                 </template>
               </b-pagination>
             </b-tab>
-            <b-tab :title="'진행중('+totalWorkingRows+')'">
+            <b-tab :title="'승인완료('+totalApprovedRows+')'">
               <b-table
                 ref="custom-table"
                 class="vuetable"
-                :current-page="currentWorkingPage"
+                :current-page="currentApprovedPage"
                 :per-page="perPage"
                 :fields="bootstrapTable.fields"
-                :items="dataProviderWorking"
+                :items="dataProviderApproved"
                 selectable
                 select-mode="single"
                 :key="tableKey"
                 :filter="filter"
               >
+                <template #cell(approvedStatus)="{ item }">
+                  <span class="approved" v-if="item.approvedStatus == 1 || item.approvedStatus == 3">승인완료</span>
+                  <span class="rejected text-link" v-else-if="item.approvedStatus == 2" @click="showRejectedDetail(item)">반려</span>
+                  <custom-select
+                    v-else
+                    :options="approved_status_options"
+                    :default="approved_status_options[item.approvedStatus]"
+                    @input="onChangeApprovedStatus(item, $event)"
+                    :key="'status_'+item._id"
+                  />
+                </template>
                 <template #cell(status)="{ item }">
                   <custom-select
+                    v-if="item.approvedStatus == 3"
                     :options="getStatusOptions(item.status)"
                     :default="status_options[item.status >= 0 ? item.status : 2]"
                     @input="onChangeStatus(item, $event)"
@@ -212,21 +231,10 @@
                 </template>
                 <template #cell(action)="{ item }">
                   <div class="d-flex align-items-center justify-content-center">
-                    <div class="manage-icon-container">
-                      <router-link :to="{ path: 'register', query: { id: item._id, isView: true } }" class="text-link">
-                        <i class="simple-icon-eye" />
-                      </router-link>
-                    </div>
                     <div class="manage-icon-container ml-1" v-if="item.status != 4">
-                      <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
+                      <router-link :to="{ path: 'register', query: { id: item._id, isView: true, isSetReward: true } }" class="text-link">
                         <i class="simple-icon-pencil" />
                       </router-link>
-                    </div>
-                    <div class="manage-icon-container ml-1" v-if="(item.status != 0) && (item.status != 3)">
-                      <i class="simple-icon-trash" @click="deleteItem(item)" />
-                    </div>
-                    <div class="manage-icon-container ml-1">
-                      <i class="simple-icon-docs" @click="duplicateItem(item)" />
                     </div>
                   </div>
                 </template>
@@ -234,9 +242,9 @@
               <b-pagination
                 size="sm"
                 align="center"
-                :total-rows="totalWorkingRows"
+                :total-rows="totalApprovedRows"
                 :per-page="perPage"
-                v-model="currentWorkingPage"
+                v-model="currentApprovedPage"
               >
                 <template v-slot:next-text>
                   <i class="simple-icon-arrow-right" />
@@ -252,21 +260,33 @@
                 </template>
               </b-pagination>
             </b-tab>
-            <b-tab :title="'예약('+totalReservedRows+')'">
+            <b-tab :title="'승인대기('+totalPendingRows+')'">
               <b-table
                 ref="custom-table"
                 class="vuetable"
-                :current-page="currentReservedPage"
+                :current-page="currentPendingPage"
                 :per-page="perPage"
                 :fields="bootstrapTable.fields"
-                :items="dataProviderReserved"
+                :items="dataProviderPending"
                 selectable
                 select-mode="single"
                 :key="tableKey"
                 :filter="filter"
               >
+                <template #cell(approvedStatus)="{ item }">
+                  <span class="approved" v-if="item.approvedStatus == 1 || item.approvedStatus == 3">승인완료</span>
+                  <span class="rejected text-link" v-else-if="item.approvedStatus == 2" @click="showRejectedDetail(item)">반려</span>
+                  <custom-select
+                    v-else
+                    :options="approved_status_options"
+                    :default="approved_status_options[item.approvedStatus]"
+                    @input="onChangeApprovedStatus(item, $event)"
+                    :key="'status_'+item._id"
+                  />
+                </template>
                 <template #cell(status)="{ item }">
                   <custom-select
+                    v-if="item.approvedStatus == 3"
                     :options="getStatusOptions(item.status)"
                     :default="status_options[item.status >= 0 ? item.status : 2]"
                     @input="onChangeStatus(item, $event)"
@@ -292,21 +312,10 @@
                 </template>
                 <template #cell(action)="{ item }">
                   <div class="d-flex align-items-center justify-content-center">
-                    <div class="manage-icon-container">
-                      <router-link :to="{ path: 'register', query: { id: item._id, isView: true } }" class="text-link">
-                        <i class="simple-icon-eye" />
-                      </router-link>
-                    </div>
                     <div class="manage-icon-container ml-1" v-if="item.status != 4">
-                      <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
+                      <router-link :to="{ path: 'register', query: { id: item._id, isView: true, isSetReward: true } }" class="text-link">
                         <i class="simple-icon-pencil" />
                       </router-link>
-                    </div>
-                    <div class="manage-icon-container ml-1" v-if="(item.status != 0) && (item.status != 3)">
-                      <i class="simple-icon-trash" @click="deleteItem(item)" />
-                    </div>
-                    <div class="manage-icon-container ml-1">
-                      <i class="simple-icon-docs" @click="duplicateItem(item)" />
                     </div>
                   </div>
                 </template>
@@ -314,9 +323,9 @@
               <b-pagination
                 size="sm"
                 align="center"
-                :total-rows="totalReservedRows"
+                :total-rows="totalPendingRows"
                 :per-page="perPage"
-                v-model="currentReservedPage"
+                v-model="currentPendingPage"
               >
                 <template v-slot:next-text>
                   <i class="simple-icon-arrow-right" />
@@ -332,21 +341,33 @@
                 </template>
               </b-pagination>
             </b-tab>
-            <b-tab :title="'대기('+totalPausedRows+')'">
+            <b-tab :title="'반려('+totalRejectedRows+')'">
               <b-table
                 ref="custom-table"
                 class="vuetable"
-                :current-page="currentPausedPage"
+                :current-page="currentRejectedPage"
                 :per-page="perPage"
                 :fields="bootstrapTable.fields"
-                :items="dataProviderPaused"
+                :items="dataProviderRejected"
                 selectable
                 select-mode="single"
                 :key="tableKey"
                 :filter="filter"
               >
+                <template #cell(approvedStatus)="{ item }">
+                  <span class="approved" v-if="item.approvedStatus == 1 || item.approvedStatus == 3">승인완료</span>
+                  <span class="rejected text-link" v-else-if="item.approvedStatus == 2" @click="showRejectedDetail(item)">반려</span>
+                  <custom-select
+                    v-else
+                    :options="approved_status_options"
+                    :default="approved_status_options[item.approvedStatus]"
+                    @input="onChangeApprovedStatus(item, $event)"
+                    :key="'status_'+item._id"
+                  />
+                </template>
                 <template #cell(status)="{ item }">
                   <custom-select
+                    v-if="item.approvedStatus == 3"
                     :options="getStatusOptions(item.status)"
                     :default="status_options[item.status >= 0 ? item.status : 2]"
                     @input="onChangeStatus(item, $event)"
@@ -372,21 +393,10 @@
                 </template>
                 <template #cell(action)="{ item }">
                   <div class="d-flex align-items-center justify-content-center">
-                    <div class="manage-icon-container">
-                      <router-link :to="{ path: 'register', query: { id: item._id, isView: true } }" class="text-link">
-                        <i class="simple-icon-eye" />
-                      </router-link>
-                    </div>
                     <div class="manage-icon-container ml-1" v-if="item.status != 4">
-                      <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
+                      <router-link :to="{ path: 'register', query: { id: item._id, isView: true, isSetReward: true } }" class="text-link">
                         <i class="simple-icon-pencil" />
                       </router-link>
-                    </div>
-                    <div class="manage-icon-container ml-1" v-if="(item.status != 0) && (item.status != 3)">
-                      <i class="simple-icon-trash" @click="deleteItem(item)" />
-                    </div>
-                    <div class="manage-icon-container ml-1">
-                      <i class="simple-icon-docs" @click="duplicateItem(item)" />
                     </div>
                   </div>
                 </template>
@@ -394,169 +404,9 @@
               <b-pagination
                 size="sm"
                 align="center"
-                :total-rows="totalPausedRows"
+                :total-rows="totalRejectedRows"
                 :per-page="perPage"
-                v-model="currentPausedPage"
-              >
-                <template v-slot:next-text>
-                  <i class="simple-icon-arrow-right" />
-                </template>
-                <template v-slot:prev-text>
-                  <i class="simple-icon-arrow-left" />
-                </template>
-                <template v-slot:first-text>
-                  <i class="simple-icon-control-start" />
-                </template>
-                <template v-slot:last-text>
-                  <i class="simple-icon-control-end" />
-                </template>
-              </b-pagination>
-            </b-tab>
-            <b-tab :title="'중지('+totalStoppedRows+')'">
-              <b-table
-                ref="custom-table"
-                class="vuetable"
-                :current-page="currentStoppedPage"
-                :per-page="perPage"
-                :fields="bootstrapTable.fields"
-                :items="dataProviderStopped"
-                selectable
-                select-mode="single"
-                :key="tableKey"
-                :filter="filter"
-              >
-                <template #cell(status)="{ item }">
-                  <custom-select
-                    :options="getStatusOptions(item.status)"
-                    :default="status_options[item.status >= 0 ? item.status : 2]"
-                    @input="onChangeStatus(item, $event)"
-                    :key="'status_'+item._id"
-                  />
-                </template>
-                <template #cell(level)="{ item }">
-                  <b-select
-                    v-model="item.level"
-                    :options="level_options"
-                    @change="onChangeLevel(item)"
-                  />
-                </template>
-                <template #cell(createdAt)="{ item }">
-                  {{ formatDateWithMin(item.createdAt) }}
-                  {{ formatDateWithMin(item.updatedAt)}}(수정)
-                </template>
-                <template #cell(duration)="{ item }">
-                  {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
-                </template>
-                <template #cell(type)="{ item }">
-                  {{ type_options[item.type].label }}
-                </template>
-                <template #cell(action)="{ item }">
-                  <div class="d-flex align-items-center justify-content-center">
-                    <div class="manage-icon-container">
-                      <router-link :to="{ path: 'register', query: { id: item._id, isView: true } }" class="text-link">
-                        <i class="simple-icon-eye" />
-                      </router-link>
-                    </div>
-                    <div class="manage-icon-container ml-1" v-if="item.status != 4">
-                      <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
-                        <i class="simple-icon-pencil" />
-                      </router-link>
-                    </div>
-                    <div class="manage-icon-container ml-1" v-if="(item.status != 0) && (item.status != 3)">
-                      <i class="simple-icon-trash" @click="deleteItem(item)" />
-                    </div>
-                    <div class="manage-icon-container ml-1">
-                      <i class="simple-icon-docs" @click="duplicateItem(item)" />
-                    </div>
-                  </div>
-                </template>
-              </b-table>
-              <b-pagination
-                size="sm"
-                align="center"
-                :total-rows="totalStoppedRows"
-                :per-page="perPage"
-                v-model="currentStoppedPage"
-              >
-                <template v-slot:next-text>
-                  <i class="simple-icon-arrow-right" />
-                </template>
-                <template v-slot:prev-text>
-                  <i class="simple-icon-arrow-left" />
-                </template>
-                <template v-slot:first-text>
-                  <i class="simple-icon-control-start" />
-                </template>
-                <template v-slot:last-text>
-                  <i class="simple-icon-control-end" />
-                </template>
-              </b-pagination>
-            </b-tab>
-            <b-tab :title="'종료('+totalFinishedRows+')'">
-              <b-table
-                ref="custom-table"
-                class="vuetable"
-                :current-page="currentFinishedPage"
-                :per-page="perPage"
-                :fields="bootstrapTable.fields"
-                :items="dataProviderFinished"
-                selectable
-                select-mode="single"
-                :key="tableKey"
-                :filter="filter"
-              >
-                <template #cell(status)="{ item }">
-                  <custom-select
-                    :options="getStatusOptions(item.status)"
-                    :default="status_options[item.status >= 0 ? item.status : 2]"
-                    @input="onChangeStatus(item, $event)"
-                    :key="'status_'+item._id"
-                  />
-                </template>
-                <template #cell(level)="{ item }">
-                  <b-select
-                    v-model="item.level"
-                    :options="level_options"
-                    @change="onChangeLevel(item)"
-                  />
-                </template>
-                <template #cell(createdAt)="{ item }">
-                  {{ formatDateWithMin(item.createdAt) }}
-                  {{ formatDateWithMin(item.updatedAt)}}(수정)
-                </template>
-                <template #cell(duration)="{ item }">
-                  {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
-                </template>
-                <template #cell(type)="{ item }">
-                  {{ type_options[item.type].label }}
-                </template>
-                <template #cell(action)="{ item }">
-                  <div class="d-flex align-items-center justify-content-center">
-                    <div class="manage-icon-container">
-                      <router-link :to="{ path: 'register', query: { id: item._id, isView: true } }" class="text-link">
-                        <i class="simple-icon-eye" />
-                      </router-link>
-                    </div>
-                    <div class="manage-icon-container ml-1" v-if="item.status != 4">
-                      <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
-                        <i class="simple-icon-pencil" />
-                      </router-link>
-                    </div>
-                    <div class="manage-icon-container ml-1" v-if="(item.status != 0) && (item.status != 3)">
-                      <i class="simple-icon-trash" @click="deleteItem(item)" />
-                    </div>
-                    <div class="manage-icon-container ml-1">
-                      <i class="simple-icon-docs" @click="duplicateItem(item)" />
-                    </div>
-                  </div>
-                </template>
-              </b-table>
-              <b-pagination
-                size="sm"
-                align="center"
-                :total-rows="totalFinishedRows"
-                :per-page="perPage"
-                v-model="currentFinishedPage"
+                v-model="currentRejectedPage"
               >
                 <template v-slot:next-text>
                   <i class="simple-icon-arrow-right" />
@@ -575,6 +425,12 @@
           </b-tabs>
         </b-card>
       </b-colxx>
+      <b-modal id="rejectModal" ref="rejectModal" title="반려사유 작성" @hide="tableKey++">
+        <b-textarea v-model="rejectDetails" />
+        <template slot="modal-footer">
+          <b-button variant="primary" @click="onClickReject()">반려하기</b-button>
+        </template>
+      </b-modal>
     </b-row>
   </div>
 </template>
@@ -623,18 +479,18 @@ export default {
       disabledFrom: null,
       tableKey: 0,
       currentPage: 1,
-      currentWorkingPage: 1,
-      currentReservedPage: 1,
-      currentPausedPage: 1,
-      currentStoppedPage: 1,
-      currentFinishedPage: 1,
+      currentApprovedPage: 1,
+      currentPendingPage: 1,
+      currentRejectedPage: 1,
+      // currentStoppedPage: 0,
+      // currentFinishedPage: 0,
       perPage: 5,
       totalRows: 0,
-      totalWorkingRows: 0,
-      totalReservedRows: 0,
-      totalPausedRows: 0,
-      totalStoppedRows: 0,
-      totalFinishedRows: 0,
+      totalApprovedRows: 0,
+      totalPendingRows: 0,
+      totalRejectedRows: 0,
+      // totalStoppedRows: 0,
+      // totalFinishedRows: 0,
       items: [],
       level_options: [1, 2, 3, 99],
       type_options: [
@@ -655,6 +511,11 @@ export default {
           value: -1,
         },
       ],
+      approved_status_options: [
+        { value: 0, text: "승인대기"},
+        { value: 1, text: "승인완료"},
+        { value: 2, text: "반려"},
+      ],
       status_options: [
         { value: 0, text: "진행중" },
         { value: 1, text: "예약" },
@@ -666,25 +527,18 @@ export default {
         selected: [],
         fields: [
           {
-            key: "status",
-            label: "",
+            key: "approvedStatus",
+            label: "심사상태",
             sortable: false,
             thClass: "fix-width bg-dark text-white text-center w-10",
             tdClass: "list-item-heading fix-width text-center w-10",
           },
           {
-            key: "level",
-            label: "레벨",
-            sortable: true,
-            thClass: "fix-width bg-dark text-white text-center w-10",
-            tdClass: "fix-width text-center w-10",
-          },
-          {
-            key: "_id",
-            label: "설문ID",
+            key: "status",
+            label: "설문상태",
             sortable: false,
-            thClass: "bg-dark text-white text-center",
-            tdClass: " text-center",
+            thClass: "fix-width bg-dark text-white text-center w-10",
+            tdClass: "list-item-heading fix-width text-center w-10",
           },
           {
             key: "creatorPhone",
@@ -694,23 +548,16 @@ export default {
             tdClass: " text-center",
           },
           {
+            key: "_id",
+            label: "설문ID",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+          {
             key: "title",
             label: "설문제목",
             sortable: false,
-            thClass: "bg-dark text-white text-center",
-            tdClass: " text-center",
-          },
-          {
-            key: "type",
-            label: "설문유형",
-            sortable: false,
-            thClass: "bg-dark text-white text-center",
-            tdClass: " text-center",
-          },
-          {
-            key: "attendCount",
-            label: "참여자수",
-            sortable: true,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
           },
@@ -730,13 +577,15 @@ export default {
           },
           {
             key: "action",
-            label: "관리",
+            label: "리워드설정",
             sortable: false,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
           },
         ],
       },
+      rejectDetails: "",
+      tempItem: null
     };
   },
   methods: {
@@ -749,7 +598,7 @@ export default {
     dataProvider(ctx) {
       this.isLoading = true;
       const params = this.apiParamsConverter(ctx);
-      let promise = axios.get(apiUrl + "/research?isDraft=0", {
+      let promise = axios.get(apiUrl + "/research?isDraft=0&isNotAdmin=true&approvedStatus=0,1,2,3", {
         params: params,
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
@@ -771,10 +620,10 @@ export default {
           return [];
         });
     },
-    dataProviderWorking(ctx) {
+    dataProviderApproved(ctx) {
       this.isLoading = true;
       const params = this.apiParamsConverter(ctx);
-      let promise = axios.get(apiUrl + "/research?isDraft=0&status=0", {
+      let promise = axios.get(apiUrl + "/research?isDraft=0&isNotAdmin=true&approvedStatus=1,3", {
         params: params,
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
@@ -784,9 +633,9 @@ export default {
       return promise
         .then((result) => result.data)
         .then((data) => {
-          this.currentWorkingPage = data.current_page;
+          this.currentApprovedPage = data.current_page;
           // this.perPage = data.per_page;
-          this.totalWorkingRows = data.total;
+          this.totalApprovedRows = data.total;
           const items = data.data;
           this.isLoading = false;
           return items;
@@ -796,10 +645,10 @@ export default {
           return [];
         });
     },
-    dataProviderReserved(ctx) {
+    dataProviderPending(ctx) {
       this.isLoading = true;
       const params = this.apiParamsConverter(ctx);
-      let promise = axios.get(apiUrl + "/research?isDraft=0&status=1", {
+      let promise = axios.get(apiUrl + "/research?isDraft=0&isNotAdmin&approvedStatus=0", {
         params: params,
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
@@ -809,9 +658,9 @@ export default {
       return promise
         .then((result) => result.data)
         .then((data) => {
-          this.currentReservedPage = data.current_page;
+          this.currentPendingPage = data.current_page;
           // this.perPage = data.per_page;
-          this.totalReservedRows = data.total;
+          this.totalPendingRows = data.total;
           const items = data.data;
           this.isLoading = false;
           return items;
@@ -821,10 +670,10 @@ export default {
           return [];
         });
     },
-    dataProviderPaused(ctx) {
+    dataProviderRejected(ctx) {
       this.isLoading = true;
       const params = this.apiParamsConverter(ctx);
-      let promise = axios.get(apiUrl + "/research?isDraft=0&status=2", {
+      let promise = axios.get(apiUrl + "/research?isDraft=0&isNotAdmin=true&approvedStatus=2", {
         params: params,
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
@@ -834,9 +683,9 @@ export default {
       return promise
         .then((result) => result.data)
         .then((data) => {
-          this.currentPausedPage = data.current_page;
+          this.currentRejectedPage = data.current_page;
           // this.perPage = data.per_page;
-          this.totalPausedRows = data.total;
+          this.totalRejectedRows = data.total;
           const items = data.data;
           this.isLoading = false;
           return items;
@@ -1074,6 +923,40 @@ export default {
         ]
       }
     },
+    onChangeApprovedStatus(item, $event) {
+      let approvedStatus = $event.value;
+      if(approvedStatus == 2) {
+        this.showModal('rejectModal');
+        this.tempItem = item;
+      } else {
+        let data = {
+          approvedStatus: approvedStatus
+        }
+        this.updateResearch(data, item._id);
+      }
+    },
+    showRejectedDetail(item) {
+      console.log('$bvModal = ', item)
+      this.$bvModal.msgBoxOk(item.rejectDetails, {
+        title: "반려사유",
+      })
+        .then(value => {
+          console.log(value);
+        })
+        .catch(err => {
+
+        })
+    },
+    onClickReject() {
+      this.hideModal('rejectModal')
+      let data = {
+        approvedStatus: 2,
+        rejectDetails: this.rejectDetails
+      };
+      this.updateResearch(data, this.tempItem._id);
+      this.tempItem = null;
+      this.rejectDetails = "";
+    },
     onChangeStatus(item, $event) {
       let prevStatus = item.status;
       console.log('item = ', item);
@@ -1168,6 +1051,12 @@ export default {
     ) {
       this.$notify(type, title, message, { duration: 3000, permanent: false });
     },
+    hideModal(refname) {
+      this.$refs[refname].hide();
+    },
+    showModal(refname) {
+      this.$refs[refname].show();
+    }
   },
 };
 </script>

@@ -6,6 +6,7 @@
         typeOption[data.type]
       }}</b-badge>
       <span class="gray-text ml-2">설문지 ID: {{data._id}}</span>
+      <span class="gray-text ml-4">작성자 ID: {{data.creatorPhone}}</span>
     </div>
 
     <h3 class="mt-4" v-if="data.type != 'research'">{{ $t("research.benefits") }}</h3>

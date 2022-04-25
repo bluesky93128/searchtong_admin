@@ -62,6 +62,9 @@ export default {
         },
         isView: {
             default: false
+        },
+        isSetReward: {
+            default: false
         }
     },
     data() {
@@ -78,6 +81,9 @@ export default {
     },
     mounted() {
         this.totalTabs = this.tabs.filter(x => x.type != "done").length;
+        if(this.isSetReward) {
+            this.clickedTab(5);
+        }
     },
     methods: {
         tabStatusFix() {

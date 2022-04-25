@@ -68,9 +68,17 @@
                     :reduce="(item) => item.value"
                     class="research-type"
                   />
-                  <b-button class="primary" @click="onClickSearch()">검색</b-button>
+                  <!-- <b-button class="primary" @click="onClickSearch()">검색</b-button> -->
                 </div>
               </b-form-group>
+            </b-colxx>
+            <b-colxx xxs="6">
+              <b-form-group label="작성자 ID" :label-cols="2">
+                <b-form-input v-model="searchForm.creatorPhone" />
+              </b-form-group>
+            </b-colxx>
+            <b-colxx xxs="6">
+              <b-button class="primary float-right" @click="onClickSearch()">검색</b-button>
             </b-colxx>
           </b-row>
         </b-card>
@@ -105,6 +113,7 @@
                 </template>
                 <template #cell(createdAt)="{ item }">
                   {{ formatDateWithMin(item.createdAt) }}
+                  {{ formatDateWithMin(item.updatedAt)}}(수정)
                 </template>
                 <template #cell(duration)="{ item }">
                   {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
@@ -160,6 +169,7 @@
                 </template>
                 <template #cell(createdAt)="{ item }">
                   {{ formatDateWithMin(item.createdAt) }}
+                  {{ formatDateWithMin(item.updatedAt)}}(수정)
                 </template>
                 <template #cell(duration)="{ item }">
                   {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
@@ -215,6 +225,7 @@
                 </template>
                 <template #cell(createdAt)="{ item }">
                   {{ formatDateWithMin(item.createdAt) }}
+                  {{ formatDateWithMin(item.updatedAt)}}(수정)
                 </template>
                 <template #cell(duration)="{ item }">
                   {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
@@ -270,6 +281,7 @@
                 </template>
                 <template #cell(createdAt)="{ item }">
                   {{ formatDateWithMin(item.createdAt) }}
+                  {{ formatDateWithMin(item.updatedAt)}}(수정)
                 </template>
                 <template #cell(duration)="{ item }">
                   {{ item.isSetPeriodLater ? "설정되지 않음" : (formatDateWithMin(item.startAt) + ' ~ ' + formatDateWithMin(item.endAt)) }}
@@ -400,7 +412,14 @@ export default {
           },
           {
             key: "_id",
-            label: "ID",
+            label: "설문ID",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+          {
+            key: "creatorPhone",
+            label: "작성자ID",
             sortable: false,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
@@ -590,6 +609,9 @@ export default {
         }
         if(params.filter.type >= 0) {
           apiParams.type = params.filter.type;
+        }
+        if(params.filter.creatorPhone) {
+          apiParams.creatorPhone = params.filter.creatorPhone;
         }
       }
       return apiParams;
