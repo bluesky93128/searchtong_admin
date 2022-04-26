@@ -76,7 +76,11 @@ const data = [{
   subs: [{
     icon: "simple-icon-people",
     label: "menu.user_manage",
-    to: "/app/user_manage/list"
+    to: "/app/user_manage/user"
+  }, {
+    icon: "simple-icon-people",
+    label: "menu.sub_admin",
+    to: "/app/user_manage/sub_admin"
   }]
 },
 {

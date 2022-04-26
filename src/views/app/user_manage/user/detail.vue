@@ -1,4 +1,3 @@
-
 <template>
   <div>
     <b-row>
@@ -11,20 +10,8 @@
       <b-colxx xxs="12">
         <b-card class="mb-4">
           <b-row>
-            <b-colxx xxs="6">
-              <b-form-group label="회원ID" :label-cols="2">
-                <b-form-input v-model="searchForm.userId" />
-              </b-form-group>
-            </b-colxx>
-            <b-colxx xxs="6">
-              <b-form-group label="회원닉네임" :label-cols="2">
-                <b-form-input v-model="searchForm.username" />
-              </b-form-group>
-            </b-colxx>
-          </b-row>
-          <b-row>
             <b-colxx xxs="12">
-              <b-form-group label="등록일" :label-cols="1">
+              <b-form-group label="설문참여일" :label-cols="1">
                 <div class="d-flex justify-content-between">
                   <div class="d-flex">
                     <b-datepicker
@@ -51,10 +38,19 @@
     </b-row>
     <b-row>
       <b-colxx xxs="12">
+        <div class="d-flex justify-content-between align-items-center">
+          <h3>회원 ID: {{decPhoneNum}}</h3>
+          <b-button variant="outline-primary" @click="onDeleteUser()">회원탈퇴</b-button>
+        </div>
+      </b-colxx>
+      <b-colxx xxs="12">
         <b-card class="mt-4">
           <b-row class="mb-2">
-            <b-colxx xs="4">
-              <div class="d-flex">
+            <b-colxx xs="6">
+              총 {{totalRows}}건
+            </b-colxx>
+            <b-colxx xs="6">
+              <div class="d-flex float-right">
                 <v-select :options="[5, 10, 25, 50, 100]" v-model="perPage"></v-select>
                 <span class="span-center-text ml-2 mr-4">개씩 보기</span>
               </div>
@@ -85,10 +81,13 @@
               {{calcAge(item)}}
             </template>
             <template #cell(postalCode)="{ item }">
-              {{ item.panelInfo && item.panelInfo.postData && item.panelInfo.postData.sigunguCode }}
+              {{ item.panelInfo && item.panelInfo.postData.sigunguCode }}
+            </template>
+            <template #cell(receivedStatus)="{item}">
+              {{item.receivedStatus == 0 ? "성공" : "대기"}}
             </template>
             <template #cell(action)="{ item }">
-              <router-link :to="{ path: 'detail', query: { id: item._id } }" class="text-link">
+              <router-link :to="{ path: 'user_detail', query: { id: item._id } }" class="text-link">
                 보기
               </router-link>
             </template>
@@ -122,7 +121,7 @@
 <script>
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
-import { apiUrl } from '../../../constants/config';
+import { apiUrl } from '../../../../constants/config';
 import moment from "moment";
 import axios from "axios";
 
@@ -131,6 +130,8 @@ export default {
     "v-select": vSelect,
   },
   mounted() {
+    this.userId = this.$route.query.id;
+    this.decPhoneNum = this.$route.query.decPhoneNum;
     // var myHeaders = new Headers();
     // myHeaders.append("Content-Type", "application/json");
     // myHeaders.append(
@@ -154,8 +155,8 @@ export default {
   },
   data() {
     return {
+      userId: '',
       searchForm: {},
-      filter: null,
       disabledTo: null,
       disabledFrom: null,
       tableKey: 0,
@@ -164,6 +165,7 @@ export default {
       totalRows: 0,
       isLoading: false,
       items: [],
+      filter: {},
       type_options: [
         {
           label: "여론조사",
@@ -189,57 +191,36 @@ export default {
         selected: [],
         fields: [
           {
-            key: "userKey",
-            label: "회원Key",
+            key: "researchId",
+            label: "설문 ID",
             sortable: false,
             thClass: "fix-width bg-dark text-white text-center",
             tdClass: "list-item-heading fix-width text-center",
           },
           {
-            key: "decPhoneNum",
-            label: "ID",
+            key: "description",
+            label: "설문제목",
             sortable: false,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
           },
           {
-            key: "gender",
-            label: "성별",
+            key: "coin",
+            label: "획득코인",
             sortable: false,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
           },
           {
-            key: "age",
-            label: "나이",
+            key: "receivedStatus",
+            label: "전송성공여부",
             sortable: false,
-            thClass: "bg-dark text-white text-center",
-            tdClass: " text-center",
-          },
-          {
-            key: "postalCode",
-            label: "우편번호",
-            sortable: false,
-            thClass: "bg-dark text-white text-center",
-            tdClass: " text-center",
-          },
-          {
-            key: "attendCount",
-            label: "설문참여건",
-            sortable: false,
-            thClass: "bg-dark text-white text-center",
-            tdClass: " text-center",
+            tdClass: "w-10",
+            thClass: "bg-dark text-white",
           },
           {
             key: "createdAt",
-            label: "회원등록일",
-            sortable: false,
-            thClass: "bg-dark text-white text-center",
-            tdClass: " text-center",
-          },
-          {
-            key: "action",
-            label: "활동내역",
+            label: "설문참여일",
             sortable: false,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
@@ -249,6 +230,9 @@ export default {
     };
   },
   methods: {
+    onClickSearch() {
+      this.filter = {...this.searchForm};
+    },
     formatDate(date) {
       return moment(date).format("YYYY.MM.DD");
     },
@@ -257,18 +241,15 @@ export default {
     },
     calcAge(item) {
       let now = new Date();
-      if(item.panelInfo.birthYear) {
+      if(item.panelInfo) {
         return now.getFullYear() - item.panelInfo.birthYear;
       } else {
         return 0;
       }
     },
-    onClickSearch() {
-      this.filter = {...this.searchForm};
-    },
     dataProvider(ctx) {
       const params = this.apiParamsConverter(ctx);
-      let promise = axios.get(apiUrl + "/user?accepted=true", {
+      let promise = axios.get(apiUrl + "/user/getUserTransactionDetails/" + this.userId, {
         params: params,
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
@@ -304,17 +285,15 @@ export default {
       }
       if (params.filter && Object.keys(params.filter).length > 0) {
         // Optional
-        if(params.filter.userId) {
-          apiParams.phoneNum = params.filter.userId;
-        }
-        if(params.filter.username) {
-          apiParams.nickname = params.filter.username;
-        }
         if(params.filter.fromDate) {
-          apiParams.fromDate = params.filter.fromDate;
+          let date = new Date(params.filter.fromDate);
+          date.setHours(0, 0, 0);
+          apiParams.attendFrom = date;
         }
         if(params.filter.toDate) {
-          apiParams.toDate = params.filter.toDate;
+          let date = new Date(params.filter.toDate);
+          date.setHours(23, 59, 59);
+          apiParams.attendTo = date;
         }
       }
       return apiParams;
@@ -386,3 +365,4 @@ export default {
 .finished {
   background-color: #7f7f7f;
 }
+</style>

@@ -65,8 +65,10 @@ const routes = [
           import(/* webpackChunkName: "user_manage" */ "./views/app/user_manage"),
         redirect: "/app/user_manage/list",
         children: [
-          { path: 'list', component: () => import(/* webpackChunkName: "user_manage" */ './views/app/user_manage/list') },
-          { path: 'detail', component: () => import(/* webpackChunkName: "user_manage" */ './views/app/user_manage/detail') },
+          { path: 'user', component: () => import(/* webpackChunkName: "user_manage" */ './views/app/user_manage/user') },
+          { path: 'detail', component: () => import(/* webpackChunkName: "user_manage" */ './views/app/user_manage/user/detail') },
+          { path: 'sub_admin', component: () => import(/* webpackChunkName: "user_manage" */ './views/app/user_manage/sub_admin') },
+          { path: 'sub-admin-detail', component: () => import(/* webpackChunkName: "user_manage" */ './views/app/user_manage/sub_admin/detail') },
         ]
       },
       {

@@ -1,3 +1,4 @@
+
 <template>
   <div>
     <b-row>
@@ -10,8 +11,20 @@
       <b-colxx xxs="12">
         <b-card class="mb-4">
           <b-row>
+            <b-colxx xxs="6">
+              <b-form-group label="회원ID" :label-cols="2">
+                <b-form-input v-model="searchForm.userId" />
+              </b-form-group>
+            </b-colxx>
+            <b-colxx xxs="6">
+              <b-form-group label="회원닉네임" :label-cols="2">
+                <b-form-input v-model="searchForm.username" />
+              </b-form-group>
+            </b-colxx>
+          </b-row>
+          <b-row>
             <b-colxx xxs="12">
-              <b-form-group label="진행기간" :label-cols="1">
+              <b-form-group label="등록일" :label-cols="1">
                 <div class="d-flex justify-content-between">
                   <div class="d-flex">
                     <b-datepicker
@@ -28,7 +41,7 @@
                       :min="disabledTo"
                     />
                   </div>
-                  <b-button class="primary">검색</b-button>
+                  <b-button class="primary" @click="onClickSearch()">검색</b-button>
                 </div>
               </b-form-group>
             </b-colxx>
@@ -60,6 +73,7 @@
             selectable
             select-mode="single"
             :key="tableKey"
+            :filter="filter"
           >
             <template #cell(gender)="{ item }">
               {{item.panelInfo && item.panelInfo.gender ? '여자' : '남자'}}
@@ -71,13 +85,10 @@
               {{calcAge(item)}}
             </template>
             <template #cell(postalCode)="{ item }">
-              {{ item.panelInfo && item.panelInfo.postData.sigunguCode }}
-            </template>
-            <template #cell(receivedStatus)="{item}">
-              {{item.receivedStatus == 0 ? "성공" : "대기"}}
+              {{ item.panelInfo && item.panelInfo.postData && item.panelInfo.postData.sigunguCode }}
             </template>
             <template #cell(action)="{ item }">
-              <router-link :to="{ path: 'user_detail', query: { id: item._id } }" class="text-link">
+              <router-link :to="{ path: 'detail', query: { id: item._id, decPhoneNum: item.decPhoneNum } }" class="text-link">
                 보기
               </router-link>
             </template>
@@ -111,7 +122,7 @@
 <script>
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
-import { apiUrl } from '../../../constants/config';
+import { apiUrl } from '../../../../constants/config';
 import moment from "moment";
 import axios from "axios";
 
@@ -120,7 +131,6 @@ export default {
     "v-select": vSelect,
   },
   mounted() {
-    this.userId = this.$route.query.id;
     // var myHeaders = new Headers();
     // myHeaders.append("Content-Type", "application/json");
     // myHeaders.append(
@@ -144,8 +154,8 @@ export default {
   },
   data() {
     return {
-      userId: '',
       searchForm: {},
+      filter: null,
       disabledTo: null,
       disabledFrom: null,
       tableKey: 0,
@@ -179,36 +189,57 @@ export default {
         selected: [],
         fields: [
           {
-            key: "researchId",
-            label: "설문 ID",
+            key: "userKey",
+            label: "회원Key",
             sortable: false,
             thClass: "fix-width bg-dark text-white text-center",
             tdClass: "list-item-heading fix-width text-center",
           },
           {
-            key: "description",
-            label: "설문제목",
+            key: "decPhoneNum",
+            label: "ID",
             sortable: false,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
           },
           {
-            key: "coin",
-            label: "획득코인",
+            key: "gender",
+            label: "성별",
             sortable: false,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
           },
           {
-            key: "receivedStatus",
-            label: "전송성공여부",
+            key: "age",
+            label: "나이",
             sortable: false,
-            tdClass: "w-10",
-            thClass: "bg-dark text-white",
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+          {
+            key: "postalCode",
+            label: "우편번호",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+          {
+            key: "attendCount",
+            label: "설문참여건",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
           },
           {
             key: "createdAt",
-            label: "설문참여일",
+            label: "회원등록일",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+          {
+            key: "action",
+            label: "활동내역",
             sortable: false,
             thClass: "bg-dark text-white text-center",
             tdClass: " text-center",
@@ -226,15 +257,18 @@ export default {
     },
     calcAge(item) {
       let now = new Date();
-      if(item.panelInfo) {
+      if(item.panelInfo.birthYear) {
         return now.getFullYear() - item.panelInfo.birthYear;
       } else {
         return 0;
       }
     },
+    onClickSearch() {
+      this.filter = {...this.searchForm};
+    },
     dataProvider(ctx) {
       const params = this.apiParamsConverter(ctx);
-      let promise = axios.get(apiUrl + "/user/getUserTransactionDetails/" + this.userId, {
+      let promise = axios.get(apiUrl + "/user?accepted=true", {
         params: params,
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
@@ -268,8 +302,20 @@ export default {
       if (params.sortBy && params.sortBy.length > 0) {
         apiParams.sort = `${params.sortBy}|${params.sortDesc ? "desc" : "asc"}`;
       }
-      if (params.filter && params.filter.length > 0) {
+      if (params.filter && Object.keys(params.filter).length > 0) {
         // Optional
+        if(params.filter.userId) {
+          apiParams.phoneNum = params.filter.userId;
+        }
+        if(params.filter.username) {
+          apiParams.nickname = params.filter.username;
+        }
+        if(params.filter.fromDate) {
+          apiParams.fromDate = params.filter.fromDate;
+        }
+        if(params.filter.toDate) {
+          apiParams.toDate = params.filter.toDate;
+        }
       }
       return apiParams;
     },
@@ -340,4 +386,3 @@ export default {
 .finished {
   background-color: #7f7f7f;
 }
-</style>

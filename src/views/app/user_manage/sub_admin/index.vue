@@ -1,0 +1,459 @@
+
+<template>
+  <div>
+    <b-row>
+      <b-colxx xxs="12">
+        <h2>서브관리자</h2>
+        <div class="separator mb-5"></div>
+      </b-colxx>
+    </b-row>
+    <b-row>
+      <b-colxx xxs="12">
+        <b-card class="mb-4">
+          <b-row>
+            <b-colxx xxs="6">
+              <b-form-group label="회원ID" :label-cols="2">
+                <b-form-input v-model="searchForm.userId" />
+              </b-form-group>
+            </b-colxx>
+            <b-colxx xxs="6">
+              <b-form-group label="회원닉네임" :label-cols="2">
+                <b-form-input v-model="searchForm.username" />
+              </b-form-group>
+            </b-colxx>
+          </b-row>
+          <b-row>
+            <b-colxx xxs="12">
+              <b-form-group label="등록일" :label-cols="1">
+                <div class="d-flex justify-content-between">
+                  <div class="d-flex">
+                    <b-datepicker
+                      locale="ko-KR"
+                      v-model="searchForm.fromDate"
+                      :placeholder="$t('search.all')"
+                      :max="disabledFrom"
+                    />
+                    <span class="span-center-text mx-2">~</span>
+                    <b-datepicker
+                      locale="ko-KR"
+                      v-model="searchForm.toDate"
+                      :placeholder="$t('search.all')"
+                      :min="disabledTo"
+                    />
+                  </div>
+                  <b-button class="primary" @click="onClickSearch()">검색</b-button>
+                </div>
+              </b-form-group>
+            </b-colxx>
+          </b-row>
+        </b-card>
+      </b-colxx>
+    </b-row>
+    <b-row>
+      <b-colxx xxs="12">
+        <b-card class="mt-4">
+          <b-row class="mb-2">
+            <b-colxx xs="4">
+              <div class="d-flex">
+                <v-select :options="[5, 10, 25, 50, 100]" v-model="perPage"></v-select>
+                <span class="span-center-text ml-2 mr-4">개씩 보기</span>
+              </div>
+            </b-colxx>
+            <b-colxx xs="8" class="text-right">
+              <span></span>
+            </b-colxx>
+          </b-row>
+          <b-table
+            ref="custom-table"
+            class="vuetable"
+            :current-page="currentPage"
+            :per-page="perPage"
+            :fields="bootstrapTable.fields"
+            :items="dataProvider"
+            selectable
+            select-mode="single"
+            :key="tableKey"
+            :filter="filter"
+          >
+            <template #cell(level)="{ item }">
+              <custom-select
+                :options="level_options"
+                :default="level_options[item.isAllowRegister ? 0 : 1]"
+                @input="onChangeLevel(item, $event)"
+                :key="'status_'+item._id"
+              />
+            </template>
+            <template #cell(createdAt)="{ item }">
+              {{ formatDateWithMin(item.createdAt) }}
+            </template>
+            <template #cell(subAdminDetails)="{ item }">
+              {{item.subAdminDetails}}<br>
+              <span class="text-link" @click="onClickUpdateDetail(item)">편집</span>
+            </template>
+            <template #cell(action)="{ item }">
+              <router-link :to="{ path: 'sub-admin-detail', query: { id: item._id } }" class="text-link">
+                보기
+              </router-link>
+            </template>
+          </b-table>
+          <b-pagination
+            size="sm"
+            align="center"
+            :total-rows="totalRows"
+            :per-page="perPage"
+            v-model="currentPage"
+          >
+            <template v-slot:next-text>
+              <i class="simple-icon-arrow-right" />
+            </template>
+            <template v-slot:prev-text>
+              <i class="simple-icon-arrow-left" />
+            </template>
+            <template v-slot:first-text>
+              <i class="simple-icon-control-start" />
+            </template>
+            <template v-slot:last-text>
+              <i class="simple-icon-control-end" />
+            </template>
+          </b-pagination>
+        </b-card>
+      </b-colxx>
+    </b-row>
+    <b-modal id="detailModal" ref="detailModal" title="비고" @hide="tableKey++">
+      <b-textarea v-model="subAdminDetails" />
+      <template slot="modal-footer">
+        <b-button variant="primary" @click="onUpdateDetail()">저장</b-button>
+      </template>
+    </b-modal>
+  </div>
+</template>
+
+<script>
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
+import { apiUrl } from '../../../../constants/config';
+import moment from "moment";
+import axios from "axios";
+import customSelect from '../../../../components/MyComponents/CustomSelect.vue';
+
+export default {
+  components: {
+    "v-select": vSelect,
+    "custom-select": customSelect
+  },
+  mounted() {
+    // var myHeaders = new Headers();
+    // myHeaders.append("Content-Type", "application/json");
+    // myHeaders.append(
+    //   "Authorization",
+    //   "Bearer " + localStorage.getItem("token")
+    // );
+    // var requestOptions = {
+    //   method: 'GET',
+    //   headers: myHeaders,
+    //   redirect: 'follow'
+    // };
+
+    // fetch(apiUrl + "/research", requestOptions)
+    //   .then(response => response.json())
+    //   .then(result => {
+    //     console.log(result);
+    //     this.items = result.data;
+    //     this.totalRows = result.total;
+    //   })
+    //   .catch(error => console.log('error', error));
+  },
+  data() {
+    return {
+      searchForm: {},
+      filter: null,
+      disabledTo: null,
+      disabledFrom: null,
+      tableKey: 0,
+      currentPage: 1,
+      perPage: 5,
+      totalRows: 0,
+      isLoading: false,
+      items: [],
+      level_options: [
+        { value: 1, text: "서브관리자"},
+        { value: 0, text: "설문등록 금지"},
+      ],
+      subAdminDetails: "",
+      tempItem: null,
+      bootstrapTable: {
+        selected: [],
+        fields: [
+          {
+            key: "level",
+            label: "등급",
+            sortable: false,
+            thClass: "fix-width bg-dark text-white text-center",
+            tdClass: "list-item-heading fix-width text-center",
+          },
+          {
+            key: "decPhoneNum",
+            label: "ID",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+          {
+            key: "subAdminDetails",
+            label: "비고",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+          {
+            key: "requestedCount",
+            label: "설문 등록신청 건",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+          {
+            key: "approvedCount",
+            label: "승인완료 건",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+          {
+            key: "createdAt",
+            label: "회원등록일",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+          {
+            key: "action",
+            label: "신청내역",
+            sortable: false,
+            thClass: "bg-dark text-white text-center",
+            tdClass: " text-center",
+          },
+        ],
+      },
+    };
+  },
+  methods: {
+    formatDate(date) {
+      return moment(date).format("YYYY.MM.DD");
+    },
+    formatDateWithMin(date) {
+      return moment(date).format("YYYY.MM.DD hh:mm");
+    },
+    onClickUpdateDetail(item) {
+      this.tempItem = item;
+      this.showModal('detailModal');
+    },
+    onUpdateDetail() {
+      let data = {
+        subAdminDetails: this.subAdminDetails,
+        userId: this.tempItem._id
+      }
+      this.updateUserDetail(data);
+      this.hideModal('detailModal');
+      this.tempItem = null;
+      this.subAdminDetails = "";
+    },
+    onChangeLevel(item, $event) {
+      let value = $event.value;
+      let data = {
+        isAllowRegister: value ? true : false,
+        userId: item._id
+      };
+      this.updateAllowRegister(data);
+    },
+    updateUserDetail(data) {
+      this.isLoading = true;
+      var myHeaders = new Headers();
+      myHeaders.append(
+        "Authorization",
+        "Bearer " + localStorage.getItem("token")
+      );
+      myHeaders.append("Content-Type", "application/json");
+
+      var raw = JSON.stringify(data);
+
+      var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+
+      fetch(apiUrl + "/user/updateSubAdminDetails", requestOptions)
+        .then((response) => response.text())
+        .then((result) => {
+          console.log(result)
+          this.tableKey++;
+          this.addNotification("success filled", "서브관리자 비고 변경", "비고가 변경 되었습니다");
+          this.isLoading = false;
+        })
+        .catch((error) => {
+          console.log("error", error)
+          this.isLoading = false;
+        });
+    },
+    updateAllowRegister(data) {
+      this.isLoading = true;
+      var myHeaders = new Headers();
+      myHeaders.append(
+        "Authorization",
+        "Bearer " + localStorage.getItem("token")
+      );
+      myHeaders.append("Content-Type", "application/json");
+
+      var raw = JSON.stringify(data);
+
+      var requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+
+      fetch(apiUrl + "/user/updateAllowRegister", requestOptions)
+        .then((response) => response.text())
+        .then((result) => {
+          console.log(result)
+          this.tableKey++;
+          this.addNotification("success filled", "서브관리자 등급 변경", "상태가 변경 되었습니다");
+          this.isLoading = false;
+        })
+        .catch((error) => {
+          console.log("error", error)
+          this.isLoading = false;
+        });
+    },
+    onClickSearch() {
+      this.filter = {...this.searchForm};
+    },
+    dataProvider(ctx) {
+      const params = this.apiParamsConverter(ctx);
+      let promise = axios.get(apiUrl + "/user?accepted=true&filterSubAdmin=true", {
+        params: params,
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
+      
+      this.isLoading = true;
+
+      return promise
+        .then((result) => result.data)
+        .then((data) => {
+          this.currentPage = data.current_page;
+          // this.perPage = data.per_page;
+          this.totalRows = data.total;
+          const items = data.data;
+          this.isLoading = false;
+          return items;
+        })
+        .catch((_error) => {
+          return [];
+        });
+    },
+    apiParamsConverter(params) {
+      let apiParams = {};
+      if (params.perPage !== 0) {
+        apiParams.per_page = params.perPage;
+      }
+      if (params.currentPage >= 1) {
+        apiParams.page = params.currentPage;
+      }
+      if (params.sortBy && params.sortBy.length > 0) {
+        apiParams.sort = `${params.sortBy}|${params.sortDesc ? "desc" : "asc"}`;
+      }
+      if (params.filter && Object.keys(params.filter).length > 0) {
+        // Optional
+        if(params.filter.userId) {
+          apiParams.phoneNum = params.filter.userId;
+        }
+        if(params.filter.username) {
+          apiParams.nickname = params.filter.username;
+        }
+        if(params.filter.fromDate) {
+          apiParams.fromDate = params.filter.fromDate;
+        }
+        if(params.filter.toDate) {
+          apiParams.toDate = params.filter.toDate;
+        }
+      }
+      return apiParams;
+    },
+    getStatus(status) {
+      switch(status) {
+        case 0: return 'status working';
+        case 1: return 'status reserved';
+        case 2: return 'status onhold';
+        case 3: return 'status stopped';
+        case 4: return 'status finished';
+      }
+    },
+    addNotification(
+      type = "success",
+      title = "This is Notify Title",
+      message = "This is Notify Message,<br>with html."
+    ) {
+      this.$notify(type, title, message, { duration: 3000, permanent: false });
+    },
+    hideModal(refname) {
+      this.$refs[refname].hide();
+    },
+    showModal(refname) {
+      this.$refs[refname].show();
+    }
+  },
+  computed: {
+    level_options() {
+      var ary = [...Array(99).keys()];
+      return ary;
+    },
+  },
+};
+</script>
+
+<style scoped>
+.research-type {
+  width: 150px !important;
+}
+.fix-width {
+  width: 100px;
+}
+.manage-icon-container {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.manage-icon-container .text-link {
+  color: #3a3a3a;
+  text-decoration: none;
+}
+.status {
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #a3a3a3;
+}
+.working {
+  background-color: #2f5597;
+}
+.reserved {
+  background-color: #70ad47;
+}
+.onhold {
+  background-color: #ffc000;
+}
+.stopped {
+  background-color: #ff0000;
+}
+.finished {
+  background-color: #7f7f7f;
+}
