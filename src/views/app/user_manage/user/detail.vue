@@ -156,6 +156,7 @@ export default {
   data() {
     return {
       userId: '',
+      decPhoneNum: '',
       searchForm: {},
       disabledTo: null,
       disabledFrom: null,
@@ -237,7 +238,7 @@ export default {
       return moment(date).format("YYYY.MM.DD");
     },
     formatDateWithMin(date) {
-      return moment(date).format("YYYY.MM.DD hh:mm");
+      return moment(date).format("YYYY.MM.DD HH:mm");
     },
     calcAge(item) {
       let now = new Date();
@@ -297,6 +298,28 @@ export default {
         }
       }
       return apiParams;
+    },
+    onDeleteUser() {
+      if(window.confirm("'" + this.decPhoneNum + "'" + "\n회원 탈퇴처리 하시겠습니까?")) {
+        var myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
+
+        var requestOptions = {
+          method: 'DELETE',
+          headers: myHeaders,
+          redirect: 'follow'
+        };
+
+        fetch(apiUrl + "/user/" + this.userId, requestOptions)
+          .then(response => response.json())
+          .then(result => {
+            console.log(result)
+            if(result.success) {
+              this.addNotification("success filled", "회원탈퇴", "회원탈퇴가 성공하였습니다.");
+            }
+          })
+          .catch(error => console.log('error', error));
+      }
     },
     getStatus(status) {
       switch(status) {

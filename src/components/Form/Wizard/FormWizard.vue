@@ -16,7 +16,7 @@
         <button type="button" class="mr-1 btn btn-primary" :disabled="!currentActive > 0" @click="previousTab()">
             {{$t('wizard.prev')}}
         </button>
-        <button type="button" class="mr-1 btn btn-primary" @click="save()" :disabled="isView">
+        <button type="button" class="mr-1 btn btn-primary" @click="save()" :disabled="isSetReward ? false : isView">
             {{$t('wizard.save')}}
         </button>
         <button type="button" class="btn btn-primary" v-if="currentActive != totalTabs - 1" :disabled="currentActive > totalTabs - 1" @click="nextTab()">

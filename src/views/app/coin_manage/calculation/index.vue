@@ -712,7 +712,7 @@ export default {
       this.bootstrapTable.selected = items;
     },
     formatDateWithMin(date) {
-      return moment(date).format("YYYY.MM.DD hh:mm");
+      return moment(date).format("YYYY.MM.DD HH:mm");
     },
     getStatus(status) {
       switch(status) {

@@ -233,7 +233,7 @@ export default {
       return num.toFixed(2);
     },
     formatDateWithMin(date) {
-      return moment(date).format("YYYY.MM.DD hh:mm");
+      return moment(date).format("YYYY.MM.DD HH:mm");
     },
 
     dataProvider(ctx) {

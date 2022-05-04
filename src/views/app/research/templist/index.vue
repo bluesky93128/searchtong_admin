@@ -140,6 +140,11 @@
             <template #cell(action)="{ item }">
               <div class="d-flex align-items-center justify-content-center">
                 <div class="manage-icon-container">
+                  <router-link :to="{ path: 'register', query: { id: item._id, isView: true } }" class="text-link">
+                    <i class="simple-icon-eye" />
+                  </router-link>
+                </div>
+                <div class="manage-icon-container ml-1">
                   <router-link :to="{ path: 'register', query: { id: item._id } }" class="text-link">
                     <i class="simple-icon-pencil" />
                   </router-link>
@@ -324,7 +329,7 @@ export default {
       return moment(date).format("YYYY.MM.DD");
     },
     formatDateWithMin(date) {
-      return moment(date).format("YYYY.MM.DD hh:mm");
+      return moment(date).format("YYYY.MM.DD HH:mm");
     },
     dataProvider(ctx) {
       this.isLoading = true;

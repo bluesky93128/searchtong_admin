@@ -1123,7 +1123,7 @@ export default {
     },
 
     formatDateWithMin(date) {
-      return moment(date).format("YYYY.MM.DD hh:mm");
+      return moment(date).format("YYYY.MM.DD HH:mm");
     },
 
     calcTotalRows() {

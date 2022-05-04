@@ -306,6 +306,9 @@ export default {
       if(this.isView) {
         return;
       }
+      this.data.itemQuestion[this.data.itemQuestion.length - 1].itemView.forEach( view => {
+        view.nextItemQuestionOrder = 0;
+      });
       this.data.itemQuestion.push({
         order: this.data.itemQuestion.length,
         title: "",
@@ -347,6 +350,9 @@ export default {
       temp.itemView = tmpViews;
       delete temp._id;
       temp.order = this.data.itemQuestion.length;
+      this.data.itemQuestion[this.data.itemQuestion.length - 1].itemView.forEach( view => {
+        view.nextItemQuestionOrder = 0;
+      });
       this.data.itemQuestion.push(temp);
       this.$forceUpdate();
     },
