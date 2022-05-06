@@ -327,7 +327,7 @@ export default {
       if(this.isView) return;
       this.selectedGungu = item;
       this.sigunguCode = this.selectedGungu.code.slice(0, 5);
-      axios.get("https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes?regcode_pattern=" + this.sigunguCode + "*")
+      axios.get("https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes?regcode_pattern=" + this.sigunguCode + "*00")
       .then((result) => result.data)
       .then((data) => {
         console.log(data);
