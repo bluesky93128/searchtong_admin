@@ -305,7 +305,7 @@ export default {
       this.selectedSido = item;
       this.sidoCode = this.selectedSido.code.slice(0, 2);
       console.log(this.sidoCode);
-      axios.get("https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes?regcode_pattern=" + this.sidoCode + "*000000")
+      axios.get("https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes?regcode_pattern=" + this.sidoCode + "*00000")
       .then((result) => result.data)
       .then((data) => {
         console.log(data);
