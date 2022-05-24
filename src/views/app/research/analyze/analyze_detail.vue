@@ -1001,7 +1001,8 @@ export default {
         itemQuestion: [],
         itemFinish: {},
         itemResearcher: {},
-        itemReward: {}
+        itemReward: {},
+        responseCost: 0
       },
       analyticsData: null,
       doughnutChartData: [],
