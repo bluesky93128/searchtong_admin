@@ -1297,7 +1297,7 @@ export default {
           종료시간: this.formatDateWithMin(new Date(item.researchEnd)),
         }
         Object.keys(item.researchAnswerResult).forEach((key, i) => {
-          new_item['문항'+(i + 1)] = item.researchAnswerResult[key];
+          new_item['문항'+(i + 1)] = ' ' + item.researchAnswerResult[key];
         })
         json_data.push(new_item);
       })
