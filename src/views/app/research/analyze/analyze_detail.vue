@@ -1282,23 +1282,25 @@ export default {
       var json_data = [];
       let curYear = new Date().getFullYear();
       data.forEach((item, index) => {
-        var new_item = {
-          번호: index + 1,
-          '사용자 ID': item.user.decPhoneNum || '',
-          성별: item.user.panelInfo.gender || '',
-          나이: curYear - item.user.panelInfo.birthYear + 1 || '',
-          지역1: item.user.panelInfo.postData.sido || '',
-          지역2: item.user.panelInfo.postData.sigungu || '',
-          지역3: item.user.panelInfo.postData.bname || '',
-          직업: item.user.userResearchInfo? item.user.userResearchInfo.job: "" || '',
-          소득수준: item.user.userResearchInfo? item.user.userResearchInfo.salary: "" || '',
-          시작시간: this.formatDateWithMin(new Date(item.researchStart)) || '',
-          종료시간: this.formatDateWithMin(new Date(item.researchEnd)) || '',
+        if(item.user) {
+          var new_item = {
+            번호: index + 1,
+            '사용자 ID': item.user.decPhoneNum,
+            성별: item.user.panelInfo.gender,
+            나이: curYear - item.user.panelInfo.birthYear + 1,
+            지역1: item.user.panelInfo.postData.sido,
+            지역2: item.user.panelInfo.postData.sigungu,
+            지역3: item.user.panelInfo.postData.bname,
+            직업: item.user.userResearchInfo? item.user.userResearchInfo.job: "",
+            소득수준: item.user.userResearchInfo? item.user.userResearchInfo.salary: "",
+            시작시간: this.formatDateWithMin(new Date(item.researchStart)),
+            종료시간: this.formatDateWithMin(new Date(item.researchEnd)),
+          }
+          Object.keys(item.researchAnswerResult).forEach((key, i) => {
+            new_item['문항'+(i + 1)] = item.researchAnswerResult[key];
+          })
+          json_data.push(new_item);
         }
-        Object.keys(item.researchAnswerResult).forEach((key, i) => {
-          new_item['문항'+(i + 1)] = item.researchAnswerResult[key];
-        })
-        json_data.push(new_item);
       })
       return json_data;
     },
