@@ -1286,14 +1286,14 @@ export default {
         if(item.user) {
           var new_item = {
             번호: index + 1,
-            '사용자 ID': item.user.decPhoneNum,
-            성별: item.user.panelInfo.gender,
-            나이: curYear - item.user.panelInfo.birthYear + 1,
-            지역1: item.user.panelInfo.postData.sido,
-            지역2: item.user.panelInfo.postData.sigungu,
-            지역3: item.user.panelInfo.postData.bname,
-            직업: item.user.userResearchInfo? item.user.userResearchInfo.job: "",
-            소득수준: item.user.userResearchInfo? item.user.userResearchInfo.salary: "",
+            '사용자 ID': item.user ? item.user.decPhoneNum : '',
+            성별: item.user ? item.user.panelInfo.gender : '',
+            나이: item.user ? curYear - item.user.panelInfo.birthYear + 1 : '',
+            지역1: item.user ? item.user.panelInfo.postData.sido : '',
+            지역2: item.user ? item.user.panelInfo.postData.sigungu : '',
+            지역3: item.user ? item.user.panelInfo.postData.bname : '',
+            직업: item.user ? item.user.userResearchInfo? item.user.userResearchInfo.job: "" : '',
+            소득수준: item.user ? item.user.userResearchInfo? item.user.userResearchInfo.salary: "" : '',
             시작시간: this.formatDateWithMin(new Date(item.researchStart)),
             종료시간: this.formatDateWithMin(new Date(item.researchEnd)),
           }
