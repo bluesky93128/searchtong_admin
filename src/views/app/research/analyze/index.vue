@@ -480,7 +480,7 @@ export default {
     dataProvider(ctx) {
       this.isLoading = true;
       const params = this.apiParamsConverter(ctx);
-      let promise = axios.get(apiUrl + "/research?isDraft=0&status=0,3,4", {
+      let promise = axios.get(apiUrl + "/research?isCallFromAdmin=true&isDraft=0&status=0,3,4", {
         params: params,
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
@@ -505,7 +505,7 @@ export default {
     dataProviderWorking(ctx) {
       this.isLoading = true;
       const params = this.apiParamsConverter(ctx);
-      let promise = axios.get(apiUrl + "/research?isDraft=0&status=0", {
+      let promise = axios.get(apiUrl + "/research?isCallFromAdmin=true&isDraft=0&status=0", {
         params: params,
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
@@ -530,7 +530,7 @@ export default {
     dataProviderStopped(ctx) {
       this.isLoading = true;
       const params = this.apiParamsConverter(ctx);
-      let promise = axios.get(apiUrl + "/research?isDraft=0&status=3", {
+      let promise = axios.get(apiUrl + "/research?isCallFromAdmin=true&isDraft=0&status=3", {
         params: params,
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
@@ -555,7 +555,7 @@ export default {
     dataProviderFinished(ctx) {
       this.isLoading = true;
       const params = this.apiParamsConverter(ctx);
-      let promise = axios.get(apiUrl + "/research?isDraft=0&status=4", {
+      let promise = axios.get(apiUrl + "/research?isCallFromAdmin=true&isDraft=0&status=4", {
         params: params,
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),

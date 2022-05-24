@@ -334,7 +334,7 @@ export default {
     dataProvider(ctx) {
       this.isLoading = true;
       const params = this.apiParamsConverter(ctx);
-      let promise = axios.get(apiUrl + "/research?isDraft=1", {
+      let promise = axios.get(apiUrl + "/research?isCallFromAdmin=true&isDraft=1", {
         params: params,
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),

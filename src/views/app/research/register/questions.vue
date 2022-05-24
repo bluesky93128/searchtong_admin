@@ -56,7 +56,10 @@
                 </b-colxx>
               </b-row>
             </b-form-group>
-            <b-form-textarea v-model="item.answerGuide" v-if="item.type1 == 1" placeholder="답변을 입력해주세요" :disabled="isView" />
+            <div class="d-flex">
+              <b-form-textarea class="w-70" v-model="item.answerGuide" v-if="item.type1 == 1" placeholder="답변을 입력해주세요" :disabled="isView" />
+              <b-form-select v-model="item.nextItemQuestionOrderSubjective" v-if="index != data.itemQuestion.length-1" :disabled="isView" :options="calcNextItemOptions(index)"  plain class="ml-2 mr-2 w-30" />
+            </div>
             <b-form-group
               label="보기문항"
               label-cols="2"
@@ -306,6 +309,7 @@ export default {
       if(this.isView) {
         return;
       }
+      this.data.itemQuestion[this.data.itemQuestion.length - 1].nextItemQuestionOrderSubjective = 0;
       this.data.itemQuestion[this.data.itemQuestion.length - 1].itemView.forEach( view => {
         view.nextItemQuestionOrder = 0;
       });
@@ -318,6 +322,7 @@ export default {
         min: 1,
         max: 1,
         viewType: 0,
+        nextItemQuestionOrderSubjective: -1,
         itemView: [
           {
             order: 0,
@@ -350,6 +355,7 @@ export default {
       temp.itemView = tmpViews;
       delete temp._id;
       temp.order = this.data.itemQuestion.length;
+      this.data.itemQuestion[this.data.itemQuestion.length - 1].nextItemQuestionOrderSubjective = 0;
       this.data.itemQuestion[this.data.itemQuestion.length - 1].itemView.forEach( view => {
         view.nextItemQuestionOrder = 0;
       });
@@ -377,6 +383,7 @@ export default {
             min: 1, // 다중응답 - 최소선택개수
             max: 1, // 다중응답 - 최대선택개수
             viewType: 0, // 보기문항 (0: 텍스트, 1: 이미지)
+            nextItemQuestionOrderSubjective: 0,
             itemView: [
               // 보기문항내용
               {
