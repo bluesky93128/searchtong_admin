@@ -105,6 +105,9 @@
                 :key="tableKey"
                 :filter="filter"
               >
+                <template #cell(title)="{ item }">
+                  <a :href="'https://searchtong.com/Detail?id='+item._id" target="_blank">{{item.title}}</a>
+                </template>
                 <template #cell(status)="{ item }">
                   <custom-select
                     :options="getStatusOptions(item.status)"

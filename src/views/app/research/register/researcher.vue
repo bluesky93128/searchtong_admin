@@ -176,7 +176,8 @@ export default {
       typeOption: ["여론조사", "서베이", "광고"],
       conditionOptions: [
         { text: '있음', value: 0 },
-        { text: '없음(조건없이 누구나 참여 가능)    ※광고는 참여조건 설정이 불가합니다.', value: 1 },
+        { text: '없음(조건없이 누구나 참여 가능)', value: 1 },
+        { text: '무작위조사(회원가입 없이 참여 가능)    ※광고는 참여조건 설정이 불가합니다.', value: 2 },
       ],
       genderOptions: [
         { text: '무관', value: 0 },

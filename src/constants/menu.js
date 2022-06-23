@@ -65,6 +65,10 @@ const data = [{
     icon: "simple-icon-paper-plane",
     label: "menu.app_manage.inquery",
     to: "/app/app_manage/inquery"
+  }, {
+    icon: "simple-icon-paper-plane",
+    label: "menu.app_manage.report",
+    to: "/app/app_manage/report"
   }
   ]
 },

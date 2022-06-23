@@ -56,6 +56,9 @@ const routes = [
           { path: 'faq_edit', component: () => import(/* webpackChunkName: "app_management" */ "./views/app/app_manage/faq/faq_edit") },
           { path: 'inquery', component: () => import(/* webpackChunkName: "piaf" */ './views/app/app_manage/inquery') },
           { path: 'inquery_edit', component: () => import(/* webpackChunkName: "app_management" */ "./views/app/app_manage/inquery/inquery_edit") },
+          { path: 'report', component: () => import(/* webpackChunkName: "piaf" */ './views/app/app_manage/report') },
+          { path: 'report_new', component: () => import(/* webpackChunkName: "app_management" */ "./views/app/app_manage/report/report_new") },
+          { path: 'report_edit', component: () => import(/* webpackChunkName: "app_management" */ "./views/app/app_manage/report/report_edit") },
         ]
       },
 

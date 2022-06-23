@@ -131,7 +131,8 @@
       "title": "앱관리",
       "notice": "공지사항",
       "faq": "FAQ",
-      "inquery": "1:1문의"
+      "inquery": "1:1문의",
+      "report": "여론조사 리포트"
     },
     "user_manage": "회원관리",
     "sub_admin": "서브관리자",

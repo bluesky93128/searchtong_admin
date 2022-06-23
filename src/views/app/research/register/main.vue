@@ -192,6 +192,12 @@
                   >
                 </div>
               </b-form-group>
+              <b-form-group label-cols="2" content-cols="4" label="공개설정">
+                <b-form-radio-group>
+                  <b-form-radio v-model="data.isPublic" name="isPublic" value="true">공개</b-form-radio>
+                  <b-form-radio v-model="data.isPublic" name="isPublic" value="false">비공개</b-form-radio>
+                </b-form-radio-group>
+              </b-form-group>
             </b-card>
           </div>
         </b-colxx>
