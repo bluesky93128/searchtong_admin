@@ -28,22 +28,22 @@
                   <main-page :data="data" :isView="isView" />
                 </div>
               </tab>
-              <tab name="2. 본문설정" v-if="isView || (data.isDraft) || ((status != 0) && (status != 3))">
+              <tab name="2. 본문설정">
                 <div class="wizard-basic-step">
                   <text-page :data="data" :gotoHome="gotoHome" :isView="isView" />
                 </div>
               </tab>
-              <tab name="3. 문항설정" v-if="isView || ((data.isDraft) || ((status != 0) && (status != 3))) && data.type != 2">
+              <tab name="3. 문항설정" v-if="data.type != 2">
                 <div class="wizard-basic-step">
                   <questions-page :data="data" :gotoHome="gotoHome" :isView="isView" />
                 </div>
               </tab>
-              <tab name="4. 종료글 설정" v-if="isView || ((data.isDraft) || ((status != 0) && (status != 3))) && data.type != 2">
+              <tab name="4. 종료글 설정" v-if="data.type != 2">
                 <div class="wizard-basic-step">
                   <finish-text-page :data="data" :gotoHome="gotoHome" :isView="isView" />
                 </div>
               </tab>
-              <tab name="5. 조사대상 설정" v-if="isView || (data.type != 2)">
+              <tab name="5. 조사대상 설정" v-if="(data.type != 2)">
                 <div class="wizard-basic-step">
                   <researcher-page :data="data" :gotoHome="gotoHome" :isView="isView" />
                 </div>

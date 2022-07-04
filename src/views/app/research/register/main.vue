@@ -98,7 +98,7 @@
                     :min="today"
                     style="flex: 8; margin-right: 10px"
                     v-model="startDate"
-                    :disabled="isView || data.isSetPeriodLater || (data.status == 0 || data.status == 3)"
+                    :disabled="isView || data.isSetPeriodLater || (!data.isDraft && (data.status == 0 || data.status == 3))"
                     @change="onStartDateChanged()"
                   />
                   <b-input
@@ -107,7 +107,7 @@
                     max="23"
                     v-model="startHour"
                     style="flex: 2; margin-right: 10px"
-                    :disabled="isView || data.isSetPeriodLater || (data.status == 0 || data.status == 3)"
+                    :disabled="isView || data.isSetPeriodLater || (!data.isDraft && (data.status == 0 || data.status == 3))"
                     @change="onStartDateChanged()"
                   />
                   <b-input
@@ -116,7 +116,7 @@
                     max="59"
                     v-model="startMinute"
                     style="flex: 2; margin-right: 10px"
-                    :disabled="isView || data.isSetPeriodLater || (data.status == 0 || data.status == 3)"
+                    :disabled="isView || data.isSetPeriodLater || (!data.isDraft && (data.status == 0 || data.status == 3))"
                     @change="onStartDateChanged()"
                   />
                   <span class="span-center-text mx-2">~</span>
@@ -152,7 +152,7 @@
                     @change="onEndDateChanged()"
                   />
                 </div>
-                <b-check class="col-3 mt-2" v-model="data.isSetPeriodLater" :disabled="data.status == 0 || data.status == 3">
+                <b-check class="col-3 mt-2" v-model="data.isSetPeriodLater" :disabled="isView || (!data.isDraft && (data.status == 0 || data.status == 3))">
                   {{ $t("research.isSetPeriodLater") }}
                 </b-check>
               </b-form-group>
@@ -193,9 +193,9 @@
                 </div>
               </b-form-group>
               <b-form-group label-cols="2" content-cols="4" label="공개설정">
-                <b-form-radio-group>
-                  <b-form-radio v-model="data.isPublic" name="isPublic" value="true">공개</b-form-radio>
-                  <b-form-radio v-model="data.isPublic" name="isPublic" value="false">비공개</b-form-radio>
+                <b-form-radio-group v-model="data.isPublic" >
+                  <b-form-radio name="isPublic" :value="true">공개</b-form-radio>
+                  <b-form-radio name="isPublic" :value="false">비공개</b-form-radio>
                 </b-form-radio-group>
               </b-form-group>
             </b-card>
@@ -223,6 +223,7 @@ export default {
       today: new Date(),
       user_data: {},
       balance: 0,
+      isPublic: true
     };
   },
   mounted() {
