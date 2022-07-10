@@ -253,10 +253,10 @@ export default {
         this.addNotification("error filled", "설문유형 변경", "보기상태에서는 설문유형변경이 불가합니다.");
         return;
       }
-      if(this.data.status == 0 || this.data.status == 3) {
-        this.addNotification("error filled", "설문유형 변경", "진행중/중지 상태의 설문은 설문유형변경이 불가합니다.");
-        return;
-      }
+      // if(this.data.status == 0 || this.data.status == 3) {
+      //   this.addNotification("error filled", "설문유형 변경", "진행중/중지 상태의 설문은 설문유형변경이 불가합니다.");
+      //   return;
+      // }
       if(this.data.type == 0) {
         if(type == 1) {
           if(confirm('설문유형을 서베이로 변경합니다. 계속하시겠습니까?')) {
