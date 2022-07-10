@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div class="loader-container" v-show="isLoading">
+      <div class="loader"></div>
+    </div>
     <b-row>
       <b-colxx xxs="12">
         <!-- <h2>배너 상세</h2>
@@ -129,6 +132,7 @@ export default {
   data() {
     return {
       downloadUrl: downloadUrl,
+      isLoading: false,
       report_data: {
         title: "",
         content: '',
@@ -156,6 +160,7 @@ export default {
     };
   },
   mounted() {
+    this.isLoading = true;
     this.id = this.$route.query.id;
     var requestOptions = {
       method: 'GET',
@@ -166,7 +171,8 @@ export default {
       .then(response => response.json())
       .then(result => {
         console.log(result)
-        this.report_data = result;
+        this.report_data = result.report;
+        this.isLoading = false;
       })
       .catch(error => console.log('error', error));
   },
@@ -186,6 +192,7 @@ export default {
     // },
 
     onRegister() {
+      this.isLoading = true;
       console.log(this.report_data);
       var myHeaders = new Headers();
       myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
@@ -202,6 +209,7 @@ export default {
         .then(response => response.json())
         .then(result => {
           this.addNotification("success filled", "여론조사 리포트 수정", "여론조사 리포트가 성공적으로 수정되었습니다.");
+          this.isLoading = false;
           this.$router.go(-1);
         })
         .catch(error => {
@@ -211,6 +219,7 @@ export default {
     },
     onDelete() {
       if(confirm("여론조사리포트를 삭제하시겠습니까?")) {
+        this.isLoading = true;
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
 
@@ -225,6 +234,7 @@ export default {
           .then(result => {
             console.log(result)
             this.addNotification("success filled", "여론조사 리포트 삭제", "여론조사 리포트가 성공적으로 삭제되었습니다.");
+            this.isLoading = false;
             this.$router.go(-1);
            })
           .catch(error => {
@@ -240,6 +250,7 @@ export default {
       var self = this;
       input.onchange = _ => {
         // you can use this method to get file and perform respective operations
+        this.isLoading = true;
         var formdata = new FormData();
         formdata.append("file", input.files[0]);
 
@@ -255,6 +266,7 @@ export default {
             console.log(result);
             self.report_data.thumbnailUrl = result.filename;
             self.thumbnailKey = result.filename;
+            this.isLoading = false;
           })
           .catch(error => console.log('error', error));
         
@@ -274,6 +286,7 @@ export default {
       var self = this;
       input.onchange = async _ => {
         // you can use this method to get file and perform respective operations
+        this.isLoading = true;
         for(let i = 0; i < input.files.length; i++) {
           var formdata = new FormData();
           formdata.append("file", input.files[i]);
@@ -300,6 +313,7 @@ export default {
             // .catch(error => console.log('error', error));
         }
         
+        this.isLoading = false;
         
       };
       input.click();

@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div class="loader-container" v-show="isLoading">
+      <div class="loader"></div>
+    </div>
     <b-row>
       <b-colxx xxs="12">
         <h2>{{$t('menu.app_manage.report')}}</h2>
@@ -145,6 +148,7 @@ export default {
       ko: ko,
       status_text: ["전체공개", "회원공개", "비공개"],
       status_variant: ["primary", "outline-primary", "secondary"],
+      isLoading: false,
       searchForm: {},
       filter: null,
       disabledTo: null,
@@ -214,6 +218,7 @@ export default {
       this.filter = {...this.searchForm};
     },
     dataProvider(ctx) {
+      this.isLoading = true;
       const params = this.apiParamsConverter(ctx);
       let promise = axios.get(apiUrl + "/report", {
         params: params,
@@ -226,6 +231,7 @@ export default {
           // this.perPage = data.per_page;
           this.totalRows = data.total;
           const items = data.data;
+          this.isLoading = false;
           return items;
         })
         .catch((_error) => {
@@ -259,6 +265,7 @@ export default {
       return apiParams;
     },
     onRemoveNotices() {
+      this.isLoading = true;
       
       var myHeaders = new Headers();
       myHeaders.append("Authorization", "Bearer " + localStorage.getItem("token"));
@@ -281,6 +288,7 @@ export default {
           } else {
             self.addNotification("error filled", "여론조사 리포트 삭제", "여론조사 리포트를 삭제하는 중에 오류가 발생했습니다.");
           }
+          this.isLoading = false;
         })
         .catch(error => console.log('error', error));
       })
