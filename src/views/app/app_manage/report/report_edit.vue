@@ -28,7 +28,7 @@
                     display: flex;
                   "
                   alt="이미지"
-                  :key = "thumbnailKey"
+                  :key="thumbnailKey"
                 />
                 <div v-else
                   style="

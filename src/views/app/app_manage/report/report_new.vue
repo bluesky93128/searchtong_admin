@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div class="loader-container" v-show="isLoading">
+      <div class="loader"></div>
+    </div>
     <b-row>
       <b-colxx xxs="12">
         <!-- <h2>배너 상세</h2>
@@ -25,7 +28,7 @@
                     display: flex;
                   "
                   alt="이미지"
-                  :key = "thumbnailKey"
+                  :key="thumbnailKey"
                 />
                 <div v-else
                   style="
@@ -128,6 +131,7 @@ export default {
   data() {
     return {
       downloadUrl: downloadUrl,
+      isLoading: false,
       report_data: {
         title: "",
         content: '',
@@ -183,15 +187,19 @@ export default {
         redirect: 'follow'
       };
 
+      this.isLoading = true;
+
       fetch(apiUrl + "/report", requestOptions)
         .then(response => response.json())
         .then(result => {
           this.addNotification("success filled", "여론조사 리포트 등록", "여론조사 리포트가 성공적으로 등록되었습니다.");
           this.$router.go(-1);
+          this.isLoading = false;
         })
         .catch(error => {
           console.log('error', error)
           this.addNotification("error filled", "여론조사 리포트 등록", "여론조사 리포트가 실패하였습니다.");
+          this.isLoading = false;
         });
     },
     onClickSelectFile() {
@@ -210,12 +218,15 @@ export default {
           redirect: 'follow'
         };
 
+        this.isLoading = true;
+
         fetch(apiUrl + "/upload", requestOptions)
           .then(response => response.json())
           .then(result => {
             console.log(result);
             self.report_data.thumbnailUrl = result.filename;
             self.thumbnailKey = result.filename;
+            this.isLoading = false;
           })
           .catch(error => console.log('error', error));
         
@@ -229,12 +240,13 @@ export default {
 
     onUploadFiles() {
       let input = document.createElement('input');
-      input.accept=".jpg, .jpeg, .png";
+      // input.accept=".pdf";
       input.type = 'file';
       input.multiple = 'multiple';
       var self = this;
       input.onchange = async _ => {
         // you can use this method to get file and perform respective operations
+        this.isLoading = true;
         for(let i = 0; i < input.files.length; i++) {
           var formdata = new FormData();
           formdata.append("file", input.files[i]);
@@ -261,7 +273,7 @@ export default {
             // .catch(error => console.log('error', error));
         }
         
-        
+        this.isLoading = false;
       };
       input.click();
     },
