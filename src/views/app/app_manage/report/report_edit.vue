@@ -280,7 +280,7 @@ export default {
 
     onUploadFiles() {
       let input = document.createElement('input');
-      input.accept=".jpg, .jpeg, .png";
+      // input.accept=".jpg, .jpeg, .png";
       input.type = 'file';
       input.multiple = 'multiple';
       var self = this;
