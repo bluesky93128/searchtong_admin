@@ -108,7 +108,7 @@
             size="sm"
             align="center"
             :total-rows="totalRows"
-            per-page="5"
+            :per-page="perPage"
             v-model="currentPage"
           >
             <template v-slot:next-text>
@@ -228,7 +228,7 @@ export default {
         .then((result) => result.data)
         .then((data) => {
           this.currentPage = data.current_page;
-          // this.perPage = data.per_page;
+          this.perPage = data.per_page;
           this.totalRows = data.total;
           const items = data.data;
           this.isLoading = false;
