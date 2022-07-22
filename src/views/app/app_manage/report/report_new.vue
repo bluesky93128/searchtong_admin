@@ -72,13 +72,13 @@
               <b-form-input v-model="report_data.title" />
             </b-form-group>
             <b-form-group label-cols="2" content-cols="8" label="본문">
-              <!-- <quill-editor
+              <quill-editor
                 ref="myTextEditor"
                 v-model="report_data.content"
                 :options="editorOption"
               >
-              </quill-editor> -->
-              <b-textarea v-model="report_data.content" />
+              </quill-editor>
+              <!-- <b-textarea v-model="report_data.content" /> -->
             </b-form-group>
             <!-- <b-form-group label-cols="2" content-cols="4" label="메인공지">
               <b-checkbox v-model="report_data.isMain">메인공지</b-checkbox>
